@@ -96,11 +96,13 @@ public class AuthController {
             return "redirect:/login";
         }
 
-        model.addAttribute("nombreUsuario", session.getAttribute("usuarioNombre"));
-        return "inicio";
+        // Redirigir al catálogo de productos
+        return "redirect:/productos";
     }
 
-
+    /**
+     * Dashboard para administradores
+     */
     @GetMapping("/admin/dashboard")
     public String adminDashboard(HttpSession session, Model model) {
         if (session.getAttribute("usuarioId") == null) {
