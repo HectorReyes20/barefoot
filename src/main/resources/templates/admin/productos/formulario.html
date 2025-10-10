@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${esEdicion} ? 'Editar Producto' : 'Nuevo Producto'">Producto - Barefoot Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+        --primary-color: #2c5f2d;
+        --secondary-color: #97bc62;
+        --sidebar-bg: #1a1a2e;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f5f7fa;
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 260px;
+        background: linear-gradient(180deg, var(--sidebar-bg) 0%, #0f3460 100%);
+        padding: 0;
+        z-index: 1000;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    }
+
+    .sidebar-header {
+        padding: 30px 20px;
+        background: rgba(255,255,255,0.1);
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        color: white;
+    }
+
+    .sidebar-menu {
+        list-style: none;
+        padding: 20px 0;
+        margin: 0;
+    }
+
+    .sidebar-menu li a {
+        display: block;
+        padding: 15px 25px;
+        color: rgba(255,255,255,0.8);
+        text-decoration: none;
+        transition: all 0.3s;
+        border-left: 3px solid transparent;
+    }
+
+    .sidebar-menu li a:hover,
+    .sidebar-menu li a.active {
+        background: #16213e;
+        color: white;
+        border-left-color: var(--secondary-color);
+        padding-left: 30px;
+    }
+
+    .main-content {
+        margin-left: 260px;
+        padding: 30px;
+    }
+
+    .top-bar {
+        background: white;
+        padding: 20px 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        margin-bottom: 30px;
+    }
+
+    .top-bar h2 {
+        margin: 0;
+        color: var(--primary-color);
+    }
+
+    .form-card {
+        background: white;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .form-section {
+        margin-bottom: 30px;
+        padding-bottom: 30px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .form-section:last-child {
+        border-bottom: none;
+    }
+
+    .form-section-title {
+        color: var(--primary-color);
+        font-weight: 600;
+        margin-bottom: 20px;
+        font-size: 1.2rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+    }
+
+    .form-control, .form-select {
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 12px;
+        transition: all 0.3s;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(44, 95, 45, 0.1);
+    }
+
+    .btn-guardar {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+
+    .btn-guardar:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(44, 95, 45, 0.3);
+        color: white;
+    }
+
+    .btn-cancelar {
+        background: #6c757d;
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+    }
+
+    .imagen-preview {
+        max-width: 200px;
+        max-height: 200px;
+        border-radius: 10px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        margin-top: 10px;
+    }
+
+    .form-check-input:checked {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+  </style>
+</head>
+<body>
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="sidebar-header">
+    <h3><i class="fas fa-shoe-prints me-2"></i> Barefoot Admin</h3>
+  </div>
+  <ul class="sidebar-menu">
+    <li><a th:href="@{/admin/dashboard}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+    <li><a th:href="@{/admin/productos}" class="active"><i class="fas fa-box"></i> Productos</a></li>
+    <li><a href="#"><i class="fas fa-shopping-cart"></i> Pedidos</a></li>
+    <li><a href="#"><i class="fas fa-users"></i> Clientes</a></li>
+    <li><a href="#"><i class="fas fa-palette"></i> Personalizaciones</a></li>
+    <li><a th:href="@{/logout}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
+  </ul>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <h2>
+      <i class="fas fa-box me-2"></i>
+      <span th:text="${esEdicion} ? 'Editar Producto' : 'Nuevo Producto'">Producto</span>
+    </h2>
+  </div>
+
+  <!-- Form Card -->
+  <div class="form-card">
+    <form th:action="${esEdicion} ? @{/admin/productos/actualizar/{id}(id=${producto.id})} : @{/admin/productos/guardar}"
+          method="post"
+          th:object="${producto}">
+
+      <!-- Información Básica -->
+      <div class="form-section">
+        <h4 class="form-section-title">
+          <i class="fas fa-info-circle me-2"></i> Información Básica
+        </h4>
+
+        <div class="row">
+          <div class="col-md-8">
+            <div class="mb-3">
+              <label for="nombre" class="form-label">
+                <i class="fas fa-tag me-1"></i> Nombre del Producto *
+              </label>
+              <input type="text" class="form-control" id="nombre"
+                     th:field="*{nombre}" placeholder="Ej: Urban Barefoot Negro" required>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="mb-3">
+              <label for="categoria" class="form-label">
+                <i class="fas fa-folder me-1"></i> Categoría *
+              </label>
+              <select class="form-select" id="categoria" th:field="*{categoria}" required>
+                <option value="">Seleccionar...</option>
+                <option value="Casual">Casual</option>
+                <option value="Deportivo">Deportivo</option>
+                <option value="Formal">Formal</option>
+                <option value="Infantil">Infantil</option>
+                <option value="Running">Running</option>
+                <option value="Senderismo">Senderismo</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="descripcion" class="form-label">
+            <i class="fas fa-align-left me-1"></i> Descripción
+          </label>
+          <textarea class="form-control" id="descripcion"
+                    th:field="*{descripcion}" rows="3"
+                    placeholder="Describe las características del producto..."></textarea>
+        </div>
+      </div>
+
+      <!-- Precios y Stock -->
+      <div class="form-section">
+        <h4 class="form-section-title">
+          <i class="fas fa-dollar-sign me-2"></i> Precios y Stock
+        </h4>
+
+        <div class="row">
+          <div class="col-md-4">
+            <div class="mb-3">
+              <label for="precio" class="form-label">
+                <i class="fas fa-money-bill-wave me-1"></i> Precio (S/) *
+              </label>
+              <input type="number" class="form-control" id="precio"
+                     th:field="*{precio}" step="0.01" min="0" placeholder="299.00" required>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="mb-3">
+              <label for="precioDescuento" class="form-label">
+                <i class="fas fa-tag me-1"></i> Precio con Descuento (S/)
+              </label>
+              <input type="number" class="form-control" id="precioDescuento"
+                     th:field="*{precioDescuento}" step="0.01" min="0" placeholder="249.00">
+              <small class="text-muted">Dejar vacío si no hay descuento</small>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="mb-3">
+              <label for="stock" class="form-label">
+                <i class="fas fa-boxes me-1"></i> Stock *
+              </label>
+              <input type="number" class="form-control" id="stock"
+                     th:field="*{stock}" min="0" placeholder="50" required>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Características -->
+      <div class="form-section">
+        <h4 class="form-section-title">
+          <i class="fas fa-list me-2"></i> Características
+        </h4>
+
+        <div class="row">
+          <div class="col-md-4">
+            <div class="mb-3">
+              <label for="talla" class="form-label">
+                <i class="fas fa-ruler me-1"></i> Talla
+              </label>
+              <select class="form-select" id="talla" th:field="*{talla}">
+                <option value="">Seleccionar...</option>
+                <option value="35">35</option>
+                <option value="36">36</option>
+                <option value="37">37</option>
+                <option value="38">38</option>
+                <option value="39">39</option>
+                <option value="40">40</option>
+                <option value="41">41</option>
+                <option value="42">42</option>
+                <option value="43">43</option>
+                <option value="44">44</option>
+                <option value="45">45</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="mb-3">
+              <label for="color" class="form-label">
+                <i class="fas fa-palette me-1"></i> Color
+              </label>
+              <select class="form-select" id="color" th:field="*{color}">
+                <option value="">Seleccionar...</option>
+                <option value="Negro">Negro</option>
+                <option value="Blanco">Blanco</option>
+                <option value="Marrón">Marrón</option>
+                <option value="Beige">Beige</option>
+                <option value="Gris">Gris</option>
+                <option value="Azul">Azul</option>
+                <option value="Verde">Verde</option>
+                <option value="Rojo">Rojo</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="mb-3">
+              <label for="material" class="form-label">
+                <i class="fas fa-layer-group me-1"></i> Material
+              </label>
+              <select class="form-select" id="material" th:field="*{material}">
+                <option value="">Seleccionar...</option>
+                <option value="Cuero">Cuero</option>
+                <option value="Lona">Lona</option>
+                <option value="Sintético">Sintético</option>
+                <option value="Malla">Malla</option>
+                <option value="Gamuza">Gamuza</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Imagen -->
+      <div class="form-section">
+        <h4 class="form-section-title">
+          <i class="fas fa-image me-2"></i> Imagen del Producto
+        </h4>
+
+        <div class="mb-3">
+          <label for="imagenUrl" class="form-label">
+            <i class="fas fa-link me-1"></i> URL de la Imagen
+          </label>
+          <input type="url" class="form-control" id="imagenUrl"
+                 th:field="*{imagenUrl}"
+                 placeholder="https://ejemplo.com/imagen.jpg"
+                 onchange="previewImage(this.value)">
+          <small class="text-muted">Pega la URL de una imagen desde internet</small>
+        </div>
+
+        <div id="imagePreview" th:if="${producto.imagenUrl != null}">
+          <img th:src="${producto.imagenUrl}" class="imagen-preview" alt="Preview">
+        </div>
+      </div>
+
+      <!-- Estado -->
+      <div class="form-section">
+        <h4 class="form-section-title">
+          <i class="fas fa-toggle-on me-2"></i> Estado del Producto
+        </h4>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-check form-switch mb-3">
+              <input class="form-check-input" type="checkbox" id="activo"
+                     th:field="*{activo}">
+              <label class="form-check-label" for="activo">
+                <i class="fas fa-check-circle me-1"></i> Producto Activo
+              </label>
+              <small class="d-block text-muted">El producto será visible en la tienda</small>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="form-check form-switch mb-3">
+              <input class="form-check-input" type="checkbox" id="destacado"
+                     th:field="*{destacado}">
+              <label class="form-check-label" for="destacado">
+                <i class="fas fa-star me-1"></i> Producto Destacado
+              </label>
+              <small class="d-block text-muted">Aparecerá en la sección destacados</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botones -->
+      <div class="d-flex gap-3 justify-content-end">
+        <a th:href="@{/admin/productos}" class="btn btn-cancelar">
+          <i class="fas fa-times me-2"></i> Cancelar
+        </a>
+        <button type="submit" class="btn btn-guardar">
+          <i class="fas fa-save me-2"></i>
+          <span th:text="${esEdicion} ? 'Actualizar Producto' : 'Guardar Producto'">Guardar</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Preview de imagen
+  function previewImage(url) {
+      const previewDiv = document.getElementById('imagePreview');
+
+      if (!previewDiv) {
+          const container = document.createElement('div');
+          container.id = 'imagePreview';
+          document.getElementById('imagenUrl').parentElement.appendChild(container);
+      }
+
+      if (url && url.trim() !== '') {
+          document.getElementById('imagePreview').innerHTML =
+              '<img src="' + url + '" class="imagen-preview" alt="Preview" onerror="this.style.display=\'none\'">';
+      } else {
+          document.getElementById('imagePreview').innerHTML = '';
+      }
+  }
+
+  // Calcular porcentaje de descuento automáticamente
+  document.getElementById('precio').addEventListener('input', calcularDescuento);
+  document.getElementById('precioDescuento').addEventListener('input', calcularDescuento);
+
+  function calcularDescuento() {
+      const precio = parseFloat(document.getElementById('precio').value);
+      const precioDescuento = parseFloat(document.getElementById('precioDescuento').value);
+
+      if (precio && precioDescuento && precioDescuento < precio) {
+          const porcentaje = ((precio - precioDescuento) / precio * 100).toFixed(0);
+          document.getElementById('precioDescuento').nextElementSibling.textContent =
+              'Descuento del ' + porcentaje + '%';
+          document.getElementById('precioDescuento').nextElementSibling.classList.add('text-success');
+      } else {
+          document.getElementById('precioDescuento').nextElementSibling.textContent =
+              'Dejar vacío si no hay descuento';
+          document.getElementById('precioDescuento').nextElementSibling.classList.remove('text-success');
+      }
+  }
+
+  // Validación del formulario
+  document.querySelector('form').addEventListener('submit', function(e) {
+      const precio = parseFloat(document.getElementById('precio').value);
+      const precioDescuento = parseFloat(document.getElementById('precioDescuento').value);
+
+      if (precioDescuento && precioDescuento >= precio) {
+          e.preventDefault();
+          alert('El precio con descuento debe ser menor al precio regular');
+          return false;
+      }
+
+      const stock = parseInt(document.getElementById('stock').value);
+      if (stock < 0) {
+          e.preventDefault();
+          alert('El stock no puede ser negativo');
+          return false;
+      }
+  });
+
+  // Calcular descuento al cargar si ya existe
+  window.addEventListener('load', calcularDescuento);
+</script>
+</body>
+</html>

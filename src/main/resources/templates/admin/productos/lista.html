@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Productos - Barefoot Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c5f2d;
+            --secondary-color: #97bc62;
+            --sidebar-bg: #1a1a2e;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 260px;
+            background: linear-gradient(180deg, var(--sidebar-bg) 0%, #0f3460 100%);
+            padding: 0;
+            z-index: 1000;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-header {
+            padding: 30px 20px;
+            background: rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 20px 0;
+            margin: 0;
+        }
+
+        .sidebar-menu li a {
+            display: block;
+            padding: 15px 25px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-menu li a:hover,
+        .sidebar-menu li a.active {
+            background: #16213e;
+            color: white;
+            border-left-color: var(--secondary-color);
+            padding-left: 30px;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 30px;
+        }
+
+        .top-bar {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .top-bar h2 {
+            margin: 0;
+            color: var(--primary-color);
+        }
+
+        .btn-nuevo {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-nuevo:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(44, 95, 45, 0.3);
+            color: white;
+        }
+
+        .content-card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .table-imagen {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .badge-categoria {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        .btn-accion {
+            padding: 5px 10px;
+            margin: 0 2px;
+            border-radius: 5px;
+            font-size: 0.85rem;
+        }
+
+        .producto-activo {
+            color: #28a745;
+        }
+
+        .producto-inactivo {
+            color: #dc3545;
+        }
+
+        .stats-mini {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-mini {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-mini h4 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .stat-mini p {
+            margin: 5px 0 0 0;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+<!-- Sidebar -->
+<div class="sidebar">
+    <div class="sidebar-header">
+        <h3><i class="fas fa-shoe-prints me-2"></i> Barefoot Admin</h3>
+    </div>
+    <ul class="sidebar-menu">
+        <li><a th:href="@{/admin/dashboard}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a th:href="@{/admin/productos}" class="active"><i class="fas fa-box"></i> Productos</a></li>
+        <li><a href="#"><i class="fas fa-shopping-cart"></i> Pedidos</a></li>
+        <li><a href="#"><i class="fas fa-users"></i> Clientes</a></li>
+        <li><a href="#"><i class="fas fa-palette"></i> Personalizaciones</a></li>
+        <li><a href="#"><i class="fas fa-chart-line"></i> Estadísticas</a></li>
+        <li><a th:href="@{/logout}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
+    </ul>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <h2><i class="fas fa-box me-2"></i> Gestión de Productos</h2>
+        <a th:href="@{/admin/productos/nuevo}" class="btn btn-nuevo">
+            <i class="fas fa-plus me-2"></i> Nuevo Producto
+        </a>
+    </div>
+
+    <!-- Mensajes de feedback -->
+    <div th:if="${mensaje}" th:class="'alert alert-' + ${tipoMensaje}" role="alert">
+        <i class="fas fa-check-circle me-2"></i>
+        <span th:text="${mensaje}"></span>
+    </div>
+
+    <!-- Mini Stats -->
+    <div class="stats-mini">
+        <div class="stat-mini" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <h4 th:text="${productos.size()}">0</h4>
+            <p>Total Productos</p>
+        </div>
+        <div class="stat-mini" style="background: linear-gradient(135deg, #2c5f2d 0%, #97bc62 100%);">
+            <h4 th:text="${#lists.size(#lists.select(productos, p -> p.activo == true))}">0</h4>
+            <p>Activos</p>
+        </div>
+        <div class="stat-mini" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+            <h4 th:text="${#lists.size(#lists.select(productos, p -> p.destacado == true))}">0</h4>
+            <p>Destacados</p>
+        </div>
+        <div class="stat-mini" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+            <h4 th:text="${#lists.size(#lists.select(productos, p -> p.stock < 10))}">0</h4>
+            <p>Stock Bajo</p>
+        </div>
+    </div>
+
+    <!-- Content Card -->
+    <div class="content-card">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th>Imagen</th>
+                    <th>Nombre</th>
+                    <th>Categoría</th>
+                    <th>Precio</th>
+                    <th>Stock</th>
+                    <th>Estado</th>
+                    <th>Destacado</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(productos)}">
+                    <td colspan="8" class="text-center text-muted py-5">
+                        <i class="fas fa-box-open fa-3x mb-3"></i>
+                        <p class="mb-0">No hay productos registrados</p>
+                        <a th:href="@{/admin/productos/nuevo}" class="btn btn-primary mt-3">
+                            <i class="fas fa-plus me-2"></i> Crear primer producto
+                        </a>
+                    </td>
+                </tr>
+                <tr th:each="producto : ${productos}">
+                    <td>
+                        <img th:if="${producto.imagenUrl != null}"
+                             th:src="${producto.imagenUrl}"
+                             class="table-imagen"
+                             alt="Producto">
+                        <div th:if="${producto.imagenUrl == null}"
+                             class="table-imagen bg-secondary d-flex align-items-center justify-content-center">
+                            <i class="fas fa-image text-white"></i>
+                        </div>
+                    </td>
+                    <td>
+                        <strong th:text="${producto.nombre}">Nombre</strong>
+                        <br>
+                        <small class="text-muted" th:text="${producto.descripcion}">Descripción</small>
+                    </td>
+                    <td>
+                        <span class="badge badge-categoria bg-info" th:text="${producto.categoria}">Categoría</span>
+                    </td>
+                    <td>
+                        <strong th:text="'S/ ' + ${producto.precio}">S/ 0.00</strong>
+                        <br>
+                        <small th:if="${producto.tieneDescuento()}"
+                               class="text-success">
+                            <i class="fas fa-tag me-1"></i>
+                            <span th:text="'S/ ' + ${producto.precioDescuento}"></span>
+                            (<span th:text="${producto.porcentajeDescuento} + '%'"></span> OFF)
+                        </small>
+                    </td>
+                    <td>
+                                <span th:class="${producto.stock < 10} ? 'text-danger fw-bold' : ''"
+                                      th:text="${producto.stock}">0</span>
+                        <br>
+                        <small th:if="${producto.stock < 10}" class="text-danger">
+                            <i class="fas fa-exclamation-triangle"></i> Stock bajo
+                        </small>
+                    </td>
+                    <td>
+                        <i th:class="${producto.activo} ? 'fas fa-check-circle producto-activo' : 'fas fa-times-circle producto-inactivo'"></i>
+                        <span th:text="${producto.activo} ? 'Activo' : 'Inactivo'">Estado</span>
+                    </td>
+                    <td>
+                        <button th:onclick="'toggleDestacado(' + ${producto.id} + ')'"
+                                class="btn btn-sm btn-link p-0">
+                            <i th:class="${producto.destacado} ? 'fas fa-star text-warning' : 'far fa-star text-muted'"
+                               style="font-size: 1.2rem;"></i>
+                        </button>
+                    </td>
+                    <td>
+                        <a th:href="@{/admin/productos/detalle/{id}(id=${producto.id})}"
+                           class="btn btn-sm btn-info btn-accion" title="Ver detalle">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a th:href="@{/admin/productos/editar/{id}(id=${producto.id})}"
+                           class="btn btn-sm btn-primary btn-accion" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <button th:onclick="'confirmarEliminar(' + ${producto.id} + ', \'' + ${producto.nombre} + '\')'"
+                                class="btn btn-sm btn-danger btn-accion" title="Eliminar">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function confirmarEliminar(id, nombre) {
+        if (confirm('¿Estás seguro de eliminar el producto "' + nombre + '"?')) {
+            window.location.href = '/admin/productos/eliminar/' + id;
+        }
+    }
+
+    function toggleDestacado(id) {
+        window.location.href = '/admin/productos/destacar/' + id;
+    }
+
+    // Auto-ocultar mensajes después de 5 segundos
+    setTimeout(function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            alert.style.transition = 'opacity 0.5s';
+            alert.style.opacity = '0';
+            setTimeout(() => alert.remove(), 500);
+        });
+    }, 5000);
+</script>
+</body>
+</html>
