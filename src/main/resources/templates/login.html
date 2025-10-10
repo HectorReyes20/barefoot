@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Barefoot Store</title>
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<div class="container">
+    <div class="login-container">
+        <div class="login-left">
+            <h1><i class="fas fa-shoe-prints"></i> Barefoot Store</h1>
+            <p>Calzado personalizado que respeta la forma natural de tus pies. Comodidad, salud y estilo en cada paso.</p>
+            <div class="mt-4">
+                <i class="fas fa-check-circle me-2"></i> Diseños 100% personalizables<br>
+                <i class="fas fa-check-circle me-2 mt-2"></i> Materiales premium<br>
+                <i class="fas fa-check-circle me-2 mt-2"></i> Envío a todo el Perú
+            </div>
+        </div>
+
+        <div class="login-right">
+            <div class="login-header">
+                <h2>Iniciar Sesión</h2>
+                <p class="text-muted">Bienvenido de vuelta</p>
+            </div>
+
+            <div th:if="${error}" class="alert alert-danger" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <span th:text="${error}"></span>
+            </div>
+
+            <form th:action="@{/login}" method="post">
+                <div class="mb-3">
+                    <label for="email" class="form-label">
+                        <i class="fas fa-envelope me-1"></i> Email
+                    </label>
+                    <input type="email" class="form-control" id="email" name="email"
+                           placeholder="tu@email.com" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">
+                        <i class="fas fa-lock me-1"></i> Contraseña
+                    </label>
+                    <input type="password" class="form-control" id="password" name="password"
+                           placeholder="••••••••" required>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="remember">
+                    <label class="form-check-label" for="remember">
+                        Recordarme
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-login">
+                    <i class="fas fa-sign-in-alt me-2"></i> Iniciar Sesión
+                </button>
+            </form>
+
+            <div class="register-link">
+                <p class="mb-0">¿No tienes una cuenta? <a th:href="@{/registro}">Regístrate aquí</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
