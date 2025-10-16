@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Objects;
+import java.util.Collections;
 
 @Controller
 @RequestMapping("/productos")
@@ -32,24 +34,27 @@ public class CatalogoController {
     }
 
     /**
-     * Ver detalle de un producto
-     */
+        cambie unas cosas del la logica ya que no mostraba, por si occuria algun tipo de error para que sea mas facil de identificar     */
     @GetMapping("/{id}")
     public String verDetalleProducto(@PathVariable Long id,
                                      HttpSession session,
                                      Model model) {
         Optional<Producto> producto = productoService.obtenerProductoPorId(id);
 
-        if (producto.isEmpty() || !producto.get().getActivo()) {
+        if (producto.isEmpty() || !Boolean.TRUE.equals(producto.get().getActivo())) {
             return "redirect:/productos";
         }
 
-        // Obtener productos relacionados (misma categoría)
-        List<Producto> productosRelacionados = productoService
-                .buscarPorCategoria(producto.get().getCategoria());
-
-        // Remover el producto actual de la lista
-        productosRelacionados.removeIf(p -> p.getId().equals(id));
+        // Obtener productos relacionados (misma categoría) - proteger contra categoría nula
+        String categoria = producto.get().getCategoria();
+        List<Producto> productosRelacionados;
+        if (categoria == null || categoria.trim().isEmpty()) {
+            productosRelacionados = Collections.emptyList();
+        } else {
+            productosRelacionados = productoService.buscarPorCategoria(categoria);
+            // Remover el producto actual de la lista (comparación null-safe)
+            productosRelacionados.removeIf(p -> Objects.equals(p.getId(), id));
+        }
 
         model.addAttribute("producto", producto.get());
         model.addAttribute("productosRelacionados", productosRelacionados);
@@ -65,6 +70,10 @@ public class CatalogoController {
     public String filtrarPorCategoria(@PathVariable String categoria,
                                       HttpSession session,
                                       Model model) {
+        if (categoria == null || categoria.trim().isEmpty()) {
+            return "redirect:/productos";
+        }
+
         List<Producto> productos = productoService.buscarPorCategoria(categoria);
 
         model.addAttribute("productos", productos);
@@ -78,10 +87,17 @@ public class CatalogoController {
      * Buscar productos
      */
     @GetMapping("/buscar")
-    public String buscarProductos(@RequestParam String query,
+    public String buscarProductos(@RequestParam(name = "query", required = false) String query,
                                   HttpSession session,
                                   Model model) {
-        List<Producto> productos = productoService.buscarPorNombre(query);
+        List<Producto> productos;
+
+        if (query == null || query.trim().isEmpty()) {
+            // Si no viene query, mostramos todos los activos (mejor UX que 400)
+            productos = productoService.obtenerProductosActivos();
+        } else {
+            productos = productoService.buscarPorNombre(query.trim());
+        }
 
         model.addAttribute("productos", productos);
         model.addAttribute("query", query);
