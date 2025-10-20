@@ -1,0 +1,643 @@
+</div>
+</div>
+
+<!-- Paginación -->
+<nav th:if="${totalPages != null && totalPages > 1}" class="mt-5">
+    <ul class="pagination justify-content-center">
+        <!-- Primera página -->
+        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+            <a class="page-link" th:href="@{/productos(page=0, size=${pageSize}, categoria=${categoriaActual}, orden=${ordenActual})}">
+                <i class="fas fa-angle-double-left"></i>
+            </a>
+        </li>
+
+        <!-- Anterior -->
+        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+            <a class="page-link" th:href="@{/productos(page=${currentPage - 1}, size=${pageSize}, categoria=${categoriaActual}, orden=${ordenActual})}">
+                <i class="fas fa-angle-left"></i>
+            </a>
+        </li>
+
+        <!-- Números de página -->
+        <li class="page-item"
+            th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+            th:if="${i >= (currentPage - 2) && i <= (currentPage + 2)}"
+            th:classappend="${i == currentPage} ? 'active'">
+            <a class="page-link" th:href="@{/productos(page=${i}, size=${pageSize}, categoria=${categoriaActual}, orden=${ordenActual})}"
+               th:text="${i + 1}">1</a>
+        </li>
+
+        <!-- Siguiente -->
+        <li class="page-item" th:classappend="${currentPage >= totalPages - 1} ? 'disabled'">
+            <a class="page-link" th:href="@{/productos(page=${currentPage + 1}, size=${pageSize}, categoria=${categoriaActual}, orden=${ordenActual})}">
+                <i class="fas fa-angle-right"></i>
+            </a>
+        </li>
+
+        <!-- Última página -->
+        <li class="page-item" th:classappend="${currentPage >= totalPages - 1} ? 'disabled'">
+            <a class="page-link" th:href="@{/productos(page=${totalPages - 1}, size=${pageSize}, categoria=${categoriaActual}, orden=${ordenActual})}">
+                <i class="fas fa-angle-double-right"></i>
+            </a>
+        </li>
+    </ul>
+</nav>
+</div>
+</div>
+</div><!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo - Barefoot Store</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c5f2d;
+            --secondary-color: #97bc62;
+            --accent-color: #d4a574;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: white !important;
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.9) !important;
+            margin: 0 10px;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover {
+            color: white !important;
+            transform: translateY(-2px);
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, rgba(44, 95, 45, 0.95) 0%, rgba(151, 188, 98, 0.95) 100%),
+                        url('https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=1200') center/cover;
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .hero-section h1 {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .search-bar {
+            max-width: 600px;
+            margin: 30px auto 0;
+        }
+
+        .search-bar input {
+            border-radius: 50px 0 0 50px;
+            border: none;
+            padding: 15px 25px;
+        }
+
+        .search-bar button {
+            border-radius: 0 50px 50px 0;
+            background: var(--accent-color);
+            border: none;
+            padding: 15px 30px;
+            color: white;
+            font-weight: 600;
+        }
+
+        .filters-section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 20px;
+        }
+
+        .filter-title {
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .filter-option {
+            display: block;
+            padding: 8px 0;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .filter-option:hover {
+            color: var(--primary-color);
+            padding-left: 10px;
+        }
+
+        .filter-option.active {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .product-card {
+            background: white;
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .product-image-container {
+            position: relative;
+            overflow: hidden;
+            height: 280px;
+            background: #f8f8f8;
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .product-card:hover img {
+            transform: scale(1.1);
+        }
+
+        .badge-descuento {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #dc3545;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .badge-destacado {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: #ffc107;
+            color: #333;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .product-card .card-body {
+            padding: 25px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card .card-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .product-card .card-text {
+            color: #666;
+            font-size: 0.9rem;
+            flex-grow: 1;
+            margin-bottom: 15px;
+        }
+
+        .product-price {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .product-price-original {
+            font-size: 1.2rem;
+            color: #999;
+            text-decoration: line-through;
+            margin-left: 10px;
+        }
+
+        .product-stock {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .product-stock.low {
+            color: #dc3545;
+            font-weight: 600;
+        }
+
+        .btn-ver-detalle {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s;
+        }
+
+        .btn-ver-detalle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(44, 95, 45, 0.3);
+            color: white;
+        }
+
+        .no-products {
+            text-align: center;
+            padding: 80px 20px;
+            color: #999;
+        }
+
+        .no-products i {
+            font-size: 5rem;
+            margin-bottom: 20px;
+        }
+
+        .breadcrumb {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .results-header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sort-select {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 8px 15px;
+        }
+    </style>
+</head>
+<body>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/productos}">
+            <i class="fas fa-shoe-prints me-2"></i> Barefoot Store
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/productos}">
+                        <i class="fas fa-shopping-bag me-1"></i> Productos
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><i class="fas fa-palette me-1"></i> Personalizar</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><i class="fas fa-shopping-cart me-1"></i> Carrito</a>
+                </li>
+                <li class="nav-item dropdown" th:if="${usuarioNombre != null}">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle me-1"></i> <span th:text="${nombreUsuario}">Usuario</span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Mi Perfil</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-box me-2"></i> Mis Pedidos</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" th:href="@{/logout}"><i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item" th:if="${usuarioNombre == null}">
+                    <a class="nav-link" th:href="@{/login}">
+                        <i class="fas fa-sign-in-alt me-1"></i> Iniciar Sesión
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <h1>
+            <span th:if="${categoriaActual != null}" th:text="${categoriaActual}">Categoría</span>
+            <span th:if="${esDestacados != null && esDestacados}">Productos Destacados</span>
+            <span th:if="${categoriaActual == null && (esDestacados == null || !esDestacados)}">Nuestro Catálogo</span>
+        </h1>
+        <p th:if="${query != null}" th:text="'Resultados para: ' + ${query}">Búsqueda</p>
+        <p th:if="${categoriaActual == null && (esDestacados == null || !esDestacados) && query == null}">
+            Descubre nuestra colección de calzado barefoot
+        </p>
+
+        <!-- Barra de búsqueda -->
+        <div class="search-bar">
+            <form th:action="@{/productos/buscar}" method="get" class="d-flex">
+                <input type="text" name="query" class="form-control"
+                       placeholder="Buscar productos..." th:value="${query}">
+                <button type="submit" class="btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<div class="container mb-5">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/productos}">Inicio</a></li>
+            <li class="breadcrumb-item active" th:if="${categoriaActual != null}" th:text="${categoriaActual}">Categoría</li>
+            <li class="breadcrumb-item active" th:if="${esDestacados != null && esDestacados}">Destacados</li>
+            <li class="breadcrumb-item active" th:if="${query != null}">Búsqueda</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Filtros Sidebar -->
+        <div class="col-lg-3 mb-4">
+            <div class="filters-section">
+                <h5 class="filter-title">
+                    <i class="fas fa-filter me-2"></i> Categorías
+                </h5>
+                <a th:href="@{/productos}" class="filter-option"
+                   th:classappend="${categoriaActual == null ? 'active' : ''}">
+                    <i class="fas fa-th me-2"></i> Todas las categorías
+                </a>
+                <a th:href="@{/productos(categoria='Casual')}" class="filter-option"
+                   th:classappend="${categoriaActual == 'Casual' ? 'active' : ''}">
+                    <i class="fas fa-walking me-2"></i> Casual
+                </a>
+                <a th:href="@{/productos(categoria='Deportivo')}" class="filter-option"
+                   th:classappend="${categoriaActual == 'Deportivo' ? 'active' : ''}">
+                    <i class="fas fa-running me-2"></i> Deportivo
+                </a>
+                <a th:href="@{/productos(categoria='Formal')}" class="filter-option"
+                   th:classappend="${categoriaActual == 'Formal' ? 'active' : ''}">
+                    <i class="fas fa-briefcase me-2"></i> Formal
+                </a>
+                <a th:href="@{/productos(categoria='Running')}" class="filter-option"
+                   th:classappend="${categoriaActual == 'Running' ? 'active' : ''}">
+                    <i class="fas fa-fire me-2"></i> Running
+                </a>
+                <a th:href="@{/productos(categoria='Senderismo')}" class="filter-option"
+                   th:classappend="${categoriaActual == 'Senderismo' ? 'active' : ''}">
+                    <i class="fas fa-mountain me-2"></i> Senderismo
+                </a>
+
+                <hr class="my-4">
+
+                <h5 class="filter-title">
+                    <i class="fas fa-dollar-sign me-2"></i> Precio
+                </h5>
+                <form th:action="@{/productos}" method="get">
+                    <input type="hidden" th:if="${categoriaActual != null}" name="categoria" th:value="${categoriaActual}">
+                    <div class="mb-3">
+                        <label class="form-label" style="font-size: 0.9rem;">Rango de precio</label>
+                        <div class="d-flex gap-2 align-items-center">
+                            <input type="number" name="precioMin" class="form-control form-control-sm"
+                                   placeholder="Min" step="10" min="0">
+                            <span>-</span>
+                            <input type="number" name="precioMax" class="form-control form-control-sm"
+                                   placeholder="Max" step="10" min="0">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-sm w-100"
+                            style="background: var(--primary-color); color: white;">
+                        <i class="fas fa-filter me-1"></i> Aplicar
+                    </button>
+                </form>
+
+                <div class="mt-2">
+                    <a th:href="@{/productos(categoria=${categoriaActual}, precioMax=200)}"
+                       class="filter-option" style="font-size: 0.85rem;">
+                        <i class="fas fa-tag me-2"></i> Hasta S/ 200
+                    </a>
+                    <a th:href="@{/productos(categoria=${categoriaActual}, precioMin=200, precioMax=300)}"
+                       class="filter-option" style="font-size: 0.85rem;">
+                        <i class="fas fa-tag me-2"></i> S/ 200 - S/ 300
+                    </a>
+                    <a th:href="@{/productos(categoria=${categoriaActual}, precioMin=300, precioMax=400)}"
+                       class="filter-option" style="font-size: 0.85rem;">
+                        <i class="fas fa-tag me-2"></i> S/ 300 - S/ 400
+                    </a>
+                    <a th:href="@{/productos(categoria=${categoriaActual}, precioMin=400)}"
+                       class="filter-option" style="font-size: 0.85rem;">
+                        <i class="fas fa-tag me-2"></i> Más de S/ 400
+                    </a>
+                </div>
+
+                <hr class="my-4">
+
+                <h5 class="filter-title">
+                    <i class="fas fa-palette me-2"></i> Color
+                </h5>
+                <a th:href="@{/productos(categoria=${categoriaActual}, color='Negro')}" class="filter-option">
+                    <span style="display: inline-block; width: 20px; height: 20px; background: #000; border-radius: 50%; margin-right: 10px;"></span>
+                    Negro
+                </a>
+                <a th:href="@{/productos(categoria=${categoriaActual}, color='Blanco')}" class="filter-option">
+                    <span style="display: inline-block; width: 20px; height: 20px; background: #fff; border: 1px solid #ddd; border-radius: 50%; margin-right: 10px;"></span>
+                    Blanco
+                </a>
+                <a th:href="@{/productos(categoria=${categoriaActual}, color='Marrón')}" class="filter-option">
+                    <span style="display: inline-block; width: 20px; height: 20px; background: #8B4513; border-radius: 50%; margin-right: 10px;"></span>
+                    Marrón
+                </a>
+                <a th:href="@{/productos(categoria=${categoriaActual}, color='Beige')}" class="filter-option">
+                    <span style="display: inline-block; width: 20px; height: 20px; background: #F5F5DC; border: 1px solid #ddd; border-radius: 50%; margin-right: 10px;"></span>
+                    Beige
+                </a>
+                <a th:href="@{/productos(categoria=${categoriaActual}, color='Gris')}" class="filter-option">
+                    <span style="display: inline-block; width: 20px; height: 20px; background: #808080; border-radius: 50%; margin-right: 10px;"></span>
+                    Gris
+                </a>
+
+                <hr class="my-4">
+
+                <h5 class="filter-title">
+                    <i class="fas fa-star me-2"></i> Especiales
+                </h5>
+                <a th:href="@{/productos/destacados}" class="filter-option"
+                   th:classappend="${esDestacados != null && esDestacados ? 'active' : ''}">
+                    <i class="fas fa-star me-2"></i> Productos destacados
+                </a>
+                <a th:href="@{/productos(precioDescuento='true')}" class="filter-option">
+                    <i class="fas fa-percentage me-2"></i> En oferta
+                </a>
+
+                <hr class="my-4">
+
+                <!-- Botón limpiar filtros -->
+                <a th:href="@{/productos}" class="btn btn-outline-secondary btn-sm w-100">
+                    <i class="fas fa-times me-2"></i> Limpiar filtros
+                </a>
+            </div>
+        </div>
+
+        <!-- Productos Grid -->
+        <div class="col-lg-9">
+            <!-- Results Header -->
+            <div class="results-header">
+                <div>
+                    <strong th:text="${totalItems != null ? totalItems : #lists.size(productos)}">0</strong> productos encontrados
+                    <span th:if="${totalPages != null && totalPages > 1}">
+                            - Página <span th:text="${currentPage + 1}">1</span> de <span th:text="${totalPages}">1</span>
+                        </span>
+                </div>
+                <select class="sort-select" onchange="ordenarProductos(this.value)">
+                    <option value="">Ordenar por</option>
+                    <option value="precio-asc" th:selected="${ordenActual == 'precio-asc'}">Precio: Menor a Mayor</option>
+                    <option value="precio-desc" th:selected="${ordenActual == 'precio-desc'}">Precio: Mayor a Menor</option>
+                    <option value="nombre" th:selected="${ordenActual == 'nombre'}">Nombre A-Z</option>
+                </select>
+            </div>
+
+            <!-- No Products Message -->
+            <div th:if="${#lists.isEmpty(productos)}" class="no-products">
+                <i class="fas fa-box-open"></i>
+                <h3>No se encontraron productos</h3>
+                <p>Intenta con otros filtros o búsqueda</p>
+                <a th:href="@{/productos}" class="btn btn-ver-detalle mt-3" style="max-width: 300px; margin: 0 auto;">
+                    Ver todos los productos
+                </a>
+            </div>
+
+            <!-- Products Grid -->
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4" th:each="producto : ${productos}">
+                    <div class="card product-card">
+                        <div class="product-image-container">
+                            <img th:if="${producto.imagenUrl != null}"
+                                 th:src="${producto.imagenUrl}"
+                                 th:alt="${producto.nombre}">
+                            <div th:if="${producto.imagenUrl == null}"
+                                 class="d-flex align-items-center justify-content-center h-100 bg-light">
+                                <i class="fas fa-image fa-3x text-muted"></i>
+                            </div>
+
+                            <span th:if="${producto.tieneDescuento()}" class="badge-descuento">
+                                    -<span th:text="${producto.porcentajeDescuento}">0</span>%
+                                </span>
+
+                            <span th:if="${producto.destacado}" class="badge-destacado">
+                                    <i class="fas fa-star me-1"></i> Destacado
+                                </span>
+                        </div>
+
+                        <div class="card-body">
+                            <h5 class="card-title" th:text="${producto.nombre}">Nombre del Producto</h5>
+                            <p class="card-text" th:text="${producto.descripcion}">Descripción del producto</p>
+
+                            <div class="product-stock"
+                                 th:classappend="${producto.stock < 10 ? 'low' : ''}">
+                                <i class="fas fa-boxes me-1"></i>
+                                <span th:if="${producto.stock > 10}">Stock disponible</span>
+                                <span th:if="${producto.stock <= 10 && producto.stock > 0}">
+                                        ¡Solo quedan <span th:text="${producto.stock}">0</span>!
+                                    </span>
+                                <span th:if="${producto.stock == 0}" class="text-danger">
+                                        <i class="fas fa-times-circle me-1"></i> Agotado
+                                    </span>
+                            </div>
+
+                            <div class="d-flex align-items-center mb-3">
+                                <span class="product-price" th:text="'S/ ' + ${producto.precioFinal}">S/ 0.00</span>
+                                <span th:if="${producto.tieneDescuento()}"
+                                      class="product-price-original"
+                                      th:text="'S/ ' + ${producto.precio}">S/ 0.00</span>
+                            </div>
+
+                            <a th:href="@{/productos/{id}(id=${producto.id})}"
+                               class="btn btn-ver-detalle">
+                                <i class="fas fa-eye me-2"></i> Ver Detalle
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="bg-dark text-white py-4 mt-5">
+    <div class="container text-center">
+        <p class="mb-0">&copy; 2024 Barefoot Store Perú - Calzado saludable y personalizado</p>
+        <div class="mt-2">
+            <a href="#" class="text-white me-3"><i class="fab fa-facebook"></i></a>
+            <a href="#" class="text-white me-3"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="text-white"><i class="fab fa-whatsapp"></i></a>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script th:inline="javascript">
+    function ordenarProductos(tipo) {
+        if (tipo) {
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.set('orden', tipo);
+            urlParams.set('page', '0'); // Reset a primera página
+            window.location.href = window.location.pathname + '?' + urlParams.toString();
+        }
+    }
+
+    // Mantener parámetros en los enlaces de filtros
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const orden = urlParams.get('orden');
+
+        if (orden) {
+            // Actualizar todos los enlaces de filtros para mantener el orden
+            document.querySelectorAll('.filter-option').forEach(link => {
+                const href = link.getAttribute('href');
+                if (href && !href.includes('orden=')) {
+                    link.setAttribute('href', href + (href.includes('?') ? '&' : '?') + 'orden=' + orden);
+                }
+            });
+        }
+    });
+</script>
+</body>
+</html>
