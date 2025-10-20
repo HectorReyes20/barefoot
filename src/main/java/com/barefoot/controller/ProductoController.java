@@ -30,7 +30,16 @@ public class ProductoController {
         }
 
         List<Producto> productos = productoService.obtenerTodosLosProductos();
+
+        // Calcular estadísticas
+        long productosActivos = productos.stream().filter(Producto::getActivo).count();
+        long productosDestacados = productos.stream().filter(Producto::getDestacado).count();
+        long productosStockBajo = productos.stream().filter(p -> p.getStock() < 10).count();
+
         model.addAttribute("productos", productos);
+        model.addAttribute("productosActivos", productosActivos);
+        model.addAttribute("productosDestacados", productosDestacados);
+        model.addAttribute("productosStockBajo", productosStockBajo);
         model.addAttribute("nombreUsuario", session.getAttribute("usuarioNombre"));
 
         return "admin/productos/lista";
@@ -197,7 +206,7 @@ public class ProductoController {
         return "admin/productos/detalle";
     }
 
-    // Metodo auxiliar para verificar si es admin
+    // Método auxiliar para verificar si es admin
     private boolean esAdmin(HttpSession session) {
         String rol = (String) session.getAttribute("usuarioRol");
         return "ADMIN".equals(rol);
