@@ -1,166 +1,468 @@
- :root {
-            --primary-color: #2c5f2d;
-            --secondary-color: #97bc62;
-            --accent-color: #d4a574;
-        }
+/* ============================= */
+/* 🎨 ==== SISTEMA DE DISEÑO: PALETA DE COLORES (Opción 2: Naranja Vibrante) ==== */
+/* ============================= */
+:root {
+    /** El color principal de tu marca. Un café profundo y elegante. */
+    --color-primary: #4E342E; /* Marrón Chocolate Oscuro */
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f5f5;
-        }
+    /** El color de acento para botones (CTAs) y enlaces. */
+    --color-accent: #F39C12;  /* Naranja Vibrante / Ámbar */
 
-        .navbar {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
+    /** Color para los fondos principales de la página */
+    --color-background: #FBF9F6; /* Un blanco roto / crema muy sutil */
 
-        .navbar-brand {
-            font-weight: bold;
-            font-size: 1.5rem;
-            color: white !important;
-        }
+    /** Color para las superficies (cards, pop-ups) */
+    --color-surface: #FFFFFF;    /* Blanco puro para contraste */
 
-        .nav-link {
-            color: rgba(255,255,255,0.9) !important;
-            margin: 0 10px;
-            transition: all 0.3s;
-        }
+    /** Color de texto principal. Más suave que el negro puro. */
+    --color-text: #3E3E3E;       /* Un gris/marrón muy oscuro */
 
-        .nav-link:hover {
-            color: white !important;
-            transform: translateY(-2px);
-        }
+    /** Color de texto para usar sobre fondos oscuros (ej. el footer) */
+    --color-text-light: #FFFFFF;
 
-        .hero-section {
-            background: linear-gradient(135deg, rgba(44, 95, 45, 0.9) 0%, rgba(151, 188, 98, 0.9) 100%),
-                        url('https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=1200') center/cover;
-            color: white;
-            padding: 100px 0;
-            text-align: center;
-        }
+    /* Variables del Chatbot y Fragmentos (heredarán la nueva paleta) */
+    --primary-color: var(--color-primary);
+    --secondary-color: var(--color-accent);
+    --accent-color: var(--color-accent); /* Asegura que fragments.css también tome el naranja */
+}
 
-        .hero-section h1 {
-            font-size: 3rem;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
+/* 🎨 ==== Estilos Generales ==== */
+body {
+    font-family: 'Poppins', sans-serif;
+    color: var(--color-text);
+    background-color: var(--color-background);
+    margin: 0;
+    padding: 0;
+}
 
-        .hero-section p {
-            font-size: 1.3rem;
-            margin-bottom: 30px;
-        }
+h1, h2, h3, h4, h5 {
+    font-weight: 600;
+    /* El color se hereda del body */
+}
 
-        .btn-custom {
-            background-color: var(--accent-color);
-            color: white;
-            padding: 15px 40px;
-            border-radius: 50px;
-            font-weight: 600;
-            border: none;
-            transition: all 0.3s;
-        }
+a {
+    text-decoration: none;
+    /* Recomendación: añade un color base para enlaces */
+    color: var(--color-primary);
+    transition: color 0.3s ease;
+}
+a:hover {
+    color: var(--color-accent);
+}
 
-        .btn-custom:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(212, 165, 116, 0.4);
-            color: white;
-        }
+/* ============================= */
+/* 🌄 ==== HERO SECTION ==== */
+/* ============================= */
+.hero-section {
+    /* Cambiamos el degradado de verdes por uno elegante de marrón y oro */
+    background: linear-gradient(135deg, rgba(78, 52, 46, 0.9) 0%, rgba(192, 160, 128, 0.8) 100%),
+                url('https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=1200') center/cover;
+    color: var(--color-text-light);
+    text-align: center;
+    padding: 100px 0;
+}
 
-        .features {
-            padding: 80px 0;
-        }
+.hero-section h1 {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
 
-        .feature-card {
-            background: white;
-            border-radius: 15px;
-            padding: 40px;
-            text-align: center;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            transition: all 0.3s;
-            height: 100%;
-        }
+.hero-section p {
+    font-size: 1.3rem;
+    margin-bottom: 30px;
+}
 
-        .feature-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
-        }
+.btn-hero {
+    background-color: var(--color-accent);
+    /* El texto oscuro sobre el fondo dorado tiene mejor legibilidad */
+    color: var(--color-primary);
+    padding: 15px 40px;
+    border-radius: 50px;
+    font-weight: 600;
+    border: none;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
 
-        .feature-card i {
-            font-size: 3rem;
-            color: var(--primary-color);
-            margin-bottom: 20px;
-        }
+.btn-hero:hover {
+    background-color: #AE8C6D; /* Un tono de oro más oscuro para el hover */
+    transform: scale(1.05);
+}
 
-        .feature-card h3 {
-            color: var(--primary-color);
-            margin-bottom: 15px;
-        }
+/* ============================= */
+/* 💬 ==== BIENVENIDA ==== */
+/* ============================= */
+.welcome-box {
+    background: var(--color-surface);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07); /* Sombra más sutil */
+    margin: -50px auto 50px;
+    max-width: 800px;
+    position: relative;
+    z-index: 10;
+}
 
-        .products-section {
-            padding: 80px 0;
-            background-color: white;
-        }
+.icon-highlight {
+    color: var(--color-accent);
+}
 
-        .product-card {
-            border: none;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            transition: all 0.3s;
-        }
+/* ============================= */
+/* 🌿 ==== FEATURES ==== */
+/* ============================= */
+.features {
+    padding: 80px 0;
+}
 
-        .product-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-        }
+.features .section-title h2 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--color-primary);
+}
 
-        .product-card img {
-            height: 250px;
-            object-fit: cover;
-        }
+.feature-card {
+    background: var(--color-surface);
+    border-radius: 15px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05); /* Sombra más sutil */
+    transition: all 0.3s ease;
+    height: 100%;
+}
 
-        .product-card .card-body {
-            padding: 25px;
-        }
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
 
-        .product-price {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--primary-color);
-        }
+.feature-icon {
+    font-size: 3rem;
+    color: var(--color-primary);
+    margin-bottom: 20px;
+}
 
-        .btn-add-cart {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 50px;
-            transition: all 0.3s;
-        }
+.feature-card h3 {
+    color: var(--color-primary);
+    margin-bottom: 15px;
+}
 
-        .btn-add-cart:hover {
-            background-color: var(--secondary-color);
-            transform: scale(1.05);
-        }
+/* ============================= */
+/* 👟 ==== PRODUCTOS ==== */
+/* ============================= */
+.products-section {
+    padding: 80px 0;
+    /* El fondo de la sección ahora es el crema, las cards serán blancas */
+    background-color: var(--color-background);
+}
 
-        .user-welcome {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin: -50px auto 50px;
-            max-width: 800px;
-            position: relative;
-            z-index: 10;
-        }
+.products-section .section-title h2 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--color-primary);
+}
 
-        .section-title {
-            text-align: center;
-            margin-bottom: 50px;
-        }
+.product-card {
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+    background: var(--color-surface); /* Aseguramos que la card sea blanca */
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
 
-        .section-title h2 {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: var(--primary-color);
-        }
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.product-card img {
+    height: 250px;
+    object-fit: cover;
+}
+
+.product-card .card-body {
+    padding: 25px;
+}
+
+.price {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--color-primary);
+}
+
+.btn-add {
+    background-color: var(--color-primary);
+    color: var(--color-text-light);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+}
+
+.btn-add:hover {
+    background-color: #3E2723; /* Marrón más oscuro para hover */
+    transform: scale(1.05);
+}
+
+/* ============================= */
+/* 🦶 ==== FOOTER ==== */
+/* ============================= */
+footer {
+    background-color: var(--color-primary);
+    color: var(--color-text-light);
+    text-align: center;
+    padding: 40px 0;
+}
+
+footer a {
+    color: var(--color-accent);
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+/* ============================================
+   CHATBOT
+   ============================================ */
+/* ¡BUENAS NOTICIAS!
+   Tu CSS del chatbot ya usaba variables (--primary-color y --secondary-color).
+   Al definir estas variables en el :root (al inicio del CSS),
+   el chatbot adoptará AUTOMÁTICAMENTE tu nueva paleta marrón y dorada
+   sin necesidad de cambiar una sola línea aquí.
+*/
+.chatbot-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.chatbot-button {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chatbot-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+}
+
+.chatbot-window {
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    width: 350px;
+    height: 500px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 40px rgba(0,0,0,0.16);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.chatbot-window.active {
+    display: flex;
+}
+
+.chatbot-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chatbot-header h5 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.chatbot-header small {
+    display: block;
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+.chatbot-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.3s;
+}
+
+.chatbot-close:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+.chatbot-messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: var(--color-background); /* Usamos nuestro fondo general */
+}
+
+.chatbot-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chatbot-messages::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+
+.message {
+    margin-bottom: 15px;
+    display: flex;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.message.bot {
+    justify-content: flex-start;
+}
+
+.message.user {
+    justify-content: flex-end;
+}
+
+.message-content {
+    max-width: 75%;
+    padding: 10px 15px;
+    border-radius: 18px;
+    font-size: 14px;
+    line-height: 1.5;
+    word-wrap: break-word;
+    white-space: pre-line;
+}
+
+.message.bot .message-content {
+    background: var(--color-surface); /* Blanco */
+    color: var(--color-text); /* Texto oscuro */
+    border-bottom-left-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.message.user .message-content {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    border-bottom-right-radius: 5px;
+}
+
+.chatbot-input {
+    padding: 15px;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    gap: 10px;
+    background: var(--color-surface);
+}
+
+.chatbot-input input {
+    flex: 1;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    padding: 10px 15px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s;
+    background: var(--color-background); /* Fondo de input sutil */
+    color: var(--color-text);
+}
+
+.chatbot-input input:focus {
+    border-color: var(--primary-color);
+}
+
+.chatbot-input button {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+    font-size: 16px;
+}
+
+.chatbot-input button:hover {
+    transform: scale(1.1);
+}
+
+.chatbot-input button:active {
+    transform: scale(0.95);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+    .chatbot-window {
+        width: calc(100% - 40px);
+        height: 70vh;
+        right: 20px;
+        left: 20px;
+    }
+
+    .chatbot-container {
+        right: 20px;
+    }
+
+    .hero-section h1 {
+        font-size: 2rem;
+    }
+
+    .hero-section p {
+        font-size: 1.1rem;
+    }
+}
