@@ -15,19 +15,26 @@ public class AuthController {
     @Autowired
     private UsuarioService usuarioService;
 
-
+    /**
+     * Muestra la página de login
+     */
     @GetMapping("/login")
     public String mostrarLogin() {
         return "login";
     }
 
+    /**
+     * Muestra la página de registro
+     */
     @GetMapping("/registro")
     public String mostrarRegistro(Model model) {
         model.addAttribute("usuario", new Usuario());
         return "registro";
     }
 
-
+    /**
+     * Procesa el login
+     */
     @PostMapping("/login")
     public String procesarLogin(
             @RequestParam String email,
@@ -58,7 +65,9 @@ public class AuthController {
         }
     }
 
-
+    /**
+     * Procesa el registro
+     */
     @PostMapping("/registro")
     public String procesarRegistro(
             @ModelAttribute Usuario usuario,
@@ -82,14 +91,18 @@ public class AuthController {
         }
     }
 
-
+    /**
+     * Cierra la sesión
+     */
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate();
         return "redirect:/login";
     }
 
-
+    /**
+     * Página de inicio para usuarios
+     */
     @GetMapping("/inicio")
     public String inicio(HttpSession session, Model model) {
         if (session.getAttribute("usuarioId") == null) {
@@ -97,7 +110,7 @@ public class AuthController {
         }
 
         // Redirigir al catálogo de productos
-        return "redirect:/productos";
+        return "inicio";
     }
 
     /**
