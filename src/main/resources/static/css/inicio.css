@@ -1,166 +1,420 @@
- :root {
-            --primary-color: #2c5f2d;
-            --secondary-color: #97bc62;
-            --accent-color: #d4a574;
-        }
+/* ============================================
+   INICIO.CSS - Barefoot Store
+   ============================================ */
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f5f5;
-        }
+:root {
+    --primary-color: #2c5f2d;
+    --secondary-color: #97bc62;
+    --accent-color: #d4a574;
+}
 
-        .navbar {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f5f5;
+}
 
-        .navbar-brand {
-            font-weight: bold;
-            font-size: 1.5rem;
-            color: white !important;
-        }
+/* ============================================
+   NAVBAR
+   ============================================ */
+.navbar {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
 
-        .nav-link {
-            color: rgba(255,255,255,0.9) !important;
-            margin: 0 10px;
-            transition: all 0.3s;
-        }
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: white !important;
+}
 
-        .nav-link:hover {
-            color: white !important;
-            transform: translateY(-2px);
-        }
+.nav-link {
+    color: rgba(255,255,255,0.9) !important;
+    margin: 0 10px;
+    transition: all 0.3s;
+}
 
-        .hero-section {
-            background: linear-gradient(135deg, rgba(44, 95, 45, 0.9) 0%, rgba(151, 188, 98, 0.9) 100%),
-                        url('https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=1200') center/cover;
-            color: white;
-            padding: 100px 0;
-            text-align: center;
-        }
+.nav-link:hover {
+    color: white !important;
+    transform: translateY(-2px);
+}
 
-        .hero-section h1 {
-            font-size: 3rem;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
+/* ============================================
+   HERO SECTION
+   ============================================ */
+.hero-section {
+    background: linear-gradient(135deg, rgba(44, 95, 45, 0.9) 0%, rgba(151, 188, 98, 0.9) 100%),
+                url('https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=1200') center/cover;
+    color: white;
+    padding: 100px 0;
+    text-align: center;
+}
 
-        .hero-section p {
-            font-size: 1.3rem;
-            margin-bottom: 30px;
-        }
+.hero-section h1 {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
 
-        .btn-custom {
-            background-color: var(--accent-color);
-            color: white;
-            padding: 15px 40px;
-            border-radius: 50px;
-            font-weight: 600;
-            border: none;
-            transition: all 0.3s;
-        }
+.hero-section p {
+    font-size: 1.3rem;
+    margin-bottom: 30px;
+}
 
-        .btn-custom:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(212, 165, 116, 0.4);
-            color: white;
-        }
+.btn-custom {
+    background-color: var(--accent-color);
+    color: white;
+    padding: 15px 40px;
+    border-radius: 50px;
+    font-weight: 600;
+    border: none;
+    transition: all 0.3s;
+}
 
-        .features {
-            padding: 80px 0;
-        }
+.btn-custom:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(212, 165, 116, 0.4);
+    color: white;
+}
 
-        .feature-card {
-            background: white;
-            border-radius: 15px;
-            padding: 40px;
-            text-align: center;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            transition: all 0.3s;
-            height: 100%;
-        }
+/* ============================================
+   USER WELCOME
+   ============================================ */
+.user-welcome {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin: -50px auto 50px;
+    max-width: 800px;
+    position: relative;
+    z-index: 10;
+}
 
-        .feature-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
-        }
+/* ============================================
+   FEATURES SECTION
+   ============================================ */
+.features {
+    padding: 80px 0;
+}
 
-        .feature-card i {
-            font-size: 3rem;
-            color: var(--primary-color);
-            margin-bottom: 20px;
-        }
+.section-title {
+    text-align: center;
+    margin-bottom: 50px;
+}
 
-        .feature-card h3 {
-            color: var(--primary-color);
-            margin-bottom: 15px;
-        }
+.section-title h2 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--primary-color);
+}
 
-        .products-section {
-            padding: 80px 0;
-            background-color: white;
-        }
+.feature-card {
+    background: white;
+    border-radius: 15px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    transition: all 0.3s;
+    height: 100%;
+}
 
-        .product-card {
-            border: none;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            transition: all 0.3s;
-        }
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+}
 
-        .product-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-        }
+.feature-card i {
+    font-size: 3rem;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+}
 
-        .product-card img {
-            height: 250px;
-            object-fit: cover;
-        }
+.feature-card h3 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
 
-        .product-card .card-body {
-            padding: 25px;
-        }
+/* ============================================
+   PRODUCTS SECTION
+   ============================================ */
+.products-section {
+    padding: 80px 0;
+    background-color: white;
+}
 
-        .product-price {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--primary-color);
-        }
+.product-card {
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    transition: all 0.3s;
+}
 
-        .btn-add-cart {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 50px;
-            transition: all 0.3s;
-        }
+.product-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+}
 
-        .btn-add-cart:hover {
-            background-color: var(--secondary-color);
-            transform: scale(1.05);
-        }
+.product-card img {
+    height: 250px;
+    object-fit: cover;
+}
 
-        .user-welcome {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin: -50px auto 50px;
-            max-width: 800px;
-            position: relative;
-            z-index: 10;
-        }
+.product-card .card-body {
+    padding: 25px;
+}
 
-        .section-title {
-            text-align: center;
-            margin-bottom: 50px;
-        }
+.product-price {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary-color);
+}
 
-        .section-title h2 {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: var(--primary-color);
-        }
+.btn-add-cart {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 50px;
+    transition: all 0.3s;
+}
+
+.btn-add-cart:hover {
+    background-color: var(--secondary-color);
+    transform: scale(1.05);
+}
+
+/* ============================================
+   CHATBOT
+   ============================================ */
+.chatbot-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.chatbot-button {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chatbot-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+}
+
+.chatbot-window {
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    width: 350px;
+    height: 500px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 40px rgba(0,0,0,0.16);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.chatbot-window.active {
+    display: flex;
+}
+
+.chatbot-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chatbot-header h5 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.chatbot-header small {
+    display: block;
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+.chatbot-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.3s;
+}
+
+.chatbot-close:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+.chatbot-messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: #f8f9fa;
+}
+
+.chatbot-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chatbot-messages::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+
+.message {
+    margin-bottom: 15px;
+    display: flex;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.message.bot {
+    justify-content: flex-start;
+}
+
+.message.user {
+    justify-content: flex-end;
+}
+
+.message-content {
+    max-width: 75%;
+    padding: 10px 15px;
+    border-radius: 18px;
+    font-size: 14px;
+    line-height: 1.5;
+    word-wrap: break-word;
+    white-space: pre-line;
+}
+
+.message.bot .message-content {
+    background: white;
+    color: #333;
+    border-bottom-left-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.message.user .message-content {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    border-bottom-right-radius: 5px;
+}
+
+.chatbot-input {
+    padding: 15px;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    gap: 10px;
+    background: white;
+}
+
+.chatbot-input input {
+    flex: 1;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    padding: 10px 15px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.chatbot-input input:focus {
+    border-color: var(--primary-color);
+}
+
+.chatbot-input button {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+    font-size: 16px;
+}
+
+.chatbot-input button:hover {
+    transform: scale(1.1);
+}
+
+.chatbot-input button:active {
+    transform: scale(0.95);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+    .chatbot-window {
+        width: calc(100% - 40px);
+        height: 70vh;
+        right: 20px;
+        left: 20px;
+    }
+
+    .chatbot-container {
+        right: 20px;
+    }
+
+    .hero-section h1 {
+        font-size: 2rem;
+    }
+
+    .hero-section p {
+        font-size: 1.1rem;
+    }
+}
