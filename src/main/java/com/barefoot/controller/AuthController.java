@@ -61,11 +61,23 @@ public class AuthController {
 
     @PostMapping("/registro")
     public String procesarRegistro(
-            @ModelAttribute Usuario usuario,
+            @RequestParam String nombre,
+            @RequestParam String apellido,
+            @RequestParam String email,
+            @RequestParam(required = false) String telefono,
+            @RequestParam String password,
             Model model,
             HttpSession session) {
 
         try {
+            // Crear objeto usuario
+            Usuario usuario = new Usuario();
+            usuario.setNombre(nombre);
+            usuario.setApellido(apellido);
+            usuario.setEmail(email);
+            usuario.setTelefono(telefono);
+            usuario.setPassword(password);
+
             Usuario nuevoUsuario = usuarioService.registrarUsuario(usuario);
 
             // Iniciar sesión automáticamente después del registro
@@ -96,8 +108,9 @@ public class AuthController {
             return "redirect:/login";
         }
 
-        // Redirigir al catálogo de productos
-        return "redirect:/productos";
+        model.addAttribute("nombreUsuario", session.getAttribute("usuarioNombre"));
+        // CAMBIO: Ahora retorna directamente la vista "inicio"
+        return "inicio";
     }
 
     /**
