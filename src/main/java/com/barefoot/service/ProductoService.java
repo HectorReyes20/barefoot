@@ -3,6 +3,10 @@ package com.barefoot.service;
 import com.barefoot.model.Producto;
 import com.barefoot.repository.ProductoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -225,5 +229,44 @@ public class ProductoService {
     public List<Producto> buscarConFiltros(String categoria, Double precioMin,
                                            Double precioMax, String color) {
         return productoRepository.buscarConFiltros(categoria, precioMin, precioMax, color);
+    }
+
+    /**
+     * Obtener productos con paginación
+     */
+    public Page<Producto> obtenerProductosConPaginacion(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("fechaCreacion").descending());
+        return productoRepository.findAll(pageable);
+    }
+
+    /**
+     * Obtener productos activos con paginación
+     */
+    public Page<Producto> obtenerProductosActivosConPaginacion(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("fechaCreacion").descending());
+        return productoRepository.findByActivoTrue(pageable);
+    }
+
+    /**
+     * Obtener productos por categoría con paginación
+     */
+    public Page<Producto> obtenerProductosPorCategoriaConPaginacion(String categoria, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return productoRepository.findByCategoriaAndActivoTrue(categoria, pageable);
+    }
+
+    /**
+     * Buscar productos con paginación y ordenamiento
+     */
+    public Page<Producto> buscarProductosConPaginacion(String query, int page, int size, String sortBy, String direction) {
+        Sort sort = direction.equalsIgnoreCase("desc") ?
+                Sort.by(sortBy).descending() :
+                Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        if (query != null && !query.trim().isEmpty()) {
+            return productoRepository.findByNombreContainingIgnoreCaseAndActivoTrue(query, pageable);
+        }
+        return productoRepository.findByActivoTrue(pageable);
     }
 }

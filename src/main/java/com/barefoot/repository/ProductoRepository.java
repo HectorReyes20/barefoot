@@ -1,5 +1,7 @@
 package com.barefoot.repository;
 import com.barefoot.model.Producto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,15 +13,18 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
 
     // Buscar productos activos
     List<Producto> findByActivoTrue();
+    Page<Producto> findByActivoTrue(Pageable pageable);
 
     // Buscar por categoría
     List<Producto> findByCategoriaAndActivoTrue(String categoria);
+    Page<Producto> findByCategoriaAndActivoTrue(String categoria, Pageable pageable);
 
     // Buscar productos destacados
     List<Producto> findByDestacadoTrueAndActivoTrue();
 
     // Buscar por nombre (búsqueda parcial, insensible a mayúsculas)
     List<Producto> findByNombreContainingIgnoreCaseAndActivoTrue(String nombre);
+    Page<Producto> findByNombreContainingIgnoreCaseAndActivoTrue(String nombre, Pageable pageable);
 
     // Buscar por rango de precio
     List<Producto> findByPrecioBetweenAndActivoTrue(Double precioMin, Double precioMax);
