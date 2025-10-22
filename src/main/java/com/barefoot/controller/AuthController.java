@@ -110,7 +110,7 @@ public class AuthController {
         }
 
         // Redirigir al catálogo de productos
-        return "redirect:/productos";
+        return "inicio";
     }
 
     /**

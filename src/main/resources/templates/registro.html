@@ -1,13 +1,86 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro - Barefoot Store</title>
-    <link rel="stylesheet" th:href="@{/css/registro.css}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
+<head th:replace="~{fragments :: head('Registro - Barefoot Store')}"></head>
+<style>
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 40px 0;
+    }
+
+    .register-container {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        overflow: hidden;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .register-header {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        color: white;
+        padding: 40px;
+        text-align: center;
+    }
+
+    .register-header h1 {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .register-body {
+        padding: 40px;
+    }
+
+    .form-control {
+        padding: 12px 15px;
+        border-radius: 10px;
+        border: 2px solid #e0e0e0;
+        transition: all 0.3s;
+    }
+
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(44, 95, 45, 0.1);
+    }
+
+    .btn-register {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        color: white;
+        padding: 12px;
+        border-radius: 10px;
+        border: none;
+        font-weight: 600;
+        width: 100%;
+        transition: transform 0.3s;
+    }
+
+    .btn-register:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(44, 95, 45, 0.3);
+    }
+
+    .login-link {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .login-link a {
+        color: var(--primary-color);
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .login-link a:hover {
+        text-decoration: underline;
+    }
+
+    .alert {
+        border-radius: 10px;
+    }
+</style>
 <body>
 <div class="container">
     <div class="register-container">
@@ -26,15 +99,15 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="nombre" class="form-label">
-                            <i class="fas fa-user me-1"></i> Nombre
+                            <i class="fas fa-user me-1"></i> Nombre *
                         </label>
                         <input type="text" class="form-control" id="nombre"
-                               th:field="*{nombre}" placeholder="Juan" required>
+                               th:field="*{nombre}" placeholder="Juan" required autofocus>
                     </div>
 
                     <div class="col-md-6 mb-3">
                         <label for="apellido" class="form-label">
-                            <i class="fas fa-user me-1"></i> Apellido
+                            <i class="fas fa-user me-1"></i> Apellido *
                         </label>
                         <input type="text" class="form-control" id="apellido"
                                th:field="*{apellido}" placeholder="Pérez" required>
@@ -43,7 +116,7 @@
 
                 <div class="mb-3">
                     <label for="email" class="form-label">
-                        <i class="fas fa-envelope me-1"></i> Email
+                        <i class="fas fa-envelope me-1"></i> Email *
                     </label>
                     <input type="email" class="form-control" id="email"
                            th:field="*{email}" placeholder="tu@email.com" required>
@@ -51,15 +124,16 @@
 
                 <div class="mb-3">
                     <label for="telefono" class="form-label">
-                        <i class="fas fa-phone me-1"></i> Teléfono (opcional)
+                        <i class="fas fa-phone me-1"></i> Teléfono
                     </label>
                     <input type="tel" class="form-control" id="telefono"
                            th:field="*{telefono}" placeholder="+51 999 999 999">
+                    <small class="text-muted">Opcional</small>
                 </div>
 
                 <div class="mb-3">
                     <label for="password" class="form-label">
-                        <i class="fas fa-lock me-1"></i> Contraseña
+                        <i class="fas fa-lock me-1"></i> Contraseña *
                     </label>
                     <input type="password" class="form-control" id="password"
                            th:field="*{password}" placeholder="••••••••"
@@ -69,7 +143,7 @@
 
                 <div class="mb-3">
                     <label for="confirmPassword" class="form-label">
-                        <i class="fas fa-lock me-1"></i> Confirmar Contraseña
+                        <i class="fas fa-lock me-1"></i> Confirmar Contraseña *
                     </label>
                     <input type="password" class="form-control" id="confirmPassword"
                            placeholder="••••••••" required>
@@ -94,7 +168,8 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<div th:replace="~{fragments :: scripts}"></div>
+
 <script>
     // Validar que las contraseñas coincidan
     document.querySelector('form').addEventListener('submit', function(e) {
@@ -104,6 +179,31 @@
         if (password !== confirmPassword) {
             e.preventDefault();
             alert('Las contraseñas no coinciden');
+            document.getElementById('confirmPassword').focus();
+        }
+    });
+
+    // Mostrar fortaleza de contraseña
+    document.getElementById('password').addEventListener('input', function() {
+        const password = this.value;
+        let strength = 0;
+
+        if (password.length >= 6) strength++;
+        if (password.length >= 10) strength++;
+        if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+        if (/\d/.test(password)) strength++;
+        if (/[^a-zA-Z\d]/.test(password)) strength++;
+
+        const small = this.nextElementSibling;
+        if (strength < 2) {
+            small.textContent = 'Contraseña débil';
+            small.className = 'text-danger small';
+        } else if (strength < 4) {
+            small.textContent = 'Contraseña media';
+            small.className = 'text-warning small';
+        } else {
+            small.textContent = 'Contraseña fuerte';
+            small.className = 'text-success small';
         }
     });
 </script>
