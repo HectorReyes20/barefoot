@@ -1,73 +1,39 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inicio - Barefoot Store</title>
-    <link rel="stylesheet" th:href="@{/css/inicio.css}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
+<head th:replace="~{fragments :: head('Inicio - Barefoot Store')}"></head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark">
-    <div class="container">
-        <a class="navbar-brand" href="#">
-            <i class="fas fa-shoe-prints me-2"></i> Barefoot Store
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link active" href="#"><i class="fas fa-home me-1"></i> Inicio</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#"><i class="fas fa-shopping-bag me-1"></i> Productos</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#"><i class="fas fa-palette me-1"></i> Personalizar</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#"><i class="fas fa-shopping-cart me-1"></i> Carrito</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-user-circle me-1"></i> <span th:text="${nombreUsuario}">Usuario</span>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Mi Perfil</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-box me-2"></i> Mis Pedidos</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" th:href="@{/logout}"><i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
+
+<!-- Navbar -->
+<nav th:replace="~{fragments :: navbar}"></nav>
 
 <!-- Hero Section -->
-<section class="hero-section">
+<section class="hero-section" style="background: linear-gradient(135deg, rgba(44, 95, 45, 0.9) 0%, rgba(151, 188, 98, 0.9) 100%), url('https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=1200') center/cover; color: white; padding: 100px 0; text-align: center;">
     <div class="container">
-        <h1>Bienvenido, <span th:text="${nombreUsuario}">Usuario</span>!</h1>
-        <p>Descubre el calzado barefoot que transformará tu forma de caminar</p>
-        <a href="#productos" class="btn btn-custom">
+        <h1 style="font-size: 3rem; font-weight: bold; margin-bottom: 20px;">
+            Bienvenido<span th:if="${session.usuarioNombre != null}">, <span th:text="${session.usuarioNombre}">Usuario</span></span>!
+        </h1>
+        <p style="font-size: 1.3rem; margin-bottom: 30px;">
+            Descubre el calzado barefoot que transformará tu forma de caminar
+        </p>
+        <a href="#productos" class="btn" style="background-color: #d4a574; color: white; padding: 15px 40px; border-radius: 50px; font-weight: 600; border: none; transition: all 0.3s; text-decoration: none; display: inline-block;">
             <i class="fas fa-palette me-2"></i> Personaliza tu calzado
         </a>
     </div>
 </section>
 
-<!-- Welcome Message -->
-<div class="container">
-    <div class="user-welcome">
+<!-- Welcome Message (solo si está logueado) -->
+<div class="container" th:if="${session.usuarioId != null}">
+    <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin: -50px auto 50px; max-width: 800px; position: relative; z-index: 10;">
         <div class="row align-items-center">
             <div class="col-md-8">
-                <h4 class="mb-2"><i class="fas fa-sparkles me-2" style="color: var(--accent-color);"></i> ¡Estamos felices de tenerte aquí!</h4>
+                <h4 class="mb-2">
+                    <i class="fas fa-sparkles me-2" style="color: #d4a574;"></i>
+                    ¡Estamos felices de tenerte aquí!
+                </h4>
                 <p class="mb-0 text-muted">Explora nuestra colección de calzado barefoot diseñado para la salud de tus pies</p>
             </div>
             <div class="col-md-4 text-end">
-                <a href="#" class="btn btn-outline-success">
+                <a href="#productos" class="btn btn-outline-success">
                     <i class="fas fa-gift me-2"></i> Ver ofertas
                 </a>
             </div>
@@ -76,31 +42,31 @@
 </div>
 
 <!-- Features Section -->
-<section class="features">
+<section class="features" style="padding: 80px 0;">
     <div class="container">
-        <div class="section-title">
-            <h2>¿Por qué elegir Barefoot?</h2>
+        <div class="section-title text-center mb-5">
+            <h2 style="font-size: 2.5rem; font-weight: bold; color: #2c5f2d;">¿Por qué elegir Barefoot?</h2>
             <p class="text-muted">Salud, comodidad y estilo en cada paso</p>
         </div>
         <div class="row g-4">
             <div class="col-md-4">
-                <div class="feature-card">
-                    <i class="fas fa-heartbeat"></i>
-                    <h3>Salud Podológica</h3>
+                <div style="background: white; border-radius: 15px; padding: 40px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.1); transition: all 0.3s; height: 100%;">
+                    <i class="fas fa-heartbeat" style="font-size: 3rem; color: #2c5f2d; margin-bottom: 20px;"></i>
+                    <h3 style="color: #2c5f2d; margin-bottom: 15px;">Salud Podológica</h3>
                     <p>Diseñados para respetar la anatomía natural del pie, mejorando tu postura y reduciendo dolores</p>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="feature-card">
-                    <i class="fas fa-palette"></i>
-                    <h3>100% Personalizable</h3>
+                <div style="background: white; border-radius: 15px; padding: 40px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.1); transition: all 0.3s; height: 100%;">
+                    <i class="fas fa-palette" style="font-size: 3rem; color: #2c5f2d; margin-bottom: 20px;"></i>
+                    <h3 style="color: #2c5f2d; margin-bottom: 15px;">100% Personalizable</h3>
                     <p>Elige colores, materiales y diseños. Crea el zapato perfecto que refleje tu personalidad</p>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="feature-card">
-                    <i class="fas fa-star"></i>
-                    <h3>Calidad Premium</h3>
+                <div style="background: white; border-radius: 15px; padding: 40px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.1); transition: all 0.3s; height: 100%;">
+                    <i class="fas fa-star" style="font-size: 3rem; color: #2c5f2d; margin-bottom: 20px;"></i>
+                    <h3 style="color: #2c5f2d; margin-bottom: 15px;">Calidad Premium</h3>
                     <p>Materiales de primera calidad, fabricación artesanal y diseño contemporáneo</p>
                 </div>
             </div>
@@ -109,22 +75,22 @@
 </section>
 
 <!-- Products Section -->
-<section class="products-section" id="productos">
+<section class="products-section" id="productos" style="padding: 80px 0; background-color: white;">
     <div class="container">
-        <div class="section-title">
-            <h2>Nuestra Colección</h2>
+        <div class="section-title text-center mb-5">
+            <h2 style="font-size: 2.5rem; font-weight: bold; color: #2c5f2d;">Nuestra Colección</h2>
             <p class="text-muted">Descubre los modelos más populares</p>
         </div>
         <div class="row g-4">
             <div class="col-md-4">
-                <div class="card product-card">
-                    <img src="https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=500" class="card-img-top" alt="Zapato Casual">
-                    <div class="card-body">
+                <div class="card" style="border: none; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.1); transition: all 0.3s;">
+                    <img src="https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=500" class="card-img-top" style="height: 250px; object-fit: cover;" alt="Zapato Casual">
+                    <div class="card-body" style="padding: 25px;">
                         <h5 class="card-title">Urban Barefoot</h5>
                         <p class="card-text text-muted">Elegante y cómodo para el día a día</p>
                         <div class="d-flex justify-content-between align-items-center">
-                            <span class="product-price">S/ 299.00</span>
-                            <button class="btn btn-add-cart">
+                            <span style="font-size: 1.5rem; font-weight: bold; color: #2c5f2d;">S/ 299.00</span>
+                            <button class="btn" style="background-color: #2c5f2d; color: white; border: none; padding: 10px 20px; border-radius: 50px; transition: all 0.3s;">
                                 <i class="fas fa-shopping-cart me-1"></i> Agregar
                             </button>
                         </div>
@@ -132,14 +98,14 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card product-card">
-                    <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500" class="card-img-top" alt="Zapato Deportivo">
-                    <div class="card-body">
+                <div class="card" style="border: none; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.1); transition: all 0.3s;">
+                    <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500" class="card-img-top" style="height: 250px; object-fit: cover;" alt="Zapato Deportivo">
+                    <div class="card-body" style="padding: 25px;">
                         <h5 class="card-title">Sport Flex</h5>
                         <p class="card-text text-muted">Máxima flexibilidad para tu actividad</p>
                         <div class="d-flex justify-content-between align-items-center">
-                            <span class="product-price">S/ 349.00</span>
-                            <button class="btn btn-add-cart">
+                            <span style="font-size: 1.5rem; font-weight: bold; color: #2c5f2d;">S/ 349.00</span>
+                            <button class="btn" style="background-color: #2c5f2d; color: white; border: none; padding: 10px 20px; border-radius: 50px; transition: all 0.3s;">
                                 <i class="fas fa-shopping-cart me-1"></i> Agregar
                             </button>
                         </div>
@@ -147,14 +113,14 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card product-card">
-                    <img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?w=500" class="card-img-top" alt="Zapato Formal">
-                    <div class="card-body">
+                <div class="card" style="border: none; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.1); transition: all 0.3s;">
+                    <img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?w=500" class="card-img-top" style="height: 250px; object-fit: cover;" alt="Zapato Formal">
+                    <div class="card-body" style="padding: 25px;">
                         <h5 class="card-title">Classic Barefoot</h5>
                         <p class="card-text text-muted">Elegancia profesional y confort</p>
                         <div class="d-flex justify-content-between align-items-center">
-                            <span class="product-price">S/ 399.00</span>
-                            <button class="btn btn-add-cart">
+                            <span style="font-size: 1.5rem; font-weight: bold; color: #2c5f2d;">S/ 399.00</span>
+                            <button class="btn" style="background-color: #2c5f2d; color: white; border: none; padding: 10px 20px; border-radius: 50px; transition: all 0.3s;">
                                 <i class="fas fa-shopping-cart me-1"></i> Agregar
                             </button>
                         </div>
@@ -166,17 +132,10 @@
 </section>
 
 <!-- Footer -->
-<footer class="bg-dark text-white py-4 mt-5">
-    <div class="container text-center">
-        <p class="mb-0">&copy; 2024 Barefoot Store Perú - Calzado saludable y personalizado</p>
-        <div class="mt-2">
-            <a href="#" class="text-white me-3"><i class="fab fa-facebook"></i></a>
-            <a href="#" class="text-white me-3"><i class="fab fa-instagram"></i></a>
-            <a href="#" class="text-white"><i class="fab fa-whatsapp"></i></a>
-        </div>
-    </div>
-</footer>
+<footer th:replace="~{fragments :: footer}"></footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Scripts -->
+<div th:replace="~{fragments :: scripts}"></div>
+
 </body>
 </html>
