@@ -19,9 +19,6 @@ public class ProductoController {
     @Autowired
     private ProductoService productoService;
 
-    /**
-     * Listar todos los productos (Admin)
-     */
     @GetMapping
     public String listarProductos(HttpSession session, Model model) {
         // Verificar que sea admin
@@ -31,7 +28,6 @@ public class ProductoController {
 
         List<Producto> productos = productoService.obtenerTodosLosProductos();
 
-        // Calcular estadísticas
         long productosActivos = productos.stream().filter(Producto::getActivo).count();
         long productosDestacados = productos.stream().filter(Producto::getDestacado).count();
         long productosStockBajo = productos.stream().filter(p -> p.getStock() < 10).count();
@@ -45,9 +41,6 @@ public class ProductoController {
         return "admin/productos/lista";
     }
 
-    /**
-     * Mostrar formulario para crear producto
-     */
     @GetMapping("/nuevo")
     public String mostrarFormularioCrear(HttpSession session, Model model) {
         if (!esAdmin(session)) {
@@ -60,9 +53,7 @@ public class ProductoController {
         return "admin/productos/formulario";
     }
 
-    /**
-     * Guardar nuevo producto
-     */
+
     @PostMapping("/guardar")
     public String guardarProducto(@ModelAttribute Producto producto,
                                   HttpSession session,
@@ -83,9 +74,6 @@ public class ProductoController {
         return "redirect:/admin/productos";
     }
 
-    /**
-     * Mostrar formulario para editar producto
-     */
     @GetMapping("/editar/{id}")
     public String mostrarFormularioEditar(@PathVariable Long id,
                                           HttpSession session,
@@ -110,9 +98,6 @@ public class ProductoController {
         return "admin/productos/formulario";
     }
 
-    /**
-     * Actualizar producto
-     */
     @PostMapping("/actualizar/{id}")
     public String actualizarProducto(@PathVariable Long id,
                                      @ModelAttribute Producto producto,
@@ -134,9 +119,6 @@ public class ProductoController {
         return "redirect:/admin/productos";
     }
 
-    /**
-     * Eliminar producto (soft delete)
-     */
     @GetMapping("/eliminar/{id}")
     public String eliminarProducto(@PathVariable Long id,
                                    HttpSession session,
@@ -157,9 +139,6 @@ public class ProductoController {
         return "redirect:/admin/productos";
     }
 
-    /**
-     * Toggle destacado
-     */
     @GetMapping("/destacar/{id}")
     public String toggleDestacado(@PathVariable Long id,
                                   HttpSession session,
@@ -180,9 +159,6 @@ public class ProductoController {
         return "redirect:/admin/productos";
     }
 
-    /**
-     * Ver detalle de producto
-     */
     @GetMapping("/detalle/{id}")
     public String verDetalle(@PathVariable Long id,
                              HttpSession session,
@@ -206,7 +182,6 @@ public class ProductoController {
         return "admin/productos/detalle";
     }
 
-    // Método auxiliar para verificar si es admin
     private boolean esAdmin(HttpSession session) {
         String rol = (String) session.getAttribute("usuarioRol");
         return "ADMIN".equals(rol);

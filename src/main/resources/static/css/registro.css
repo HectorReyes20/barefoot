@@ -1,24 +1,21 @@
-/* CAMBIO: Eliminamos el :root local para heredar el de iniico.css */
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    /* CAMBIO: Reemplazado degradado azul por el fondo crema de tu paleta */
     background-color: var(--color-background);
     min-height: 100vh;
     padding: 40px 0;
 }
 
 .register-container {
-    background: var(--color-surface); /* CAMBIO: De 'white' a variable */
+    background: var(--color-surface);
     border-radius: 20px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.1); /* CAMBIO: Sombra más sutil */
+    box-shadow: 0 20px 60px rgba(0,0,0,0.1);
     overflow: hidden;
     max-width: 600px;
     margin: 0 auto;
 }
 
 .register-header {
-    /* ¡Perfecto! Esto hereda el degradado café/naranja automáticamente */
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     color: white;
     padding: 40px;
@@ -43,13 +40,11 @@ body {
 }
 
 .form-control:focus {
-    border-color: var(--primary-color); /* ¡Perfecto! Hereda el café */
-    /* CAMBIO: Sombra actualizada al color café (RGB de #4E342E) */
+    border-color: var(--primary-color);
     box-shadow: 0 0 0 0.2rem rgba(78, 52, 46, 0.1);
 }
 
 .btn-register {
-    /* ¡Perfecto! Hereda el degradado café/naranja automáticamente */
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     color: white;
     padding: 12px;
@@ -62,7 +57,6 @@ body {
 
 .btn-register:hover {
     transform: translateY(-2px);
-    /* CAMBIO: Sombra actualizada al color café (RGB de #4E342E) */
     box-shadow: 0 5px 20px rgba(78, 52, 46, 0.3);
 }
 
@@ -72,14 +66,14 @@ body {
 }
 
 .login-link a {
-    color: var(--primary-color); /* ¡Perfecto! Hereda el café */
+    color: var(--primary-color);
     font-weight: 600;
     text-decoration: none;
 }
 
 .login-link a:hover {
     text-decoration: underline;
-    color: var(--secondary-color); /* CAMBIO: Añadido color de acento al hover */
+    color: var(--secondary-color);
 }
 
 .alert {

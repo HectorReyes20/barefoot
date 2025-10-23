@@ -1,12 +1,11 @@
 body {
-    /* CAMBIO: Reemplazado degradado azul por el fondo crema de tu paleta */
     background-color: var(--color-background);
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0; /* ✅ evita márgenes automáticos del navegador */
-    padding: 0; /* ✅ sin padding extra */
+    margin: 0;
+    padding: 0;
 }
 .container {
     margin: 0 !important;
@@ -17,9 +16,9 @@ body {
 }
 
 .login-container {
-    background: var(--color-surface); /* CAMBIO: De 'white' a variable */
+    background: var(--color-surface);
     border-radius: 20px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.1); /* Sombra más sutil */
+    box-shadow: 0 20px 60px rgba(0,0,0,0.1);
     overflow: hidden;
     max-width: 900px;
     width: 100%;
@@ -27,8 +26,7 @@ body {
 }
 
 .login-left {
-    flex: 1; /* <-- ARREGLO: Esta línea asegura el 50% de ancho */
-    /* ¡Perfecto! Esto ya usa variables y tomará el degradado café/naranja */
+    flex: 1;
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     padding: 60px 40px;
     color: white;
@@ -59,7 +57,7 @@ body {
 }
 
 .login-header h2 {
-    color: var(--color-text); /* CAMBIO: De '#333' a variable */
+    color: var(--color-text);
     font-weight: 600;
     margin-bottom: 10px;
 }
@@ -73,12 +71,10 @@ body {
 
 .form-control:focus {
     border-color: var(--primary-color);
-    /* CAMBIO: Sombra actualizada al color café (RGB de #4E342E) */
     box-shadow: 0 0 0 0.2rem rgba(78, 52, 46, 0.1);
 }
 
 .btn-login {
-    /* ¡Perfecto! Esto también usa variables */
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     color: white;
     padding: 12px;
@@ -91,7 +87,6 @@ body {
 
 .btn-login:hover {
     transform: translateY(-2px);
-    /* CAMBIO: Sombra actualizada al color café (RGB de #4E342E) */
     box-shadow: 0 5px 20px rgba(78, 52, 46, 0.3);
 }
 
@@ -105,14 +100,14 @@ body {
 }
 
 .register-link a {
-    color: var(--primary-color); /* ¡Perfecto! */
+    color: var(--primary-color);
     font-weight: 600;
     text-decoration: none;
 }
 
 .register-link a:hover {
     text-decoration: underline;
-    color: var(--secondary-color); /* CAMBIO: Añadido color de acento al hover */
+    color: var(--secondary-color);
 }
 
 @media (max-width: 768px) {
