@@ -41,12 +41,14 @@
 
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#personalizar">
+                    <a class="nav-link" th:href="@{/personalizar}"
+                       th:classappend="${#httpServletRequest != null and #strings.contains(#httpServletRequest.requestURI, '/personalizar') ? 'active' : ''}">
                         <i class="fas fa-palette me-1"></i> Personalizar
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#nosotros">
+                    <a class="nav-link" th:href="@{/nosotros}"
+                       th:classappend="${#httpServletRequest != null and #strings.contains(#httpServletRequest.requestURI, '/nosotros') ? 'active' : ''}">
                         <i class="fas fa-info-circle me-1"></i> Nosotros
                     </a>
                 </li>
