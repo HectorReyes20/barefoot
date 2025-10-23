@@ -9,9 +9,6 @@
     <link th:href="@{/css/fragments.css}" rel="stylesheet">
 </head>
 
-<!-- ========================================= -->
-<!-- NAVBAR FRAGMENT -->
-<!-- ========================================= -->
 <nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
     <div class="container">
         <a class="navbar-brand" th:href="@{/inicio}">
@@ -53,7 +50,6 @@
             </ul>
 
             <ul class="navbar-nav ms-auto align-items-center">
-                <!-- Carrito de Compras -->
                 <li class="nav-item me-3">
                     <a class="nav-link position-relative" href="#carrito" title="Carrito de compras">
                         <span class="cart-icon">
@@ -64,26 +60,25 @@
                     </a>
                 </li>
 
-                <!-- Usuario NO logueado -->
-                <li class="nav-item" th:if="${session.usuarioId == null}">
+                <li class="nav-item" th:unless="${usuarioLogueado}">
                     <a th:href="@{/login}" class="btn btn-login">
                         <i class="fas fa-sign-in-alt me-2"></i> Iniciar Sesión
                     </a>
                 </li>
 
-                <!-- Usuario logueado -->
-                <li class="nav-item dropdown" th:if="${session.usuarioId != null}">
+                <li class="nav-item dropdown" th:if="${usuarioLogueado}">
                     <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button"
                        data-bs-toggle="dropdown" aria-expanded="false">
-                        <div class="user-avatar me-2" th:text="${#strings.substring(session.usuarioNombre ?: 'U', 0, 1)}">U</div>
-                        <span th:text="${session.usuarioNombre}">Usuario</span>
+
+                        <div class="user-avatar me-2" th:text="${#strings.substring(nombreUsuario ?: 'U', 0, 1)}">U</div>
+                        <span th:text="${nombreUsuario}">Usuario</span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li>
                             <a class="dropdown-item disabled" href="#">
                                 <small class="text-muted">
                                     <i class="fas fa-envelope me-2"></i>
-                                    <span th:text="${session.usuario?.email}">email@example.com</span>
+                                    <span th:text="${usuarioEmail}">email@example.com</span>
                                 </small>
                             </a>
                         </li>
@@ -104,11 +99,10 @@
                             </a>
                         </li>
 
-                        <!-- Opción de Admin -->
-                        <li th:if="${session.usuarioRol == 'ADMIN'}">
+                        <li th:if="${usuarioRol == 'ADMIN'}">
                             <hr class="dropdown-divider">
                         </li>
-                        <li th:if="${session.usuarioRol == 'ADMIN'}">
+                        <li th:if="${usuarioRol == 'ADMIN'}">
                             <a class="dropdown-item text-primary" th:href="@{/admin/dashboard}">
                                 <i class="fas fa-tachometer-alt"></i> Panel Admin
                             </a>

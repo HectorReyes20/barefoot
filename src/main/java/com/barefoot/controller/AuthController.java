@@ -15,26 +15,17 @@ public class AuthController {
     @Autowired
     private UsuarioService usuarioService;
 
-    /**
-     * Muestra la página de login
-     */
     @GetMapping("/login")
     public String mostrarLogin() {
         return "login";
     }
 
-    /**
-     * Muestra la página de registro
-     */
     @GetMapping("/registro")
     public String mostrarRegistro(Model model) {
         model.addAttribute("usuario", new Usuario());
         return "registro";
     }
 
-    /**
-     * Procesa el login
-     */
     @PostMapping("/login")
     public String procesarLogin(
             @RequestParam String email,
@@ -47,13 +38,12 @@ public class AuthController {
         if (usuario.isPresent()) {
             Usuario user = usuario.get();
 
-            // Guardar usuario en sesión
-            session.setAttribute("usuario", user);
+            // Guardar usuario en sesión (¡Esto es importante!)
+            session.setAttribute("usuario", user); // Guardamos el objeto entero
             session.setAttribute("usuarioId", user.getId());
             session.setAttribute("usuarioNombre", user.getNombre());
             session.setAttribute("usuarioRol", user.getRol().toString());
 
-            // Redireccionar según el rol
             if (user.getRol() == Usuario.Rol.ADMIN) {
                 return "redirect:/admin/dashboard";
             } else {
@@ -65,9 +55,6 @@ public class AuthController {
         }
     }
 
-    /**
-     * Procesa el registro
-     */
     @PostMapping("/registro")
     public String procesarRegistro(
             @ModelAttribute Usuario usuario,
@@ -77,8 +64,8 @@ public class AuthController {
         try {
             Usuario nuevoUsuario = usuarioService.registrarUsuario(usuario);
 
-            // Iniciar sesión automáticamente después del registro
-            session.setAttribute("usuario", nuevoUsuario);
+            // Iniciar sesión automáticamente
+            session.setAttribute("usuario", nuevoUsuario); // Guardamos el objeto entero
             session.setAttribute("usuarioId", nuevoUsuario.getId());
             session.setAttribute("usuarioNombre", nuevoUsuario.getNombre());
             session.setAttribute("usuarioRol", nuevoUsuario.getRol().toString());
@@ -91,42 +78,49 @@ public class AuthController {
         }
     }
 
-    /**
-     * Cierra la sesión
-     */
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate();
         return "redirect:/login";
     }
 
+    // ==========================================================
+    // MÉTODO MODIFICADO (PÚBLICO)
+    // ==========================================================
     /**
-     * Página de inicio para usuarios
+     * Página de inicio (pública, no requiere login)
      */
     @GetMapping("/inicio")
     public String inicio(HttpSession session, Model model) {
-        if (session.getAttribute("usuarioId") == null) {
-            return "redirect:/login";
+
+        // Comprobar si hay un usuario en sesión
+        if (session.getAttribute("usuario") != null) {
+            Usuario user = (Usuario) session.getAttribute("usuario");
+
+            // Pasamos los datos al modelo para que la vista (HTML) los use
+            model.addAttribute("usuarioLogueado", true);
+            model.addAttribute("nombreUsuario", user.getNombre());
+            model.addAttribute("usuarioRol", user.getRol().toString());
+            model.addAttribute("usuarioEmail", user.getEmail());
+
+        } else {
+            // Si no hay sesión, pasamos el indicador en falso
+            model.addAttribute("usuarioLogueado", false);
         }
 
-        // Redirigir al catálogo de productos
+        // Siempre mostramos la página de inicio
         return "inicio";
     }
 
-    /**
-     * Dashboard para administradores
-     */
     @GetMapping("/admin/dashboard")
     public String adminDashboard(HttpSession session, Model model) {
         if (session.getAttribute("usuarioId") == null) {
             return "redirect:/login";
         }
-
         String rol = (String) session.getAttribute("usuarioRol");
         if (!"ADMIN".equals(rol)) {
             return "redirect:/inicio";
         }
-
         model.addAttribute("nombreUsuario", session.getAttribute("usuarioNombre"));
         return "admin/dashboard";
     }
