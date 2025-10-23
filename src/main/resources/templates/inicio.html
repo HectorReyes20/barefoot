@@ -6,15 +6,13 @@
 </head>
 <body>
 
-<!-- Navbar -->
 <nav th:replace="~{fragments :: navbar}"></nav>
 
-<!-- Hero Section -->
 <section class="hero-section">
     <div class="container">
         <h1>
-            Bienvenido<span th:if="${session.usuarioNombre != null}">,
-                <span th:text="${session.usuarioNombre}">Usuario</span>
+            Bienvenido<span th:if="${usuarioLogueado}">,
+                <span th:text="${nombreUsuario}">Usuario</span>
             </span>!
         </h1>
         <p>Descubre el calzado barefoot que transformará tu forma de caminar</p>
@@ -24,8 +22,7 @@
     </div>
 </section>
 
-<!-- Welcome Message (solo si está logueado) -->
-<div class="container" th:if="${session.usuarioId != null}">
+<div class="container" th:if="${usuarioLogueado}">
     <div class="welcome-box">
         <div class="row align-items-center">
             <div class="col-md-8">
