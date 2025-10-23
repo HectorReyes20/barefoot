@@ -38,7 +38,7 @@ public class AuthController {
         if (usuario.isPresent()) {
             Usuario user = usuario.get();
 
-            // Guardar usuario en sesión (¡Esto es importante!)
+
             session.setAttribute("usuario", user); // Guardamos el objeto entero
             session.setAttribute("usuarioId", user.getId());
             session.setAttribute("usuarioNombre", user.getNombre());
@@ -64,7 +64,7 @@ public class AuthController {
         try {
             Usuario nuevoUsuario = usuarioService.registrarUsuario(usuario);
 
-            // Iniciar sesión automáticamente
+
             session.setAttribute("usuario", nuevoUsuario); // Guardamos el objeto entero
             session.setAttribute("usuarioId", nuevoUsuario.getId());
             session.setAttribute("usuarioNombre", nuevoUsuario.getNombre());
@@ -84,31 +84,10 @@ public class AuthController {
         return "redirect:/login";
     }
 
-    // ==========================================================
-    // MÉTODO MODIFICADO (PÚBLICO)
-    // ==========================================================
-    /**
-     * Página de inicio (pública, no requiere login)
-     */
+
     @GetMapping("/inicio")
     public String inicio(HttpSession session, Model model) {
 
-        // Comprobar si hay un usuario en sesión
-        if (session.getAttribute("usuario") != null) {
-            Usuario user = (Usuario) session.getAttribute("usuario");
-
-            // Pasamos los datos al modelo para que la vista (HTML) los use
-            model.addAttribute("usuarioLogueado", true);
-            model.addAttribute("nombreUsuario", user.getNombre());
-            model.addAttribute("usuarioRol", user.getRol().toString());
-            model.addAttribute("usuarioEmail", user.getEmail());
-
-        } else {
-            // Si no hay sesión, pasamos el indicador en falso
-            model.addAttribute("usuarioLogueado", false);
-        }
-
-        // Siempre mostramos la página de inicio
         return "inicio";
     }
 
@@ -121,7 +100,7 @@ public class AuthController {
         if (!"ADMIN".equals(rol)) {
             return "redirect:/inicio";
         }
-        model.addAttribute("nombreUsuario", session.getAttribute("usuarioNombre"));
+
         return "admin/dashboard";
     }
 }

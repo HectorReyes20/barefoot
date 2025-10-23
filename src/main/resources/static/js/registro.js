@@ -1,4 +1,4 @@
-// Validar que las contraseñas coincidan
+
     document.querySelector('form').addEventListener('submit', function(e) {
         const password = document.getElementById('password').value;
         const confirmPassword = document.getElementById('confirmPassword').value;
@@ -10,7 +10,6 @@
         }
     });
 
-    // Mostrar fortaleza de contraseña
     document.getElementById('password').addEventListener('input', function() {
         const password = this.value;
         let strength = 0;

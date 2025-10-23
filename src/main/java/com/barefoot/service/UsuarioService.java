@@ -15,18 +15,13 @@ public class UsuarioService {
 
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    /**
-     * Registra un nuevo usuario en el sistema
-     */
     public Usuario registrarUsuario(Usuario usuario) {
         if (usuarioRepository.existsByEmail(usuario.getEmail())) {
             throw new RuntimeException("El email ya está registrado");
         }
 
-        // Encriptar contraseña
         usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
 
-        // Asegurar que sea rol USUARIO por defecto
         if (usuario.getRol() == null) {
             usuario.setRol(Usuario.Rol.USUARIO);
         }
@@ -34,9 +29,6 @@ public class UsuarioService {
         return usuarioRepository.save(usuario);
     }
 
-    /**
-     * Autentica a un usuario
-     */
     public Optional<Usuario> autenticar(String email, String password) {
         Optional<Usuario> usuario = usuarioRepository.findByEmail(email);
 
@@ -47,16 +39,10 @@ public class UsuarioService {
         return Optional.empty();
     }
 
-    /**
-     * Busca un usuario por email
-     */
     public Optional<Usuario> buscarPorEmail(String email) {
         return usuarioRepository.findByEmail(email);
     }
 
-    /**
-     * Busca un usuario por ID
-     */
     public Optional<Usuario> buscarPorId(Long id) {
         return usuarioRepository.findById(id);
     }
