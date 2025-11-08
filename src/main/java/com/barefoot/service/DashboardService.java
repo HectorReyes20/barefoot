@@ -19,6 +19,9 @@ public class DashboardService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    @Autowired
+    private PedidoService pedidoService;
+
     public Map<String, Object> obtenerEstadisticasGenerales() {
         Map<String, Object> estadisticas = new HashMap<>();
 
@@ -50,9 +53,9 @@ public class DashboardService {
                 .sum();
         estadisticas.put("valorInventario", valorInventario);
 
-        // Productos más vendidos (simulado por ahora)
-        estadisticas.put("ventasMes", 45890.0);
-        estadisticas.put("pedidosTotales", 245L);
+        // Estadísticas de pedidos (datos reales)
+        estadisticas.put("ventasMes", pedidoService.calcularVentasDelMes());
+        estadisticas.put("pedidosTotales", pedidoService.obtenerTodosPedidos().size());
 
         return estadisticas;
     }
