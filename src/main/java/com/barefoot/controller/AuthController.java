@@ -91,16 +91,5 @@ public class AuthController {
         return "inicio";
     }
 
-    @GetMapping("/admin/dashboard")
-    public String adminDashboard(HttpSession session, Model model) {
-        if (session.getAttribute("usuarioId") == null) {
-            return "redirect:/login";
-        }
-        String rol = (String) session.getAttribute("usuarioRol");
-        if (!"ADMIN".equals(rol)) {
-            return "redirect:/inicio";
-        }
 
-        return "admin/dashboard";
-    }
 }
