@@ -1,6 +1,8 @@
 package com.barefoot.service;
 
+import com.barefoot.model.Pedido;
 import com.barefoot.model.Producto;
+import com.barefoot.repository.PedidoRepository;
 import com.barefoot.repository.ProductoRepository;
 import com.barefoot.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,9 @@ public class DashboardService {
 
     @Autowired
     private PedidoService pedidoService;
+
+    @Autowired
+    private PedidoRepository pedidoRepository;
 
     public Map<String, Object> obtenerEstadisticasGenerales() {
         Map<String, Object> estadisticas = new HashMap<>();
@@ -98,5 +103,28 @@ public class DashboardService {
                     return mapa;
                 })
                 .collect(Collectors.toList());
+    }
+    public Map<String, Object> calcularEstadisticasCliente(Long usuarioId) {
+        // Obtenemos el historial de compras usando el método que acabamos de crear
+        List<Pedido> pedidos = pedidoRepository.findByUsuarioId(usuarioId);
+
+        // 1. Conteo total de pedidos
+        int totalPedidos = pedidos.size();
+
+        // 2. Gasto total (sumando el 'total' de cada pedido)
+        double gastoTotal = pedidos.stream()
+                .mapToDouble(Pedido::getTotal)
+                .sum();
+
+        // 3. Promedio por pedido
+        double promedioPedido = (totalPedidos > 0) ? gastoTotal / totalPedidos : 0.0;
+
+        // Empaquetamos las estadísticas para la vista
+        Map<String, Object> estadisticas = new HashMap<>();
+        estadisticas.put("totalPedidos", totalPedidos);
+        estadisticas.put("gastoTotal", gastoTotal);
+        estadisticas.put("promedioPedido", promedioPedido);
+
+        return estadisticas;
     }
 }

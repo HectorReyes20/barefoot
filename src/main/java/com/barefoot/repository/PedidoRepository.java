@@ -51,4 +51,5 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
 
     // Buscar por usuario y número de pedido
     Optional<Pedido> findByUsuarioAndNumeroPedido(Usuario usuario, String numeroPedido);
+    List<Pedido> findByUsuarioId(Long usuarioId);
 }
