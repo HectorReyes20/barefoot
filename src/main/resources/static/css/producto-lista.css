@@ -1,0 +1,107 @@
+:root {
+            --primary-color: #2c5f2d;
+            --secondary-color: #97bc62;
+            --sidebar-bg: #1a1a2e;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+        }
+        .main-content {
+                    margin-left: 260px;
+                    padding: 30px;
+                }
+
+                .top-bar {
+                    background: white;
+                    padding: 20px 30px;
+                    border-radius: 10px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+                    margin-bottom: 30px;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+
+                .top-bar h2 {
+                    margin: 0;
+                    color: var(--primary-color);
+                }
+
+                .btn-nuevo {
+                    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+                    color: white;
+                    border: none;
+                    padding: 12px 25px;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    transition: all 0.3s;
+                }
+
+                .btn-nuevo:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 5px 15px rgba(44, 95, 45, 0.3);
+                    color: white;
+                }
+
+                .content-card {
+                    background: white;
+                    padding: 30px;
+                    border-radius: 10px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+                }
+
+                .table-imagen {
+                    width: 60px;
+                    height: 60px;
+                    object-fit: cover;
+                    border-radius: 8px;
+                }
+
+                .badge-categoria {
+                    padding: 5px 12px;
+                    border-radius: 20px;
+                    font-size: 0.85rem;
+                }
+
+                .btn-accion {
+                    padding: 5px 10px;
+                    margin: 0 2px;
+                    border-radius: 5px;
+                    font-size: 0.85rem;
+                }
+
+                .producto-activo {
+                    color: #28a745;
+                }
+
+                .producto-inactivo {
+                    color: #dc3545;
+                }
+
+                .stats-mini {
+                    display: grid;
+                    grid-template-columns: repeat(4, 1fr);
+                    gap: 15px;
+                    margin-bottom: 20px;
+                }
+
+                .stat-mini {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    padding: 15px;
+                    border-radius: 10px;
+                    text-align: center;
+                }
+
+                .stat-mini h4 {
+                    margin: 0;
+                    font-size: 1.8rem;
+                }
+
+                .stat-mini p {
+                    margin: 5px 0 0 0;
+                    font-size: 0.9rem;
+                    opacity: 0.9;
+                }

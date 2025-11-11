@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registrar Movimiento - Barefoot Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link th:href="@{/css/dashboard.css}" rel="stylesheet">
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="sidebar-header">
+    <h3><i class="fas fa-shoe-prints me-2"></i> Barefoot Admin</h3>
+  </div>
+  <ul class="sidebar-menu">
+    <li><a th:href="@{/admin/dashboard}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+    <li><a th:href="@{/admin/productos}"><i class="fas fa-box"></i> Productos</a></li>
+    <li><a th:href="@{/admin/pedidos}"><i class="fas fa-shopping-cart"></i> Pedidos</a></li>
+    <li><a th:href="@{/admin/reportes}"><i class="fas fa-chart-line"></i> Reportes</a></li>
+    <li><a th:href="@{/admin/inventario}" class="active"><i class="fas fa-warehouse"></i> Inventario</a></li>
+    <li><a th:href="@{/logout}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
+  </ul>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <h2><i class="fas fa-plus-circle me-2"></i> Registrar Movimiento de Inventario</h2>
+    <a th:href="@{/admin/inventario}" class="btn btn-secondary">
+      <i class="fas fa-arrow-left me-2"></i> Volver
+    </a>
+  </div>
+
+  <div class="content-card" style="max-width: 800px; margin: 0 auto;">
+    <form th:action="@{/admin/inventario/movimientos/registrar}" method="post" id="formMovimiento">
+
+      <!-- Seleccionar Producto -->
+      <div class="form-section">
+        <h5 class="form-section-title">
+          <i class="fas fa-box me-2"></i> Producto
+        </h5>
+        <div class="mb-3">
+          <label for="productoId" class="form-label">
+            <i class="fas fa-search me-1"></i> Buscar Producto *
+          </label>
+          <select class="form-select" id="productoId" name="productoId" required
+                  onchange="mostrarStockActual(this)">
+            <option value="">Seleccionar producto...</option>
+            <option th:each="producto : ${productos}"
+                    th:value="${producto.id}"
+                    th:text="${producto.nombre} + ' (Stock: ' + ${producto.stock} + ')'"
+                    th:attr="data-stock=${producto.stock}">
+              Producto
+            </option>
+          </select>
+        </div>
+        <div id="stockInfo" class="alert alert-info" style="display: none;">
+          <i class="fas fa-info-circle me-2"></i>
+          <strong>Stock actual:</strong> <span id="stockActual">0</span> unidades
+        </div>
+      </div>
+
+      <!-- Tipo de Movimiento -->
+      <div class="form-section">
+        <h5 class="form-section-title">
+          <i class="fas fa-exchange-alt me-2"></i> Tipo de Movimiento
+        </h5>
+        <div class="mb-3">
+          <label for="tipo" class="form-label">Seleccionar Tipo *</label>
+          <select class="form-select" id="tipo" name="tipo" required onchange="actualizarIcono(this)">
+            <option value="">Seleccionar...</option>
+            <option th:each="tipoMov : ${tiposMovimiento}"
+                    th:value="${tipoMov}"
+                    th:text="${tipoMov.nombre}"
+                    th:attr="data-icono=${tipoMov.icono}, data-color=${tipoMov.colorBadge}">
+              Tipo
+            </option>
+          </select>
+        </div>
+        <div id="tipoInfo" class="alert" style="display: none;">
+          <i id="tipoIcono" class="fas fa-info-circle me-2"></i>
+          <span id="tipoDescripcion"></span>
+        </div>
+      </div>
+
+      <!-- Cantidad y Detalles -->
+      <div class="form-section">
+        <h5 class="form-section-title">
+          <i class="fas fa-list-ol me-2"></i> Detalles del Movimiento
+        </h5>
+
+        <div class="mb-3">
+          <label for="cantidad" class="form-label">
+            <i class="fas fa-sort-numeric-up me-1"></i> Cantidad *
+          </label>
+          <input type="number" class="form-control" id="cantidad" name="cantidad"
+                 min="1" required placeholder="Ej: 10">
+        </div>
+
+        <div class="mb-3">
+          <label for="motivo" class="form-label">
+            <i class="fas fa-comment me-1"></i> Motivo *
+          </label>
+          <textarea class="form-control" id="motivo" name="motivo" rows="3" required
+                    placeholder="Describe el motivo del movimiento..."></textarea>
+        </div>
+
+        <div class="mb-3">
+          <label for="numeroDocumento" class="form-label">
+            <i class="fas fa-file-invoice me-1"></i> N° Documento (Opcional)
+          </label>
+          <input type="text" class="form-control" id="numeroDocumento" name="numeroDocumento"
+                 placeholder="Ej: FAC-001234">
+          <small class="text-muted">Número de factura, guía de remisión, etc.</small>
+        </div>
+      </div>
+
+      <!-- Botones -->
+      <div class="d-flex gap-3 justify-content-end">
+        <a th:href="@{/admin/inventario}" class="btn btn-secondary">
+          <i class="fas fa-times me-2"></i> Cancelar
+        </a>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-save me-2"></i> Registrar Movimiento
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  function mostrarStockActual(select) {
+      const selectedOption = select.options[select.selectedIndex];
+      const stock = selectedOption.getAttribute('data-stock');
+
+      if (stock !== null && select.value !== '') {
+          document.getElementById('stockActual').textContent = stock;
+          document.getElementById('stockInfo').style.display = 'block';
+      } else {
+          document.getElementById('stockInfo').style.display = 'none';
+      }
+  }
+
+  function actualizarIcono(select) {
+      const selectedOption = select.options[select.selectedIndex];
+      const icono = selectedOption.getAttribute('data-icono');
+      const color = selectedOption.getAttribute('data-color');
+      const infoDiv = document.getElementById('tipoInfo');
+      const iconoElement = document.getElementById('tipoIcono');
+      const descripcionElement = document.getElementById('tipoDescripcion');
+
+      if (icono && select.value !== '') {
+          iconoElement.className = 'fas ' + icono + ' me-2';
+          infoDiv.className = 'alert alert-' + color;
+
+          // Descripciones según el tipo
+          const descripciones = {
+              'ENTRADA': 'Aumento de stock por compra o producción',
+              'SALIDA': 'Disminución de stock por venta',
+              'AJUSTE_ENTRADA': 'Corrección positiva del inventario',
+              'AJUSTE_SALIDA': 'Corrección negativa del inventario',
+              'DEVOLUCION': 'Retorno de productos al inventario',
+              'MERMA': 'Pérdida o deterioro de productos',
+              'TRANSFERENCIA': 'Movimiento entre ubicaciones'
+          };
+
+          descripcionElement.textContent = descripciones[select.value] || '';
+          infoDiv.style.display = 'block';
+      } else {
+          infoDiv.style.display = 'none';
+      }
+  }
+
+  // Validación del formulario
+  document.getElementById('formMovimiento').addEventListener('submit', function(e) {
+      const productoId = document.getElementById('productoId').value;
+      const tipo = document.getElementById('tipo').value;
+      const cantidad = parseInt(document.getElementById('cantidad').value);
+      const motivo = document.getElementById('motivo').value.trim();
+
+      if (!productoId || !tipo || !cantidad || !motivo) {
+          e.preventDefault();
+          alert('Por favor completa todos los campos obligatorios');
+          return false;
+      }
+
+      if (cantidad <= 0) {
+          e.preventDefault();
+          alert('La cantidad debe ser mayor a 0');
+          return false;
+      }
+
+      // Verificar stock suficiente para salidas
+      if (tipo.includes('SALIDA') || tipo === 'MERMA') {
+          const select = document.getElementById('productoId');
+          const selectedOption = select.options[select.selectedIndex];
+          const stockActual = parseInt(selectedOption.getAttribute('data-stock'));
+
+          if (cantidad > stockActual) {
+              e.preventDefault();
+              alert('Stock insuficiente. Stock actual: ' + stockActual + ' unidades');
+              return false;
+          }
+      }
+  });
+</script>
+</body>
+</html>

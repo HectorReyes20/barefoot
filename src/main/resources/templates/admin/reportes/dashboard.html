@@ -3,137 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reportes y Estadísticas - Barefoot Admin</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link th:href="@{/css/dashboard.css}" rel="stylesheet">
+
+  <head th:replace="~{admin/layout/head :: head(titulo='Reportes y Estadísticas - Barefoot Admin')}"></head>
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <style>
-    .chart-container {
-        position: relative;
-        height: 400px;
-        margin-bottom: 30px;
-    }
-    .chart-card {
-        background: white;
-        padding: 25px;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        margin-bottom: 30px;
-    }
-    .chart-title {
-        font-size: 1.3rem;
-        font-weight: bold;
-        color: var(--primary-color);
-        margin-bottom: 20px;
-    }
-    .metric-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 25px;
-        border-radius: 15px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        margin-bottom: 20px;
-        transition: transform 0.3s;
-    }
-    .metric-card:hover {
-        transform: translateY(-5px);
-    }
-    .metric-card h3 {
-        font-size: 2.5rem;
-        font-weight: bold;
-        margin-bottom: 5px;
-    }
-    .metric-card p {
-        opacity: 0.9;
-        margin-bottom: 0;
-    }
-    .metric-card.green {
-        background: linear-gradient(135deg, #2c5f2d 0%, #97bc62 100%);
-    }
-    .metric-card.orange {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    }
-    .metric-card.blue {
-        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    }
-    .metric-card.purple {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-    .trend-indicator {
-        display: inline-flex;
-        align-items: center;
-        padding: 5px 12px;
-        border-radius: 20px;
-        font-size: 0.9rem;
-        font-weight: 600;
-    }
-    .trend-indicator.positive {
-        background: rgba(40, 167, 69, 0.2);
-        color: #28a745;
-    }
-    .trend-indicator.negative {
-        background: rgba(220, 53, 69, 0.2);
-        color: #dc3545;
-    }
-    .product-rank {
-        display: flex;
-        align-items: center;
-        padding: 15px;
-        background: #f8f9fa;
-        border-radius: 10px;
-        margin-bottom: 10px;
-        transition: all 0.3s;
-    }
-    .product-rank:hover {
-        background: #e9ecef;
-        transform: translateX(5px);
-    }
-    .product-rank-number {
-        width: 40px;
-        height: 40px;
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-        color: white;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        margin-right: 15px;
-    }
-    .product-rank-image {
-        width: 60px;
-        height: 60px;
-        object-fit: cover;
-        border-radius: 8px;
-        margin-right: 15px;
-    }
-  </style>
+
+  <link th:href="@{/css/reportes.css}" rel="stylesheet">
 </head>
 <body>
 
-<!-- Sidebar -->
-<div class="sidebar">
-  <div class="sidebar-header">
-    <h3><i class="fas fa-shoe-prints me-2"></i> Barefoot Admin</h3>
-  </div>
-  <ul class="sidebar-menu">
-    <li><a th:href="@{/admin/dashboard}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-    <li><a th:href="@{/admin/productos}"><i class="fas fa-box"></i> Productos</a></li>
-    <li><a th:href="@{/admin/pedidos}"><i class="fas fa-shopping-cart"></i> Pedidos</a></li>
-    <li><a href="#clientes"><i class="fas fa-users"></i> Clientes</a></li>
-    <li><a th:href="@{/admin/reportes}" class="active"><i class="fas fa-chart-line"></i> Reportes</a></li>
-    <li><a th:href="@{/logout}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
-  </ul>
-</div>
+<div th:replace="~{admin/layout/sidebar :: sidebar(paginaActiva='reportes')}"></div>
 
-<!-- Main Content -->
 <div class="main-content">
-  <!-- Top Bar -->
+
   <div class="top-bar">
     <h2><i class="fas fa-chart-line me-2"></i> Reportes y Estadísticas</h2>
     <div class="d-flex align-items-center gap-3">
-      <!-- Botones de Exportación -->
       <div class="btn-group">
         <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown">
           <i class="fas fa-download me-2"></i> Exportar
@@ -177,7 +62,6 @@
     </div>
   </div>
 
-  <!-- Resumen General -->
   <div class="row">
     <div class="col-md-3">
       <div class="metric-card purple">
@@ -209,7 +93,6 @@
     </div>
   </div>
 
-  <!-- Comparativa Mes Actual vs Anterior -->
   <div class="chart-card">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h4 class="chart-title mb-0">
@@ -240,7 +123,6 @@
     </div>
   </div>
 
-  <!-- Gráfico de Ventas Mensuales -->
   <div class="chart-card">
     <h4 class="chart-title">
       <i class="fas fa-calendar-alt me-2"></i> Ventas por Mes (<span th:text="${yearSeleccionado}">2024</span>)
@@ -250,7 +132,6 @@
     </div>
   </div>
 
-  <!-- Gráfico de Ventas Anuales -->
   <div class="chart-card">
     <h4 class="chart-title">
       <i class="fas fa-chart-line me-2"></i> Evolución Anual de Ventas
@@ -261,7 +142,6 @@
   </div>
 
   <div class="row">
-    <!-- Ventas por Categoría -->
     <div class="col-lg-6">
       <div class="chart-card">
         <h4 class="chart-title">
@@ -273,7 +153,6 @@
       </div>
     </div>
 
-    <!-- Pedidos por Estado -->
     <div class="col-lg-6">
       <div class="chart-card">
         <h4 class="chart-title">
@@ -286,7 +165,6 @@
     </div>
   </div>
 
-  <!-- Ventas Diarias del Mes -->
   <div class="chart-card">
     <h4 class="chart-title">
       <i class="fas fa-calendar-day me-2"></i> Ventas Diarias del Mes Actual
@@ -296,7 +174,6 @@
     </div>
   </div>
 
-  <!-- Ventas por Método de Pago -->
   <div class="chart-card">
     <h4 class="chart-title">
       <i class="fas fa-credit-card me-2"></i> Ventas por Método de Pago
@@ -306,7 +183,6 @@
     </div>
   </div>
 
-  <!-- Top 10 Productos Más Vendidos -->
   <div class="chart-card">
     <h4 class="chart-title">
       <i class="fas fa-trophy me-2"></i> Top 10 Productos Más Vendidos
@@ -350,318 +226,320 @@
 <script th:inline="javascript">
   /*<![CDATA[*/
 
-  // Configuración de colores
-  const colors = {
-      primary: '#2c5f2d',
-      secondary: '#97bc62',
-      accent: '#d4a574',
-      blue: '#4facfe',
-      purple: '#764ba2',
-      orange: '#f5576c',
-      green: '#28a745',
-      red: '#dc3545'
-  };
+  // ... (Todo tu JavaScript para los gráficos va aquí, no cambia nada) ...
 
-  // Datos desde Thymeleaf
-  const ventasPorMes = /*[[${ventasPorMes}]]*/ {};
-  const ventasPorYear = /*[[${ventasPorYear}]]*/ {};
-  const ventasPorCategoria = /*[[${ventasPorCategoria}]]*/ {};
-  const pedidosPorEstado = /*[[${pedidosPorEstado}]]*/ {};
-  const productosMasVendidos = /*[[${productosMasVendidos}]]*/ [];
-  const ventasPorMetodoPago = /*[[${ventasPorMetodoPago}]]*/ {};
-  const ventasDiarias = /*[[${ventasDiarias}]]*/ {};
+    // Configuración de colores
+    const colors = {
+        primary: '#2c5f2d',
+        secondary: '#97bc62',
+        accent: '#d4a574',
+        blue: '#4facfe',
+        purple: '#764ba2',
+        orange: '#f5576c',
+        green: '#28a745',
+        red: '#dc3545'
+    };
 
-  // Gráfico de Ventas Mensuales
-  const ctxMensual = document.getElementById('ventasMensualChart');
-  new Chart(ctxMensual, {
-      type: 'bar',
-      data: {
-          labels: Object.keys(ventasPorMes),
-          datasets: [{
-              label: 'Ventas (S/)',
-              data: Object.values(ventasPorMes),
-              backgroundColor: colors.primary,
-              borderColor: colors.secondary,
-              borderWidth: 2,
-              borderRadius: 8
-          }]
-      },
-      options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-              legend: {
-                  display: false
-              },
-              tooltip: {
-                  callbacks: {
-                      label: function(context) {
-                          return 'S/ ' + context.parsed.y.toFixed(2);
-                      }
-                  }
-              }
-          },
-          scales: {
-              y: {
-                  beginAtZero: true,
-                  ticks: {
-                      callback: function(value) {
-                          return 'S/ ' + value;
-                      }
-                  }
-              }
-          }
-      }
-  });
+    // Datos desde Thymeleaf
+    const ventasPorMes = /*[[${ventasPorMes}]]*/ {};
+    const ventasPorYear = /*[[${ventasPorYear}]]*/ {};
+    const ventasPorCategoria = /*[[${ventasPorCategoria}]]*/ {};
+    const pedidosPorEstado = /*[[${pedidosPorEstado}]]*/ {};
+    const productosMasVendidos = /*[[${productosMasVendidos}]]*/ [];
+    const ventasPorMetodoPago = /*[[${ventasPorMetodoPago}]]*/ {};
+    const ventasDiarias = /*[[${ventasDiarias}]]*/ {};
 
-  // Gráfico de Ventas Anuales (Línea)
-  const ctxAnual = document.getElementById('ventasAnualChart');
-  new Chart(ctxAnual, {
-      type: 'line',
-      data: {
-          labels: Object.keys(ventasPorYear),
-          datasets: [{
-              label: 'Ventas Anuales (S/)',
-              data: Object.values(ventasPorYear),
-              backgroundColor: 'rgba(44, 95, 45, 0.1)',
-              borderColor: colors.primary,
-              borderWidth: 3,
-              fill: true,
-              tension: 0.4,
-              pointBackgroundColor: colors.accent,
-              pointBorderColor: colors.primary,
-              pointBorderWidth: 2,
-              pointRadius: 6,
-              pointHoverRadius: 8
-          }]
-      },
-      options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-              legend: {
-                  display: false
-              },
-              tooltip: {
-                  callbacks: {
-                      label: function(context) {
-                          return 'S/ ' + context.parsed.y.toFixed(2);
-                      }
-                  }
-              }
-          },
-          scales: {
-              y: {
-                  beginAtZero: true,
-                  ticks: {
-                      callback: function(value) {
-                          return 'S/ ' + value;
-                      }
-                  }
-              }
-          }
-      }
-  });
+    // Gráfico de Ventas Mensuales
+    const ctxMensual = document.getElementById('ventasMensualChart');
+    new Chart(ctxMensual, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(ventasPorMes),
+            datasets: [{
+                label: 'Ventas (S/)',
+                data: Object.values(ventasPorMes),
+                backgroundColor: colors.primary,
+                borderColor: colors.secondary,
+                borderWidth: 2,
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return 'S/ ' + context.parsed.y.toFixed(2);
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return 'S/ ' + value;
+                        }
+                    }
+                }
+            }
+        }
+    });
 
-  // Gráfico de Ventas por Categoría (Doughnut)
-  const ctxCategoria = document.getElementById('ventasCategoriaChart');
-  new Chart(ctxCategoria, {
-      type: 'doughnut',
-      data: {
-          labels: Object.keys(ventasPorCategoria),
-          datasets: [{
-              data: Object.values(ventasPorCategoria),
-              backgroundColor: [
-                  colors.primary,
-                  colors.secondary,
-                  colors.accent,
-                  colors.blue,
-                  colors.purple,
-                  colors.orange
-              ],
-              borderWidth: 2,
-              borderColor: '#fff'
-          }]
-      },
-      options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-              legend: {
-                  position: 'bottom'
-              },
-              tooltip: {
-                  callbacks: {
-                      label: function(context) {
-                          return context.label + ': S/ ' + context.parsed.toFixed(2);
-                      }
-                  }
-              }
-          }
-      }
-  });
+    // Gráfico de Ventas Anuales (Línea)
+    const ctxAnual = document.getElementById('ventasAnualChart');
+    new Chart(ctxAnual, {
+        type: 'line',
+        data: {
+            labels: Object.keys(ventasPorYear),
+            datasets: [{
+                label: 'Ventas Anuales (S/)',
+                data: Object.values(ventasPorYear),
+                backgroundColor: 'rgba(44, 95, 45, 0.1)',
+                borderColor: colors.primary,
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: colors.accent,
+                pointBorderColor: colors.primary,
+                pointBorderWidth: 2,
+                pointRadius: 6,
+                pointHoverRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return 'S/ ' + context.parsed.y.toFixed(2);
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return 'S/ ' + value;
+                        }
+                    }
+                }
+            }
+        }
+    });
 
-  // Gráfico de Pedidos por Estado (Pie)
-  const ctxEstado = document.getElementById('pedidosEstadoChart');
-  new Chart(ctxEstado, {
-      type: 'pie',
-      data: {
-          labels: Object.keys(pedidosPorEstado),
-          datasets: [{
-              data: Object.values(pedidosPorEstado),
-              backgroundColor: [
-                  '#ffc107',
-                  '#17a2b8',
-                  '#007bff',
-                  '#6c757d',
-                  '#20c997',
-                  '#28a745',
-                  '#dc3545'
-              ],
-              borderWidth: 2,
-              borderColor: '#fff'
-          }]
-      },
-      options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-              legend: {
-                  position: 'bottom'
-              }
-          }
-      }
-  });
+    // Gráfico de Ventas por Categoría (Doughnut)
+    const ctxCategoria = document.getElementById('ventasCategoriaChart');
+    new Chart(ctxCategoria, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(ventasPorCategoria),
+            datasets: [{
+                data: Object.values(ventasPorCategoria),
+                backgroundColor: [
+                    colors.primary,
+                    colors.secondary,
+                    colors.accent,
+                    colors.blue,
+                    colors.purple,
+                    colors.orange
+                ],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.label + ': S/ ' + context.parsed.toFixed(2);
+                        }
+                    }
+                }
+            }
+        }
+    });
 
-  // Gráfico de Productos Más Vendidos (Horizontal Bar)
-  const ctxProductos = document.getElementById('productosVendidosChart');
-  new Chart(ctxProductos, {
-      type: 'bar',
-      data: {
-          labels: productosMasVendidos.map(p => p.nombre),
-          datasets: [{
-              label: 'Unidades Vendidas',
-              data: productosMasVendidos.map(p => p.cantidadVendida),
-              backgroundColor: colors.accent,
-              borderColor: colors.primary,
-              borderWidth: 2,
-              borderRadius: 8
-          }]
-      },
-      options: {
-          indexAxis: 'y',
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-              legend: {
-                  display: false
-              }
-          },
-          scales: {
-              x: {
-                  beginAtZero: true
-              }
-          }
-      }
-  });
+    // Gráfico de Pedidos por Estado (Pie)
+    const ctxEstado = document.getElementById('pedidosEstadoChart');
+    new Chart(ctxEstado, {
+        type: 'pie',
+        data: {
+            labels: Object.keys(pedidosPorEstado),
+            datasets: [{
+                data: Object.values(pedidosPorEstado),
+                backgroundColor: [
+                    '#ffc107',
+                    '#17a2b8',
+                    '#007bff',
+                    '#6c757d',
+                    '#20c997',
+                    '#28a745',
+                    '#dc3545'
+                ],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
 
-  // Gráfico de Ventas Diarias
-  const ctxDiarias = document.getElementById('ventasDiariasChart');
-  new Chart(ctxDiarias, {
-      type: 'line',
-      data: {
-          labels: Object.keys(ventasDiarias),
-          datasets: [{
-              label: 'Ventas Diarias (S/)',
-              data: Object.values(ventasDiarias),
-              backgroundColor: 'rgba(79, 172, 254, 0.1)',
-              borderColor: colors.blue,
-              borderWidth: 2,
-              fill: true,
-              tension: 0.3,
-              pointBackgroundColor: colors.blue,
-              pointBorderWidth: 0,
-              pointRadius: 3
-          }]
-      },
-      options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-              legend: {
-                  display: false
-              },
-              tooltip: {
-                  callbacks: {
-                      label: function(context) {
-                          return 'S/ ' + context.parsed.y.toFixed(2);
-                      }
-                  }
-              }
-          },
-          scales: {
-              y: {
-                  beginAtZero: true,
-                  ticks: {
-                      callback: function(value) {
-                          return 'S/ ' + value;
-                      }
-                  }
-              }
-          }
-      }
-  });
+    // Gráfico de Productos Más Vendidos (Horizontal Bar)
+    const ctxProductos = document.getElementById('productosVendidosChart');
+    new Chart(ctxProductos, {
+        type: 'bar',
+        data: {
+            labels: productosMasVendidos.map(p => p.nombre),
+            datasets: [{
+                label: 'Unidades Vendidas',
+                data: productosMasVendidos.map(p => p.cantidadVendida),
+                backgroundColor: colors.accent,
+                borderColor: colors.primary,
+                borderWidth: 2,
+                borderRadius: 8
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
 
-  // Gráfico de Método de Pago
-  const ctxMetodoPago = document.getElementById('metodoPagoChart');
-  if (ventasPorMetodoPago.ventas) {
-      new Chart(ctxMetodoPago, {
-          type: 'bar',
-          data: {
-              labels: Object.keys(ventasPorMetodoPago.ventas),
-              datasets: [{
-                  label: 'Ventas (S/)',
-                  data: Object.values(ventasPorMetodoPago.ventas),
-                  backgroundColor: [
-                      colors.primary,
-                      colors.secondary,
-                      colors.accent,
-                      colors.blue,
-                      colors.purple,
-                      colors.orange
-                  ],
-                  borderWidth: 0,
-                  borderRadius: 8
-              }]
-          },
-          options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: {
-                  legend: {
-                      display: false
-                  },
-                  tooltip: {
-                      callbacks: {
-                          label: function(context) {
-                              return 'S/ ' + context.parsed.y.toFixed(2);
-                          }
-                      }
-                  }
-              },
-              scales: {
-                  y: {
-                      beginAtZero: true,
-                      ticks: {
-                          callback: function(value) {
-                              return 'S/ ' + value;
-                          }
-                      }
-                  }
-              }
-          }
-      });
-  }
+    // Gráfico de Ventas Diarias
+    const ctxDiarias = document.getElementById('ventasDiariasChart');
+    new Chart(ctxDiarias, {
+        type: 'line',
+        data: {
+            labels: Object.keys(ventasDiarias),
+            datasets: [{
+                label: 'Ventas Diarias (S/)',
+                data: Object.values(ventasDiarias),
+                backgroundColor: 'rgba(79, 172, 254, 0.1)',
+                borderColor: colors.blue,
+                borderWidth: 2,
+                fill: true,
+                tension: 0.3,
+                pointBackgroundColor: colors.blue,
+                pointBorderWidth: 0,
+                pointRadius: 3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return 'S/ ' + context.parsed.y.toFixed(2);
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return 'S/ ' + value;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Gráfico de Método de Pago
+    const ctxMetodoPago = document.getElementById('metodoPagoChart');
+    if (ventasPorMetodoPago.ventas) {
+        new Chart(ctxMetodoPago, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(ventasPorMetodoPago.ventas),
+                datasets: [{
+                    label: 'Ventas (S/)',
+                    data: Object.values(ventasPorMetodoPago.ventas),
+                    backgroundColor: [
+                        colors.primary,
+                        colors.secondary,
+                        colors.accent,
+                        colors.blue,
+                        colors.purple,
+                        colors.orange
+                    ],
+                    borderWidth: 0,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return 'S/ ' + context.parsed.y.toFixed(2);
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return 'S/ ' + value;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
 
   /*]]>*/
 </script>
