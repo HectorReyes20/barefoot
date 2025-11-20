@@ -67,17 +67,14 @@ public class Producto {
         fechaActualizacion = LocalDateTime.now();
     }
 
-    // Metodo para verificar si tiene descuento
     public boolean tieneDescuento() {
         return precioDescuento != null && precioDescuento < precio;
     }
 
-    // Metodo para obtener el precio final
     public Double getPrecioFinal() {
         return tieneDescuento() ? precioDescuento : precio;
     }
 
-    // Metodo para calcular porcentaje de descuento
     public Integer getPorcentajeDescuento() {
         if (tieneDescuento()) {
             return (int) (((precio - precioDescuento) / precio) * 100);

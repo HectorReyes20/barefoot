@@ -1,0 +1,50 @@
+<!DOCTYPE html >
+<div class="sidebar" th:fragment="sidebar(paginaActiva)" xmlns:th="http://www.w3.org/1999/xhtml">
+  <div class="sidebar-header">
+    <h3><i class="fas fa-shoe-prints me-2"></i> Barefoot Admin</h3>
+    <p>Panel de Administración</p>
+  </div>
+  <ul class="sidebar-menu">
+    <li>
+      <a th:href="@{/admin/dashboard}"
+         th:class="${paginaActiva == 'dashboard'} ? 'active' : ''">
+        <i class="fas fa-tachometer-alt"></i> Dashboard
+      </a>
+    </li>
+    <li>
+      <a th:href="@{/admin/productos}"
+         th:class="${paginaActiva == 'productos'} ? 'active' : ''">
+        <i class="fas fa-box"></i> Productos
+      </a>
+    </li>
+    <li>
+      <a th:href="@{/admin/pedidos}"
+         th:class="${paginaActiva == 'pedidos'} ? 'active' : ''">
+        <i class="fas fa-shopping-cart"></i> Pedidos
+      </a>
+    </li>
+    <li>
+      <a th:href="@{/admin/clientes}"
+         th:class="${paginaActiva == 'clientes'} ? 'active' : ''">
+        <i class="fas fa-users"></i> Clientes
+      </a>
+    </li>
+    <li>
+      <a th:href="@{/admin/reportes}"
+         th:class="${paginaActiva == 'reportes'} ? 'active' : ''">
+        <i class="fas fa-chart-line"></i> Reportes
+      </a>
+    </li>
+    <li>
+      <a th:href="@{/admin/inventario}"
+         th:class="${paginaActiva == 'inventario'} ? 'active' : ''">
+        <i class="fas fa-warehouse"></i> Inventario
+      </a>
+    </li>
+
+    <li><a href="#personalizaciones"><i class="fas fa-palette"></i> Personalizaciones</a></li>
+    <li><a href="#configuracion"><i class="fas fa-cog"></i> Configuración</a></li>
+
+    <li><a th:href="@{/logout}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
+  </ul>
+</div>
