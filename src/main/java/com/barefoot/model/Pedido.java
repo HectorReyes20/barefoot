@@ -23,7 +23,7 @@ public class Pedido {
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
 
-    @Column(name = "numero_pedido", unique = true, nullable = false)
+    @Column(name = "numero_pedido", length = 50, unique = true, nullable = false)
     private String numeroPedido;
 
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)

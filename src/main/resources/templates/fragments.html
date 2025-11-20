@@ -52,7 +52,7 @@
 
             <ul class="navbar-nav ms-auto align-items-center">
                 <li class="nav-item me-3">
-                    <a class="nav-link position-relative" href="#carrito" title="Carrito de compras">
+                    <a class="nav-link position-relative" th:href="@{/carrito}" title="Carrito de compras">
                         <span class="cart-icon">
                             <i class="fas fa-shopping-cart"></i>
                             <span class="cart-badge" th:if="${session.cantidadCarrito != null && session.cantidadCarrito > 0}"
