@@ -213,10 +213,26 @@
     }
 
     function addToCart() {
-        const quantity = document.getElementById('quantity').value;
-        alert('Funcionalidad de carrito se implementará en Sprint 4\n\nProducto: ' + productoNombre + '\nCantidad: ' + quantity);
-        // Aquí se implementará en Sprint 4
-    }
+    const quantity = document.getElementById('quantity').value;
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/carrito/agregar';
+
+    const productoInput = document.createElement('input');
+    productoInput.type = 'hidden';
+    productoInput.name = 'productoId';
+    productoInput.value = productoId;
+
+    const cantidadInput = document.createElement('input');
+    cantidadInput.type = 'hidden';
+    cantidadInput.name = 'cantidad';
+    cantidadInput.value = quantity;
+
+    form.appendChild(productoInput);
+    form.appendChild(cantidadInput);
+    document.body.appendChild(form);
+    form.submit();
+}
 
     function toggleFavorite() {
         // 'event' puede no estar disponible globalmente,
