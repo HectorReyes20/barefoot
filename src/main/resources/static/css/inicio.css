@@ -349,54 +349,6 @@ footer a:hover {
     color: white;
     border-bottom-right-radius: 5px;
 }
-
-.chatbot-input {
-    padding: 15px;
-    border-top: 1px solid #e0e0e0;
-    display: flex;
-    gap: 10px;
-    background: var(--color-surface);
-}
-
-.chatbot-input input {
-    flex: 1;
-    border: 1px solid #ddd;
-    border-radius: 25px;
-    padding: 10px 15px;
-    font-size: 14px;
-    outline: none;
-    transition: border-color 0.3s;
-    background: var(--color-background);
-    color: var(--color-text);
-}
-
-.chatbot-input input:focus {
-    border-color: var(--primary-color);
-}
-
-.chatbot-input button {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-    border: none;
-    color: white;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.2s;
-    font-size: 16px;
-}
-
-.chatbot-input button:hover {
-    transform: scale(1.1);
-}
-
-.chatbot-input button:active {
-    transform: scale(0.95);
-}
-
 /* ===== ESTILOS PARA OPCIONES DEL CHATBOT ===== */
 .chatbot-options {
     display: flex;

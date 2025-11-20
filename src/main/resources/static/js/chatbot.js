@@ -232,13 +232,6 @@ function getBotResponse(message) {
     return responses['default'];
 }
 
-chatbotSend.addEventListener('click', sendMessage);
-chatbotInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        sendMessage();
-    }
-});
-
 // Mensaje de bienvenida
 setTimeout(() => {
     addMessage('¡Hola! Soy el Asistente de Soporte de Barefoot Store. Estoy aquí para resolver tus dudas sobre tallas, envíos, devoluciones y más. ¿En qué puedo ayudarte? 😊', 'bot');
