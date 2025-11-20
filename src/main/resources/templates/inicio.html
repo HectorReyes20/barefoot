@@ -79,9 +79,10 @@
             <h2>Nuestra Colección</h2>
             <p class="text-muted">Descubre los modelos más populares</p>
         </div>
+
         <div class="row g-4">
             <div class="col-md-4">
-                <div class="product-card card">
+                <div class="product-card card h-100">
                     <img src="https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=500" class="card-img-top" alt="Zapato Casual">
                     <div class="card-body">
                         <h5 class="card-title">Urban Barefoot</h5>
@@ -95,8 +96,9 @@
                     </div>
                 </div>
             </div>
+
             <div class="col-md-4">
-                <div class="product-card card">
+                <div class="product-card card h-100">
                     <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500" class="card-img-top" alt="Zapato Deportivo">
                     <div class="card-body">
                         <h5 class="card-title">Sport Flex</h5>
@@ -110,8 +112,9 @@
                     </div>
                 </div>
             </div>
+
             <div class="col-md-4">
-                <div class="product-card card">
+                <div class="product-card card h-100">
                     <img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?w=500" class="card-img-top" alt="Zapato Formal">
                     <div class="card-body">
                         <h5 class="card-title">Classic Barefoot</h5>
@@ -125,9 +128,12 @@
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 </section>
+
+<!-- CHATBOT -->
 <div class="chatbot-container">
     <button class="chatbot-button" id="chatbotToggle">
         <i class="fas fa-comments"></i>
@@ -152,13 +158,13 @@
             </div>
         </div>
 
-
     </div>
 </div>
 
 <footer th:replace="~{fragments :: footer}"></footer>
-
 <div th:replace="~{fragments :: scripts}"></div>
+
 <script th:src="@{/js/chatbot.js}"></script>
+
 </body>
 </html>

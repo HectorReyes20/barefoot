@@ -1,6 +1,7 @@
 package com.barefoot.controller;
 
 import com.barefoot.model.Usuario;
+import jakarta.servlet.http.HttpServletRequest; // <--- Importante: Nueva importación
 import jakarta.servlet.http.HttpSession;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -10,8 +11,14 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 public class GlobalControllerAdvice {
 
     @ModelAttribute
-    public void addUserToModel(HttpSession session, Model model) {
+    public void addAttributes(HttpServletRequest request, HttpSession session, Model model) {
 
+        // --- SOLUCIÓN AL ERROR ---
+        // Agregamos la URI actual al modelo para que Thymeleaf pueda leerla sin usar #request
+        model.addAttribute("requestURI", request.getRequestURI());
+        // -------------------------
+
+        // Tu lógica existente de Usuario
         if (session.getAttribute("usuario") != null) {
             Usuario user = (Usuario) session.getAttribute("usuario");
 

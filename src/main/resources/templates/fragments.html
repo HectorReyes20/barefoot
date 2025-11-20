@@ -21,88 +21,110 @@
 
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav mx-auto">
+
+                <!-- INICIO -->
                 <li class="nav-item">
                     <a class="nav-link"
                        th:href="@{/inicio}"
-                       th:classappend="${#httpServletRequest != null and #httpServletRequest.requestURI == '/inicio' ? 'active' : ''}">
+                       th:classappend="${#httpServletRequest.requestURI == '/inicio' ? 'active' : ''}">
                         <i class="fas fa-home me-1"></i> Inicio
                     </a>
-
                 </li>
+
+                <!-- PRODUCTOS -->
                 <li class="nav-item">
                     <a class="nav-link"
                        th:href="@{/productos}"
-                       th:classappend="${#httpServletRequest != null and #strings.contains(#httpServletRequest.requestURI, '/productos') ? 'active' : ''}">
+                       th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/productos') ? 'active' : ''}">
                         <i class="fas fa-shopping-bag me-1"></i> Productos
                     </a>
-
                 </li>
+
+                <!-- PERSONALIZAR (link correcto) -->
                 <li class="nav-item">
-                    <a class="nav-link" th:href="@{/personalizar}"
-                       th:classappend="${#httpServletRequest != null and #strings.contains(#httpServletRequest.requestURI, '/personalizar') ? 'active' : ''}">
+                    <a class="nav-link"
+                       th:href="@{/personalizar}"
+                       th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/personalizar') ? 'active' : ''}">
                         <i class="fas fa-palette me-1"></i> Personalizar
                     </a>
                 </li>
-                <a class="nav-link" th:href="@{/nosotros}"
-                   th:classappend="${#httpServletRequest != null and #strings.contains(#httpServletRequest.requestURI, '/nosotros') ? 'active' : ''}">
+
+                <!-- NOSOTROS (link correcto) -->
+                <li class="nav-item">
+                    <a class="nav-link"
+                       th:href="@{/nosotros}"
+                       th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/nosotros') ? 'active' : ''}">
                         <i class="fas fa-info-circle me-1"></i> Nosotros
                     </a>
                 </li>
+
             </ul>
 
             <ul class="navbar-nav ms-auto align-items-center">
+
+                <!-- CARRITO -->
                 <li class="nav-item me-3">
                     <a class="nav-link position-relative" th:href="@{/carrito}" title="Carrito de compras">
                         <span class="cart-icon">
                             <i class="fas fa-shopping-cart"></i>
-                            <span class="cart-badge" th:if="${session.cantidadCarrito != null && session.cantidadCarrito > 0}"
-                                  th:text="${session.cantidadCarrito}">0</span>
+                            <span class="cart-badge"
+                                  th:if="${session.cantidadCarrito != null && session.cantidadCarrito > 0}"
+                                  th:text="${session.cantidadCarrito}">
+                            </span>
                         </span>
                     </a>
                 </li>
 
+                <!-- USUARIO NO LOGUEADO -->
                 <li class="nav-item" th:unless="${usuarioLogueado}">
                     <a th:href="@{/login}" class="btn btn-login">
                         <i class="fas fa-sign-in-alt me-2"></i> Iniciar Sesión
                     </a>
                 </li>
 
+                <!-- USUARIO LOGUEADO -->
                 <li class="nav-item dropdown" th:if="${usuarioLogueado}">
                     <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button"
-                       data-bs-toggle="dropdown" aria-expanded="false">
+                       data-bs-toggle="dropdown">
 
-                        <div class="user-avatar me-2" th:text="${#strings.substring(nombreUsuario ?: 'U', 0, 1)}">U</div>
+                        <div class="user-avatar me-2" th:text="${#strings.substring(nombreUsuario ?: 'U', 0, 1)}"></div>
                         <span th:text="${nombreUsuario}">Usuario</span>
                     </a>
+
                     <ul class="dropdown-menu dropdown-menu-end">
+
                         <li>
-                            <a class="dropdown-item disabled" href="#">
+                            <a class="dropdown-item disabled">
                                 <small class="text-muted">
                                     <i class="fas fa-envelope me-2"></i>
                                     <span th:text="${usuarioEmail}">email@example.com</span>
                                 </small>
                             </a>
                         </li>
+
                         <li><hr class="dropdown-divider"></li>
+
                         <li>
-                            <a class="dropdown-item" href="#perfil">
+                            <a class="dropdown-item" th:href="@{/perfil}">
                                 <i class="fas fa-user"></i> Mi Perfil
                             </a>
                         </li>
+
                         <li>
-                            <a class="dropdown-item" href="#pedidos">
+                            <a class="dropdown-item" th:href="@{/mis-pedidos}">
                                 <i class="fas fa-box"></i> Mis Pedidos
                             </a>
                         </li>
+
                         <li>
-                            <a class="dropdown-item" href="#favoritos">
+                            <a class="dropdown-item" th:href="@{/favoritos}">
                                 <i class="fas fa-heart"></i> Favoritos
                             </a>
                         </li>
 
-                        <li th:if="${usuarioRol == 'ADMIN'}">
-                            <hr class="dropdown-divider">
-                        </li>
+                        <!-- PANEL ADMIN -->
+                        <li th:if="${usuarioRol == 'ADMIN'}"><hr class="dropdown-divider"></li>
+
                         <li th:if="${usuarioRol == 'ADMIN'}">
                             <a class="dropdown-item text-primary" th:href="@{/admin/dashboard}">
                                 <i class="fas fa-tachometer-alt"></i> Panel Admin
@@ -110,13 +132,16 @@
                         </li>
 
                         <li><hr class="dropdown-divider"></li>
+
                         <li>
                             <a class="dropdown-item text-danger" th:href="@{/logout}">
                                 <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
                             </a>
                         </li>
+
                     </ul>
                 </li>
+
             </ul>
         </div>
     </div>
@@ -124,6 +149,7 @@
 
 <footer th:fragment="footer" class="footer-custom">
     <div class="container">
+
         <div class="row">
             <div class="col-md-4 mb-4">
                 <h5 class="mb-3">
@@ -134,30 +160,30 @@
                     Salud, comodidad y estilo en cada paso.
                 </p>
                 <div class="social-links mt-3">
-                    <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
-                    <a href="#" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
-                    <a href="#" title="TikTok"><i class="fab fa-tiktok"></i></a>
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-whatsapp"></i></a>
+                    <a href="#"><i class="fab fa-tiktok"></i></a>
                 </div>
             </div>
 
             <div class="col-md-2 mb-4">
                 <h6 class="mb-3">Productos</h6>
                 <div class="footer-links">
-                    <a href="#" class="d-block mb-2">Casual</a>
-                    <a href="#" class="d-block mb-2">Deportivo</a>
-                    <a href="#" class="d-block mb-2">Formal</a>
-                    <a href="#" class="d-block mb-2">Infantil</a>
+                    <a href="#">Casual</a>
+                    <a href="#">Deportivo</a>
+                    <a href="#">Formal</a>
+                    <a href="#">Infantil</a>
                 </div>
             </div>
 
             <div class="col-md-2 mb-4">
                 <h6 class="mb-3">Información</h6>
                 <div class="footer-links">
-                    <a href="#" class="d-block mb-2">Sobre Nosotros</a>
-                    <a href="#" class="d-block mb-2">Envíos</a>
-                    <a href="#" class="d-block mb-2">Devoluciones</a>
-                    <a href="#" class="d-block mb-2">Contacto</a>
+                    <a href="#">Sobre Nosotros</a>
+                    <a href="#">Envíos</a>
+                    <a href="#">Devoluciones</a>
+                    <a href="#">Contacto</a>
                 </div>
             </div>
 
@@ -181,13 +207,15 @@
                     &copy; 2025 Barefoot Store Perú. Todos los derechos reservados.
                 </small>
             </div>
+
             <div class="col-md-6 text-center text-md-end">
                 <small class="text-white-50">
-                    <a href="#" class="text-white-50 text-decoration-none me-3">Términos</a>
-                    <a href="#" class="text-white-50 text-decoration-none">Privacidad</a>
+                    <a href="#" class="text-white-50 me-3">Términos</a>
+                    <a href="#" class="text-white-50">Privacidad</a>
                 </small>
             </div>
         </div>
+
     </div>
 </footer>
 

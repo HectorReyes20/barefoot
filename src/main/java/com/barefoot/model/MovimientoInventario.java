@@ -87,15 +87,15 @@ public class MovimientoInventario {
         }
     }
 
-    // Constructor para crear movimientos fácilmente
+    // Constructor personalizado
     public MovimientoInventario(Producto producto, TipoMovimiento tipo, Integer cantidad,
                                 String motivo, Usuario usuario) {
+
         this.producto = producto;
         this.tipo = tipo;
         this.cantidad = cantidad;
         this.stockAnterior = producto.getStock();
 
-        // Calcular nuevo stock según el tipo
         if (esEntrada(tipo)) {
             this.stockNuevo = stockAnterior + cantidad;
         } else {
