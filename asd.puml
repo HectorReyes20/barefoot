@@ -1,0 +1,180 @@
+@startuml
+class com.barefoot.service.ProductoService {
+- ProductoRepository productoRepository
++ Producto crearProducto(Producto)
++ Producto actualizarProducto(Long,Producto)
++ void eliminarProducto(Long)
++ void eliminarProductoPermanente(Long)
++ List<Producto> obtenerTodosLosProductos()
++ List<Producto> obtenerProductosActivos()
++ Optional<Producto> obtenerProductoPorId(Long)
++ List<Producto> buscarPorCategoria(String)
++ List<Producto> obtenerProductosDestacados()
++ List<Producto> buscarPorNombre(String)
++ List<Producto> buscarPorRangoPrecio(Double,Double)
++ Producto aplicarDescuento(Long,Double)
++ Producto quitarDescuento(Long)
++ Producto actualizarStock(Long,Integer)
++ Producto reducirStock(Long,Integer)
++ Producto toggleDestacado(Long)
++ List<Producto> buscarConFiltros(String,Double,Double,String)
+}
+class com.barefoot.model.Usuario {
+- Long id
+- String email
+- String password
+- String nombre
+- String apellido
+- String telefono
+- Rol rol
+- LocalDateTime fechaRegistro
+- boolean activo
+# void onCreate()
++ void setId(Long)
++ void setEmail(String)
++ void setPassword(String)
++ void setNombre(String)
++ void setApellido(String)
++ void setTelefono(String)
++ void setRol(Rol)
++ void setFechaRegistro(LocalDateTime)
++ void setActivo(boolean)
++ Long getId()
++ String getEmail()
++ String getPassword()
++ String getNombre()
++ String getApellido()
++ String getTelefono()
++ Rol getRol()
++ LocalDateTime getFechaRegistro()
++ boolean isActivo()
+}
+enum com.barefoot.model.Rol {
++  USUARIO
++  ADMIN
+}
+class com.barefoot.model.Producto {
+- Long id
+- String nombre
+- String descripcion
+- Double precio
+- Double precioDescuento
+- String imagenUrl
+- String categoria
+- Integer stock
+- String talla
+- String color
+- String material
+- Boolean activo
+- Boolean destacado
+- LocalDateTime fechaCreacion
+- LocalDateTime fechaActualizacion
+# void onCreate()
+# void onUpdate()
++ boolean tieneDescuento()
++ Double getPrecioFinal()
++ Integer getPorcentajeDescuento()
++ Boolean getActivo()
++ Long getId()
++ String getCategoria()
++ String getNombre()
++ String getDescripcion()
++ Double getPrecio()
++ Double getPrecioDescuento()
++ String getImagenUrl()
++ Integer getStock()
++ String getTalla()
++ String getColor()
++ String getMaterial()
++ Boolean getDestacado()
++ LocalDateTime getFechaCreacion()
++ LocalDateTime getFechaActualizacion()
++ void setId(Long)
++ void setNombre(String)
++ void setDescripcion(String)
++ void setPrecio(Double)
++ void setPrecioDescuento(Double)
++ void setImagenUrl(String)
++ void setCategoria(String)
++ void setStock(Integer)
++ void setTalla(String)
++ void setColor(String)
++ void setMaterial(String)
++ void setActivo(Boolean)
++ void setDestacado(Boolean)
++ void setFechaCreacion(LocalDateTime)
++ void setFechaActualizacion(LocalDateTime)
+}
+class com.barefoot.security.PasswordGenerator {
++ {static} void main(String[])
++ {static} String generatePassword(String)
++ {static} boolean verifyPassword(String,String)
+}
+class com.barefoot.controller.ProductoController {
+- ProductoService productoService
++ String listarProductos(HttpSession,Model)
++ String mostrarFormularioCrear(HttpSession,Model)
++ String guardarProducto(Producto,HttpSession,RedirectAttributes)
++ String mostrarFormularioEditar(Long,HttpSession,Model,RedirectAttributes)
++ String actualizarProducto(Long,Producto,HttpSession,RedirectAttributes)
++ String eliminarProducto(Long,HttpSession,RedirectAttributes)
++ String toggleDestacado(Long,HttpSession,RedirectAttributes)
++ String verDetalle(Long,HttpSession,Model,RedirectAttributes)
+- boolean esAdmin(HttpSession)
+}
+class com.barefoot.controller.CatalogoController {
+- ProductoService productoService
++ String mostrarCatalogo(HttpSession,Model)
++ String verDetalleProducto(Long,HttpSession,Model)
++ String filtrarPorCategoria(String,HttpSession,Model)
++ String buscarProductos(String,HttpSession,Model)
++ String productosDestacados(HttpSession,Model)
+}
+interface com.barefoot.repository.UsuarioRepository {
+~ Optional<Usuario> findByEmail(String)
+~ boolean existsByEmail(String)
+}
+interface com.barefoot.repository.ProductoRepository {
+~ List<Producto> findByActivoTrue()
+~ List<Producto> findByCategoriaAndActivoTrue(String)
+~ List<Producto> findByDestacadoTrueAndActivoTrue()
+~ List<Producto> findByNombreContainingIgnoreCaseAndActivoTrue(String)
+~ List<Producto> findByPrecioBetweenAndActivoTrue(Double,Double)
+~ List<Producto> findByStockGreaterThanAndActivoTrue(Integer)
+~ List<Producto> findByColorAndActivoTrue(String)
+~ List<Producto> findByMaterialAndActivoTrue(String)
+~ List<Producto> buscarConFiltros(String,Double,Double,String)
+~ Long countByCategoria(String)
+~ List<Producto> findByActivoTrueOrderByPrecioAsc()
+~ List<Producto> findByActivoTrueOrderByPrecioDesc()
+~ List<Producto> findTop10ByActivoTrueOrderByFechaCreacionDesc()
+}
+class com.barefoot.BarefootApplication {
++ {static} void main(String[])
+}
+class com.barefoot.service.UsuarioService {
+- UsuarioRepository usuarioRepository
+- BCryptPasswordEncoder passwordEncoder
++ Usuario registrarUsuario(Usuario)
++ Optional<Usuario> autenticar(String,String)
++ Optional<Usuario> buscarPorEmail(String)
++ Optional<Usuario> buscarPorId(Long)
+}
+class com.barefoot.controller.AuthController {
+- UsuarioService usuarioService
++ String mostrarLogin()
++ String mostrarRegistro(Model)
++ String procesarLogin(String,String,HttpSession,Model)
++ String procesarRegistro(String,String,String,String,String,Model,HttpSession)
++ String logout(HttpSession)
++ String inicio(HttpSession,Model)
++ String adminDashboard(HttpSession,Model)
+}
+class com.barefoot.BarefootApplicationTests {
+~ void contextLoads()
+}
+
+
+org.springframework.data.jpa.repository.JpaRepository <|-- com.barefoot.repository.UsuarioRepository
+org.springframework.data.jpa.repository.JpaRepository <|-- com.barefoot.repository.ProductoRepository
+@enduml

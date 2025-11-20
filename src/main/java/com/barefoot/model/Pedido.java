@@ -68,6 +68,7 @@ public class Pedido {
     protected void onCreate() {
         fechaPedido = LocalDateTime.now();
         fechaActualizacion = LocalDateTime.now();
+
         if (numeroPedido == null) {
             numeroPedido = generarNumeroPedido();
         }

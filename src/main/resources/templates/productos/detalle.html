@@ -49,8 +49,8 @@
                 <span class="product-category" th:text="${producto.categoria}">Categoría</span>
 
                 <span th:if="${producto.destacado}" class="badge bg-warning text-dark ms-2">
-                        <i class="fas fa-star me-1"></i> Destacado
-                    </span>
+                    <i class="fas fa-star me-1"></i> Destacado
+                </span>
 
                 <div class="product-price-section">
                     <div class="d-flex align-items-center">
@@ -60,8 +60,8 @@
                               th:text="'S/ ' + ${producto.precio}">S/ 0.00</span>
                         <span th:if="${producto.tieneDescuento()}"
                               class="discount-badge">
-                                -<span th:text="${producto.porcentajeDescuento}">0</span>% OFF
-                            </span>
+                            -<span th:text="${producto.porcentajeDescuento}">0</span>% OFF
+                        </span>
                     </div>
                 </div>
 
@@ -100,7 +100,7 @@
                         <span th:if="${producto.stock > 0}">Agregar al Carrito</span>
                         <span th:if="${producto.stock == 0}">Agotado</span>
                     </button>
-                    <button class="btn btn-favorite" onclick="toggleFavorite()">
+                    <button class="btn btn-favorite" onclick="toggleFavorite(event)">
                         <i class="far fa-heart"></i>
                     </button>
                 </div>
@@ -110,6 +110,7 @@
         <div class="product-features mt-5">
             <h3 class="mb-4">Características del Producto</h3>
             <div class="row">
+
                 <div class="col-md-6 mb-3" th:if="${producto.talla != null}">
                     <div class="feature-item">
                         <div class="feature-icon">
@@ -157,6 +158,7 @@
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
@@ -164,7 +166,8 @@
     <div class="related-products" th:if="${!#lists.isEmpty(productosRelacionados)}">
         <h2 class="section-title">Productos Relacionados</h2>
         <div class="row g-4">
-            <div class="col-md-3" th:each="relacionado : ${productosRelacionados}" th:if="${relacionadoStat.index < 4}">
+            <div class="col-md-3" th:each="relacionado, relacionadoStat : ${productosRelacionados}"
+                 th:if="${relacionadoStat.index < 4}">
                 <div class="related-product-card">
                     <a th:href="@{/productos/{id}(id=${relacionado.id})}" style="text-decoration: none; color: inherit;">
                         <img th:if="${relacionado.imagenUrl != null}"
@@ -183,7 +186,9 @@
             </div>
         </div>
     </div>
+
 </div>
+
 <footer th:replace="~{fragments :: footer}"></footer>
 
 <div th:replace="~{fragments :: scripts}"></div>
@@ -191,63 +196,56 @@
 <script th:inline="javascript">
     /*<![CDATA[*/
 
-    // Obtenemos las variables de Thymeleaf de forma segura
     const maxStock = /*[[${producto.stock}]]*/ 1;
     const productoId = /*[[${producto.id}]]*/ 0;
-    const productoNombre = /*[[${producto.nombre}]]*/ '';
 
     function increaseQuantity() {
         const input = document.getElementById('quantity');
         const currentValue = parseInt(input.value);
-        if (currentValue < maxStock) {
-            input.value = currentValue + 1;
-        }
+        if (currentValue < maxStock) input.value = currentValue + 1;
     }
 
     function decreaseQuantity() {
         const input = document.getElementById('quantity');
         const currentValue = parseInt(input.value);
-        if (currentValue > 1) {
-            input.value = currentValue - 1;
-        }
+        if (currentValue > 1) input.value = currentValue - 1;
     }
 
+    // 🚀 Correcto: Enviar producto al carrito
     function addToCart() {
-    const quantity = document.getElementById('quantity').value;
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = '/carrito/agregar';
+        const quantity = document.getElementById('quantity').value;
 
-    const productoInput = document.createElement('input');
-    productoInput.type = 'hidden';
-    productoInput.name = 'productoId';
-    productoInput.value = productoId;
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/carrito/agregar';
 
-    const cantidadInput = document.createElement('input');
-    cantidadInput.type = 'hidden';
-    cantidadInput.name = 'cantidad';
-    cantidadInput.value = quantity;
+        const productoInput = document.createElement('input');
+        productoInput.type = 'hidden';
+        productoInput.name = 'productoId';
+        productoInput.value = productoId;
 
-    form.appendChild(productoInput);
-    form.appendChild(cantidadInput);
-    document.body.appendChild(form);
-    form.submit();
-}
+        const cantidadInput = document.createElement('input');
+        cantidadInput.type = 'hidden';
+        cantidadInput.name = 'cantidad';
+        cantidadInput.value = quantity;
 
-    function toggleFavorite() {
-        // 'event' puede no estar disponible globalmente,
-        // es mejor pasarlo como argumento si se llama desde el HTML:
-        // onclick="toggleFavorite(event)"
-        // Por ahora, asumimos que 'event' está en el scope:
+        form.appendChild(productoInput);
+        form.appendChild(cantidadInput);
+
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    function toggleFavorite(event) {
         const btn = event.currentTarget.closest('button');
         const icon = btn.querySelector('i');
 
-        if (icon.classList.contains('far')) { // "far" es el icono vacío
+        if (icon.classList.contains('far')) {
             icon.classList.remove('far');
-            icon.classList.add('fas'); // "fas" es el icono relleno
+            icon.classList.add('fas');
             btn.style.background = 'var(--primary-color)';
             btn.style.color = 'white';
-        } else { // Si ya está relleno
+        } else {
             icon.classList.remove('fas');
             icon.classList.add('far');
             btn.style.background = 'white';
@@ -257,5 +255,6 @@
 
     /*]]>*/
 </script>
+
 </body>
 </html>

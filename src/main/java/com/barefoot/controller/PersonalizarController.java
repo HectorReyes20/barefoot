@@ -11,7 +11,6 @@ public class PersonalizarController {
     @GetMapping("/personalizar")
     public String mostrarPersonalizar(HttpSession session, Model model) {
         model.addAttribute("nombreUsuario", session.getAttribute("usuarioNombre"));
-        return "personalizar";
+        return "personalizar"; // Nombre del archivo HTML
     }
-
 }
