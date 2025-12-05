@@ -13,12 +13,8 @@ public class GlobalControllerAdvice {
     @ModelAttribute
     public void addAttributes(HttpServletRequest request, HttpSession session, Model model) {
 
-        // --- SOLUCIÓN AL ERROR ---
-        // Agregamos la URI actual al modelo para que Thymeleaf pueda leerla sin usar #request
         model.addAttribute("requestURI", request.getRequestURI());
-        // -------------------------
 
-        // Tu lógica existente de Usuario
         if (session.getAttribute("usuario") != null) {
             Usuario user = (Usuario) session.getAttribute("usuario");
 

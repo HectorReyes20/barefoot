@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -91,7 +92,6 @@ public class CarritoController {
             RedirectAttributes redirectAttributes) {
 
         try {
-            // Validar stock
             Optional<Producto> productoOpt = productoService.obtenerProductoPorId(productoId);
             if (productoOpt.isPresent()) {
                 Producto producto = productoOpt.get();
@@ -142,6 +142,7 @@ public class CarritoController {
     // Proceder al checkout
     @GetMapping("/checkout")
     public String irACheckout(HttpSession session, RedirectAttributes redirectAttributes) {
+
         // Verificar que el usuario esté logueado
         if (session.getAttribute("usuarioId") == null) {
             redirectAttributes.addFlashAttribute("mensaje", "Debes iniciar sesión para continuar");

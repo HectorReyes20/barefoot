@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${title}">Barefoot Store</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link th:href="@{/css/fragments.css}" rel="stylesheet">
@@ -22,6 +23,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav mx-auto">
 
+                <!-- INICIO -->
                 <li class="nav-item">
                     <a class="nav-link"
                        th:href="@{/inicio}"
@@ -30,6 +32,7 @@
                     </a>
                 </li>
 
+                <!-- PRODUCTOS -->
                 <li class="nav-item">
                     <a class="nav-link"
                        th:href="@{/productos}"
@@ -38,14 +41,16 @@
                     </a>
                 </li>
 
+                <!-- MIS PEDIDOS -->
                 <li class="nav-item">
                     <a class="nav-link"
-                       th:href="@{/personalizar}"
-                       th:classappend="${requestURI != null && requestURI.contains('/personalizar') ? 'active' : ''}">
-                        <i class="fas fa-palette me-1"></i> Personalizar
+                       th:href="@{/mis-pedidos}"
+                       th:classappend="${requestURI != null && requestURI.contains('/mis-pedidos') ? 'active' : ''}">
+                        <i class="fas fa-history me-1"></i> Mis Pedidos
                     </a>
                 </li>
 
+                <!-- NOSOTROS -->
                 <li class="nav-item">
                     <a class="nav-link"
                        th:href="@{/nosotros}"
@@ -56,8 +61,10 @@
 
             </ul>
 
+            <!-- LADO DERECHO: CARRITO + LOGIN/USER -->
             <ul class="navbar-nav ms-auto align-items-center">
 
+                <!-- CARRITO -->
                 <li class="nav-item me-3">
                     <a class="nav-link position-relative" th:href="@{/carrito}" title="Carrito de compras">
                         <span class="cart-icon">
@@ -70,12 +77,14 @@
                     </a>
                 </li>
 
+                <!-- BOTÓN LOGIN -->
                 <li class="nav-item" th:unless="${usuarioLogueado}">
                     <a th:href="@{/login}" class="btn btn-login">
                         <i class="fas fa-sign-in-alt me-2"></i> Iniciar Sesión
                     </a>
                 </li>
 
+                <!-- MENÚ USUARIO -->
                 <li class="nav-item dropdown" th:if="${usuarioLogueado}">
                     <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button"
                        data-bs-toggle="dropdown">
@@ -86,6 +95,7 @@
 
                     <ul class="dropdown-menu dropdown-menu-end">
 
+                        <!-- EMAIL -->
                         <li>
                             <a class="dropdown-item disabled">
                                 <small class="text-muted">
@@ -97,24 +107,28 @@
 
                         <li><hr class="dropdown-divider"></li>
 
+                        <!-- PERFIL -->
                         <li>
                             <a class="dropdown-item" th:href="@{/perfil}">
                                 <i class="fas fa-user"></i> Mi Perfil
                             </a>
                         </li>
 
+                        <!-- MIS PEDIDOS -->
                         <li>
                             <a class="dropdown-item" th:href="@{/mis-pedidos}">
                                 <i class="fas fa-box"></i> Mis Pedidos
                             </a>
                         </li>
 
+                        <!-- FAVORITOS -->
                         <li>
                             <a class="dropdown-item" th:href="@{/favoritos}">
                                 <i class="fas fa-heart"></i> Favoritos
                             </a>
                         </li>
 
+                        <!-- PANEL ADMIN -->
                         <li th:if="${usuarioRol == 'ADMIN'}"><hr class="dropdown-divider"></li>
 
                         <li th:if="${usuarioRol == 'ADMIN'}">
@@ -125,6 +139,7 @@
 
                         <li><hr class="dropdown-divider"></li>
 
+                        <!-- LOGOUT -->
                         <li>
                             <a class="dropdown-item text-danger" th:href="@{/logout}">
                                 <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
@@ -143,10 +158,9 @@
     <div class="container">
 
         <div class="row">
+
             <div class="col-md-4 mb-4">
-                <h5 class="mb-3">
-                    <i class="fas fa-shoe-prints me-2"></i> Barefoot Store
-                </h5>
+                <h5 class="mb-3"><i class="fas fa-shoe-prints me-2"></i> Barefoot Store</h5>
                 <p class="text-white-50">
                     Calzado barefoot personalizado que respeta la anatomía natural de tus pies.
                     Salud, comodidad y estilo en cada paso.
@@ -189,6 +203,7 @@
                     </button>
                 </form>
             </div>
+
         </div>
 
         <hr style="border-color: rgba(255,255,255,0.1);">

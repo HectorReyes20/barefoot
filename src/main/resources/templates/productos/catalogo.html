@@ -8,7 +8,6 @@
 
 <body>
 
-
 <nav th:replace="~{fragments :: navbar}"></nav>
 
 <section class="hero-section">
@@ -18,11 +17,13 @@
             <span th:if="${esDestacados}">Productos Destacados</span>
             <span th:if="${categoriaActual == null && !esDestacados}">Nuestro Catálogo</span>
         </h1>
+
         <p th:if="${query != null}" th:text="'Resultados para: ' + ${query}">Búsqueda</p>
         <p th:if="${categoriaActual == null && !esDestacados && query == null}">
             Descubre nuestra colección de calzado barefoot
         </p>
 
+        <!-- BARRA DE BÚSQUEDA (Mantenida) -->
         <div class="search-bar">
             <form th:action="@{/productos/buscar}" method="get" class="d-flex">
                 <input type="text" name="query" class="form-control"
@@ -65,26 +66,32 @@
                 <h5 class="filter-title">
                     <i class="fas fa-filter me-2"></i> Categorías
                 </h5>
+
                 <a th:href="@{/productos}" class="filter-option"
                    th:classappend="${categoriaActual == null ? 'active' : ''}">
                     <i class="fas fa-th me-2"></i> Todas las categorías
                 </a>
+
                 <a th:href="@{/productos/categoria/Casual}" class="filter-option"
                    th:classappend="${categoriaActual == 'Casual' ? 'active' : ''}">
                     <i class="fas fa-walking me-2"></i> Casual
                 </a>
+
                 <a th:href="@{/productos/categoria/Deportivo}" class="filter-option"
                    th:classappend="${categoriaActual == 'Deportivo' ? 'active' : ''}">
                     <i class="fas fa-running me-2"></i> Deportivo
                 </a>
+
                 <a th:href="@{/productos/categoria/Formal}" class="filter-option"
                    th:classappend="${categoriaActual == 'Formal' ? 'active' : ''}">
                     <i class="fas fa-briefcase me-2"></i> Formal
                 </a>
+
                 <a th:href="@{/productos/categoria/Running}" class="filter-option"
                    th:classappend="${categoriaActual == 'Running' ? 'active' : ''}">
                     <i class="fas fa-fire me-2"></i> Running
                 </a>
+
                 <a th:href="@{/productos/categoria/Senderismo}" class="filter-option"
                    th:classappend="${categoriaActual == 'Senderismo' ? 'active' : ''}">
                     <i class="fas fa-mountain me-2"></i> Senderismo
@@ -95,6 +102,7 @@
                 <h5 class="filter-title">
                     <i class="fas fa-star me-2"></i> Especiales
                 </h5>
+
                 <a th:href="@{/productos/destacados}" class="filter-option"
                    th:classappend="${esDestacados ? 'active' : ''}">
                     <i class="fas fa-star me-2"></i> Productos destacados
@@ -137,12 +145,12 @@
                             </div>
 
                             <span th:if="${producto.tieneDescuento()}" class="badge-descuento">
-                                    -<span th:text="${producto.porcentajeDescuento}">0</span>%
-                                </span>
+                                -<span th:text="${producto.porcentajeDescuento}">0</span>%
+                            </span>
 
                             <span th:if="${producto.destacado}" class="badge-destacado">
-                                    <i class="fas fa-star me-1"></i> Destacado
-                                </span>
+                                <i class="fas fa-star me-1"></i> Destacado
+                            </span>
                         </div>
 
                         <div class="card-body">
@@ -154,11 +162,11 @@
                                 <i class="fas fa-boxes me-1"></i>
                                 <span th:if="${producto.stock > 10}">Stock disponible</span>
                                 <span th:if="${producto.stock <= 10 && producto.stock > 0}">
-                                        ¡Solo quedan <span th:text="${producto.stock}">0</span>!
-                                    </span>
+                                    ¡Solo quedan <span th:text="${producto.stock}">0</span>!
+                                </span>
                                 <span th:if="${producto.stock == 0}" class="text-danger">
-                                        <i class="fas fa-times-circle me-1"></i> Agotado
-                                    </span>
+                                    <i class="fas fa-times-circle me-1"></i> Agotado
+                                </span>
                             </div>
 
                             <div class="d-flex align-items-center mb-3">
@@ -177,6 +185,7 @@
                 </div>
             </div>
 
+            <!-- PAGINACIÓN -->
             <nav th:if="${totalPages != null && totalPages > 1}" class="mt-5">
                 <ul class="pagination justify-content-center">
                     <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
@@ -219,24 +228,18 @@
 </div>
 
 <footer th:replace="~{fragments :: footer}"></footer>
-
 <div th:replace="~{fragments :: scripts}"></div>
 
 <script>
     function ordenarProductos(tipo) {
-        // En una implementación real, esto haría una petición al servidor
-        // Por ahora solo recargamos con un parámetro
         if (tipo) {
-            // Construimos la URL manteniendo los parámetros actuales de categoría o búsqueda
             const url = new URL(window.location.href);
             url.searchParams.set('orden', tipo);
-            // Volvemos a la página 0 al re-ordenar
             url.searchParams.set('page', '0');
             window.location.href = url.href;
         }
     }
 
-    // Para que el <select> muestre el orden actual al cargar la página
     document.addEventListener("DOMContentLoaded", function() {
         const urlParams = new URLSearchParams(window.location.search);
         const ordenActual = urlParams.get('orden');
@@ -245,5 +248,6 @@
         }
     });
 </script>
+
 </body>
 </html>

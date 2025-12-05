@@ -30,6 +30,7 @@ public class AuthController {
     public String procesarLogin(
             @RequestParam String email,
             @RequestParam String password,
+            @RequestParam(required = false) String redirect,
             HttpSession session,
             Model model) {
 
@@ -38,11 +39,15 @@ public class AuthController {
         if (usuario.isPresent()) {
             Usuario user = usuario.get();
 
-
-            session.setAttribute("usuario", user); // Guardamos el objeto entero
+            session.setAttribute("usuario", user);
             session.setAttribute("usuarioId", user.getId());
             session.setAttribute("usuarioNombre", user.getNombre());
             session.setAttribute("usuarioRol", user.getRol().toString());
+
+            // Si viene de checkout, redirigir a checkout
+            if (redirect != null && redirect.equals("checkout")) {
+                return "redirect:/checkout";
+            }
 
             if (user.getRol() == Usuario.Rol.ADMIN) {
                 return "redirect:/admin/dashboard";
@@ -58,17 +63,22 @@ public class AuthController {
     @PostMapping("/registro")
     public String procesarRegistro(
             @ModelAttribute Usuario usuario,
+            @RequestParam(required = false) String redirect,
             Model model,
             HttpSession session) {
 
         try {
             Usuario nuevoUsuario = usuarioService.registrarUsuario(usuario);
 
-
-            session.setAttribute("usuario", nuevoUsuario); // Guardamos el objeto entero
+            session.setAttribute("usuario", nuevoUsuario);
             session.setAttribute("usuarioId", nuevoUsuario.getId());
             session.setAttribute("usuarioNombre", nuevoUsuario.getNombre());
             session.setAttribute("usuarioRol", nuevoUsuario.getRol().toString());
+
+            // Si viene de checkout, redirigir a checkout
+            if (redirect != null && redirect.equals("checkout")) {
+                return "redirect:/checkout";
+            }
 
             return "redirect:/inicio";
 
@@ -84,12 +94,8 @@ public class AuthController {
         return "redirect:/login";
     }
 
-
     @GetMapping("/inicio")
     public String inicio(HttpSession session, Model model) {
-
         return "inicio";
     }
-
-
 }

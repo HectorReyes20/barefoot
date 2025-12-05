@@ -130,12 +130,55 @@ public class CatalogoController {
         model.addAttribute("totalPages", productosPage.getTotalPages());
         model.addAttribute("totalItems", productosPage.getTotalElements());
         model.addAttribute("query", query);
-
-
         return "productos/catalogo";
     }
 
+    @GetMapping("/categoria/{nombre}")
+    public String filtrarPorCategoria(
+            @PathVariable String nombre,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size,
+            @RequestParam(required = false) String orden,
+            HttpSession session,
+            Model model) {
 
+        String sortBy = "fechaCreacion";
+        String direction = "desc";
+
+        if (orden != null) {
+            switch (orden) {
+                case "precio-asc":
+                    sortBy = "precio";
+                    direction = "asc";
+                    break;
+                case "precio-desc":
+                    sortBy = "precio";
+                    direction = "desc";
+                    break;
+                case "nombre":
+                    sortBy = "nombre";
+                    direction = "asc";
+                    break;
+            }
+        }
+
+        List<Producto> productosFiltrados = productoService.buscarPorCategoria(nombre);
+
+        int start = page * size;
+        int end = Math.min(start + size, productosFiltrados.size());
+        List<Producto> productosPaginados = productosFiltrados.subList(start, end);
+
+        model.addAttribute("productos", productosPaginados);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", (int) Math.ceil((double) productosFiltrados.size() / size));
+        model.addAttribute("totalItems", (long) productosFiltrados.size());
+        model.addAttribute("categoriaActual", nombre);
+        model.addAttribute("pageSize", size);
+        model.addAttribute("ordenActual", orden);
+        model.addAttribute("esDestacados", false);
+
+        return "productos/catalogo";
+    }
     @GetMapping("/destacados")
     public String productosDestacados(HttpSession session, Model model) {
         List<Producto> productos = productoService.obtenerProductosDestacados();
