@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{admin/layout/head :: head(titulo='Admin - Detalle de Cliente')}"></head>
+
+<body>
+
+<div th:replace="~{admin/layout/sidebar :: sidebar(paginaActiva='clientes')}"></div>
+
+<div class="main-content">
+
+  <div th:replace="~{admin/layout/navbar :: navbar(tituloPagina='Detalle del Cliente', iconoPagina='fas fa-user-tag')}"></div>
+
+  <div class="container-fluid px-0">
+    <a th:href="@{/admin/clientes}" class="btn btn-outline-secondary mb-3">
+      <i class="fas fa-arrow-left me-2"></i> Volver a la lista
+    </a>
+  </div>
+
+  <div class="row">
+    <div class="col-md-5">
+      <div class="content-card">
+        <h4 th:text="|${cliente.nombre} ${cliente.apellido}|">Nombre Cliente</h4>
+        <ul class="list-group list-group-flush mt-3">
+          <li class="list-group-item">
+            <strong>ID:</strong>
+            <span th:text="${cliente.id}">1</span>
+          </li>
+          <li class="list-group-item">
+            <strong>Email:</strong>
+            <span th:text="${cliente.email}">cliente@email.com</span>
+          </li>
+          <li class="list-group-item">
+            <strong>Teléfono:</strong>
+            <span th:text="${cliente.telefono}">+51 9...</span>
+          </li>
+          <li class="list-group-item">
+            <strong>Miembro desde:</strong>
+            <span th:text="${#temporals.format(cliente.fechaRegistro, 'dd/MM/yyyy')}">01/01/2025</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-md-7">
+      <div class="content-card">
+        <h4><i class="fas fa-chart-line me-2"></i> Estadísticas del Cliente</h4>
+        <div class="row text-center mt-3">
+          <div class="col-4">
+            <div class="p-3 bg-light rounded">
+              <h3 th:text="${stats.totalPedidos}">0</h3>
+              <p class="mb-0">Pedidos Totales</p>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="p-3 bg-success bg-opacity-10 rounded">
+              <h3 class="text-success" th:text="${#numbers.formatCurrency(stats.gastoTotal)}">S/ 0</h3>
+              <p class="mb-0">Gasto Total</p>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="p-3 bg-info bg-opacity-10 rounded">
+              <h3 class="text-info" th:text="${#numbers.formatCurrency(stats.promedioPedido)}">S/ 0</h3>
+              <p class="mb-0">Gasto Promedio</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-card">
+    <h4><i class="fas fa-history me-2"></i> Historial de Pedidos</h4>
+    <div class="table-responsive mt-3">
+      <table class="table table-hover">
+        <thead>
+        <tr>
+          <th>Nro. Pedido</th>
+          <th>Fecha</th>
+          <th>Estado</th>
+          <th>Total</th>
+          <th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="pedido : ${historial}">
+          <td th:text="${pedido.numeroPedido}">PED-001</td>
+          <td th:text="${#temporals.format(pedido.fechaPedido, 'dd/MM/yyyy HH:mm')}">...</td>
+          <td>
+                            <span class="badge"
+                                  th:classappend="${pedido.estado == 'PENDIENTE'} ? 'bg-warning' : (${pedido.estado == 'CONFIRMADO'} ? 'bg-success' : 'bg-secondary')"
+                                  th:text="${pedido.estado}">PENDIENTE</span>
+          </td>
+          <td th:text="${#numbers.formatCurrency(pedido.total)}">$0.00</td>
+          <td>
+            <a th:href="@{/admin/pedidos/detalle/{id}(id=${pedido.id})}" class="btn btn-info btn-sm">
+              <i class="fas fa-search-dollar me-1"></i> Ver Pedido
+            </a>
+          </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(historial)}">
+          <td colspan="5" class="text-center text-muted">Este cliente aún no tiene pedidos.</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <th:block th:insert="~{fragments :: head('Catálogo - Barefoot Store')}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/catalogo.css}">
+</head>
+
+<body>
+
+
+<nav th:replace="~{fragments :: navbar}"></nav>
+
+<section class="hero-section">
+    <div class="container">
+        <h1>
+            <span th:if="${categoriaActual != null}" th:text="${categoriaActual}">Categoría</span>
+            <span th:if="${esDestacados}">Productos Destacados</span>
+            <span th:if="${categoriaActual == null && !esDestacados}">Nuestro Catálogo</span>
+        </h1>
+        <p th:if="${query != null}" th:text="'Resultados para: ' + ${query}">Búsqueda</p>
+        <p th:if="${categoriaActual == null && !esDestacados && query == null}">
+            Descubre nuestra colección de calzado barefoot
+        </p>
+    </div>
+</section>
+
+<div class="container mb-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a th:href="@{/productos}">
+                    <i class="fas fa-home me-1"></i> Inicio
+                </a>
+            </li>
+
+            <li class="breadcrumb-item active" th:if="${categoriaActual != null}">
+                <i class="fas fa-tag me-1"></i>
+                <span th:text="${categoriaActual}">Categoría</span>
+            </li>
+
+            <li class="breadcrumb-item active" th:if="${esDestacados}">
+                <i class="fas fa-star me-1"></i> Destacados
+            </li>
+
+            <li class="breadcrumb-item active" th:if="${query != null}">
+                <i class="fas fa-search me-1"></i> Búsqueda
+            </li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-lg-3 mb-4">
+            <div class="filters-section">
+                <h5 class="filter-title">
+                    <i class="fas fa-filter me-2"></i> Categorías
+                </h5>
+                <a th:href="@{/productos}" class="filter-option"
+                   th:classappend="${categoriaActual == null ? 'active' : ''}">
+                    <i class="fas fa-th me-2"></i> Todas las categorías
+                </a>
+                <a th:href="@{/productos/categoria/Casual}" class="filter-option"
+                   th:classappend="${categoriaActual == 'Casual' ? 'active' : ''}">
+                    <i class="fas fa-walking me-2"></i> Casual
+                </a>
+                <a th:href="@{/productos/categoria/Deportivo}" class="filter-option"
+                   th:classappend="${categoriaActual == 'Deportivo' ? 'active' : ''}">
+                    <i class="fas fa-running me-2"></i> Deportivo
+                </a>
+                <a th:href="@{/productos/categoria/Formal}" class="filter-option"
+                   th:classappend="${categoriaActual == 'Formal' ? 'active' : ''}">
+                    <i class="fas fa-briefcase me-2"></i> Formal
+                </a>
+                <a th:href="@{/productos/categoria/Running}" class="filter-option"
+                   th:classappend="${categoriaActual == 'Running' ? 'active' : ''}">
+                    <i class="fas fa-fire me-2"></i> Running
+                </a>
+                <a th:href="@{/productos/categoria/Senderismo}" class="filter-option"
+                   th:classappend="${categoriaActual == 'Senderismo' ? 'active' : ''}">
+                    <i class="fas fa-mountain me-2"></i> Senderismo
+                </a>
+
+                <hr class="my-4">
+
+                <h5 class="filter-title">
+                    <i class="fas fa-star me-2"></i> Especiales
+                </h5>
+                <a th:href="@{/productos/destacados}" class="filter-option"
+                   th:classappend="${esDestacados ? 'active' : ''}">
+                    <i class="fas fa-star me-2"></i> Productos destacados
+                </a>
+            </div>
+        </div>
+
+        <div class="col-lg-9">
+            <div class="results-header">
+                <div>
+                    <strong th:text="${#lists.size(productos)}">0</strong> productos encontrados
+                </div>
+                <select class="sort-select" onchange="ordenarProductos(this.value)">
+                    <option value="">Ordenar por</option>
+                    <option value="precio-asc">Precio: Menor a Mayor</option>
+                    <option value="precio-desc">Precio: Mayor a Menor</option>
+                    <option value="nombre">Nombre A-Z</option>
+                </select>
+            </div>
+
+            <div th:if="${#lists.isEmpty(productos)}" class="no-products">
+                <i class="fas fa-box-open"></i>
+                <h3>No se encontraron productos</h3>
+                <p>Intenta con otros filtros o búsqueda</p>
+                <a th:href="@{/productos}" class="btn btn-ver-detalle mt-3" style="max-width: 300px; margin: 0 auto;">
+                    Ver todos los productos
+                </a>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4" th:each="producto : ${productos}">
+                    <div class="card product-card">
+                        <div class="product-image-container">
+                            <img th:if="${producto.imagenUrl != null}"
+                                 th:src="${producto.imagenUrl}"
+                                 th:alt="${producto.nombre}">
+                            <div th:if="${producto.imagenUrl == null}"
+                                 class="d-flex align-items-center justify-content-center h-100 bg-light">
+                                <i class="fas fa-image fa-3x text-muted"></i>
+                            </div>
+
+                            <span th:if="${producto.tieneDescuento()}" class="badge-descuento">
+                                    -<span th:text="${producto.porcentajeDescuento}">0</span>%
+                                </span>
+
+                            <span th:if="${producto.destacado}" class="badge-destacado">
+                                    <i class="fas fa-star me-1"></i> Destacado
+                                </span>
+                        </div>
+
+                        <div class="card-body">
+                            <h5 class="card-title" th:text="${producto.nombre}">Nombre del Producto</h5>
+                            <p class="card-text" th:text="${producto.descripcion}">Descripción del producto</p>
+
+                            <div class="product-stock"
+                                 th:classappend="${producto.stock < 10 ? 'low' : ''}">
+                                <i class="fas fa-boxes me-1"></i>
+                                <span th:if="${producto.stock > 10}">Stock disponible</span>
+                                <span th:if="${producto.stock <= 10 && producto.stock > 0}">
+                                        ¡Solo quedan <span th:text="${producto.stock}">0</span>!
+                                    </span>
+                                <span th:if="${producto.stock == 0}" class="text-danger">
+                                        <i class="fas fa-times-circle me-1"></i> Agotado
+                                    </span>
+                            </div>
+
+                            <div class="d-flex align-items-center mb-3">
+                                <span class="product-price" th:text="'S/ ' + ${producto.precioFinal}">S/ 0.00</span>
+                                <span th:if="${producto.tieneDescuento()}"
+                                      class="product-price-original"
+                                      th:text="'S/ ' + ${producto.precio}">S/ 0.00</span>
+                            </div>
+
+                            <a th:href="@{/productos/{id}(id=${producto.id})}"
+                               class="btn btn-ver-detalle">
+                                <i class="fas fa-eye me-2"></i> Ver Detalle
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <nav th:if="${totalPages != null && totalPages > 1}" class="mt-5">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{/productos(page=0, size=${pageSize}, categoria=${categoriaActual}, orden=${ordenActual})}">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                    </li>
+
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{/productos(page=${currentPage - 1}, size=${pageSize}, categoria=${categoriaActual}, orden=${ordenActual})}">
+                            <i class="fas fa-angle-left"></i>
+                        </a>
+                    </li>
+
+                    <li class="page-item"
+                        th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                        th:if="${i >= (currentPage - 2) && i <= (currentPage + 2)}"
+                        th:classappend="${i == currentPage} ? 'active'">
+                        <a class="page-link"
+                           th:href="@{/productos(page=${i}, size=${pageSize}, categoria=${categoriaActual}, orden=${ordenActual})}"
+                           th:text="${i + 1}">1</a>
+                    </li>
+
+                    <li class="page-item" th:classappend="${currentPage >= totalPages - 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/productos(page=${currentPage + 1}, size=${pageSize}, categoria=${categoriaActual}, orden=${ordenActual})}">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                    </li>
+
+                    <li class="page-item" th:classappend="${currentPage >= totalPages - 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/productos(page=${totalPages - 1}, size=${pageSize}, categoria=${categoriaActual}, orden=${ordenActual})}">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{fragments :: footer}"></footer>
+
+<div th:replace="~{fragments :: scripts}"></div>
+
+<script>
+    function ordenarProductos(tipo) {
+        // En una implementación real, esto haría una petición al servidor
+        // Por ahora solo recargamos con un parámetro
+        if (tipo) {
+            // Construimos la URL manteniendo los parámetros actuales de categoría o búsqueda
+            const url = new URL(window.location.href);
+            url.searchParams.set('orden', tipo);
+            // Volvemos a la página 0 al re-ordenar
+            url.searchParams.set('page', '0');
+            window.location.href = url.href;
+        }
+    }
+
+    // Para que el <select> muestre el orden actual al cargar la página
+    document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const ordenActual = urlParams.get('orden');
+        if (ordenActual) {
+            document.querySelector('.sort-select').value = ordenActual;
+        }
+    });
+</script>
+</body>
+</html>

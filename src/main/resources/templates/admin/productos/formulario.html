@@ -3,195 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title th:text="${esEdicion} ? 'Editar Producto' : 'Nuevo Producto'">Producto - Barefoot Admin</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    :root {
-        --primary-color: #2c5f2d;
-        --secondary-color: #97bc62;
-        --sidebar-bg: #1a1a2e;
-    }
 
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background-color: #f5f7fa;
-    }
+  <head th:replace="~{admin/layout/head :: head(titulo=(${esEdicion} ? 'Editar Producto' : 'Nuevo Producto') + ' - Barefoot Admin')}"></head>
 
-    .sidebar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        height: 100vh;
-        width: 260px;
-        background: linear-gradient(180deg, var(--sidebar-bg) 0%, #0f3460 100%);
-        padding: 0;
-        z-index: 1000;
-        box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-    }
-
-    .sidebar-header {
-        padding: 30px 20px;
-        background: rgba(255,255,255,0.1);
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-        color: white;
-    }
-
-    .sidebar-menu {
-        list-style: none;
-        padding: 20px 0;
-        margin: 0;
-    }
-
-    .sidebar-menu li a {
-        display: block;
-        padding: 15px 25px;
-        color: rgba(255,255,255,0.8);
-        text-decoration: none;
-        transition: all 0.3s;
-        border-left: 3px solid transparent;
-    }
-
-    .sidebar-menu li a:hover,
-    .sidebar-menu li a.active {
-        background: #16213e;
-        color: white;
-        border-left-color: var(--secondary-color);
-        padding-left: 30px;
-    }
-
-    .main-content {
-        margin-left: 260px;
-        padding: 30px;
-    }
-
-    .top-bar {
-        background: white;
-        padding: 20px 30px;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        margin-bottom: 30px;
-    }
-
-    .top-bar h2 {
-        margin: 0;
-        color: var(--primary-color);
-    }
-
-    .form-card {
-        background: white;
-        padding: 40px;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    }
-
-    .form-section {
-        margin-bottom: 30px;
-        padding-bottom: 30px;
-        border-bottom: 2px solid #f0f0f0;
-    }
-
-    .form-section:last-child {
-        border-bottom: none;
-    }
-
-    .form-section-title {
-        color: var(--primary-color);
-        font-weight: 600;
-        margin-bottom: 20px;
-        font-size: 1.2rem;
-    }
-
-    .form-label {
-        font-weight: 600;
-        color: #333;
-        margin-bottom: 8px;
-    }
-
-    .form-control, .form-select {
-        border: 2px solid #e0e0e0;
-        border-radius: 8px;
-        padding: 12px;
-        transition: all 0.3s;
-    }
-
-    .form-control:focus, .form-select:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 0.2rem rgba(44, 95, 45, 0.1);
-    }
-
-    .btn-guardar {
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-        color: white;
-        border: none;
-        padding: 12px 30px;
-        border-radius: 8px;
-        font-weight: 600;
-        transition: all 0.3s;
-    }
-
-    .btn-guardar:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(44, 95, 45, 0.3);
-        color: white;
-    }
-
-    .btn-cancelar {
-        background: #6c757d;
-        color: white;
-        border: none;
-        padding: 12px 30px;
-        border-radius: 8px;
-        font-weight: 600;
-    }
-
-    .imagen-preview {
-        max-width: 200px;
-        max-height: 200px;
-        border-radius: 10px;
-        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-        margin-top: 10px;
-    }
-
-    .form-check-input:checked {
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
-    }
-  </style>
+  <link th:href="@{/css/form-producto.css}" rel="stylesheet">
 </head>
 <body>
-<!-- Sidebar -->
-<div class="sidebar">
-  <div class="sidebar-header">
-    <h3><i class="fas fa-shoe-prints me-2"></i> Barefoot Admin</h3>
-  </div>
-  <ul class="sidebar-menu">
-    <li><a th:href="@{/admin/dashboard}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-    <li><a th:href="@{/admin/productos}" class="active"><i class="fas fa-box"></i> Productos</a></li>
-    <li><a href="#"><i class="fas fa-shopping-cart"></i> Pedidos</a></li>
-    <li><a href="#"><i class="fas fa-users"></i> Clientes</a></li>
-    <li><a href="#"><i class="fas fa-palette"></i> Personalizaciones</a></li>
-    <li><a th:href="@{/logout}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
-  </ul>
-</div>
 
-<!-- Main Content -->
+<div th:replace="~{admin/layout/sidebar :: sidebar(paginaActiva='productos')}"></div>
+
 <div class="main-content">
-  <!-- Top Bar -->
-  <div class="top-bar">
-    <h2>
-      <i class="fas fa-box me-2"></i>
-      <span th:text="${esEdicion} ? 'Editar Producto' : 'Nuevo Producto'">Producto</span>
-    </h2>
-  </div>
 
-  <!-- Form Card -->
+  <div th:replace="~{admin/layout/navbar :: navbar(tituloPagina=(${esEdicion} ? 'Editar Producto' : 'Nuevo Producto'), iconoPagina='fas fa-box')}"></div>
+
   <div class="form-card">
     <form th:action="${esEdicion} ? @{/admin/productos/actualizar/{id}(id=${producto.id})} : @{/admin/productos/guardar}"
           method="post"
           th:object="${producto}">
 
-      <!-- Información Básica -->
       <div class="form-section">
         <h4 class="form-section-title">
           <i class="fas fa-info-circle me-2"></i> Información Básica
@@ -236,7 +65,6 @@
         </div>
       </div>
 
-      <!-- Precios y Stock -->
       <div class="form-section">
         <h4 class="form-section-title">
           <i class="fas fa-dollar-sign me-2"></i> Precios y Stock
@@ -276,7 +104,6 @@
         </div>
       </div>
 
-      <!-- Características -->
       <div class="form-section">
         <h4 class="form-section-title">
           <i class="fas fa-list me-2"></i> Características
@@ -342,7 +169,6 @@
         </div>
       </div>
 
-      <!-- Imagen -->
       <div class="form-section">
         <h4 class="form-section-title">
           <i class="fas fa-image me-2"></i> Imagen del Producto
@@ -364,7 +190,6 @@
         </div>
       </div>
 
-      <!-- Estado -->
       <div class="form-section">
         <h4 class="form-section-title">
           <i class="fas fa-toggle-on me-2"></i> Estado del Producto
@@ -395,7 +220,6 @@
         </div>
       </div>
 
-      <!-- Botones -->
       <div class="d-flex gap-3 justify-content-end">
         <a th:href="@{/admin/productos}" class="btn btn-cancelar">
           <i class="fas fa-times me-2"></i> Cancelar
@@ -450,7 +274,7 @@
   }
 
   // Validación del formulario
-  document.querySelector('form').addEventListener('submit', function(e) {
+  document.querySelector('form').addEventListener('submit', function (e) {
       const precio = parseFloat(document.getElementById('precio').value);
       const precioDescuento = parseFloat(document.getElementById('precioDescuento').value);
 
