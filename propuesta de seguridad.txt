@@ -1,9 +1,0 @@
-Deberíamos aplicar los DTOs para los proximos avances,
-
-La razón fundamental es la Seguridad y la Separación de Responsabilidades.
-la entidad q tenemos
-- Entidad (Producto, Usuario) representa la base de datos. la API (lo que devuelven en los controladores) es un contrato público con el exterior. Nunca deben ser la misma cosa.
-1.
-Seguridad: La entidad Usuario contiene el password. Si se devuelve la entidad directamente desde la API, estás exponiendo la contraseña del usuario, aunque esté encriptada. Esto es una vulnerabilidad crítica. Un UsuarioDTO solo incluiría los campos seguros (id, nombre, email).
-2.
-Control y Contrato de API: nuestra API no debe cambiar solo porque cambias algo en la base de datos. Con un DTO,se decides exactamente qué información mostrar. Para una lista de productos, quizás solo necesitas id, nombre y precio (un ProductoResumenDTO). Para el detalle, sí necesitas la descripción completa (un ProductoDetalleDTO). El DTO es el "contrato" que ofreces, y protege los detalles internos de tu sistema.

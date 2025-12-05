@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:insert="~{fragments :: head('Detalle del Pedido - Barefoot Store')}"></th:block>
+</head>
+<body>
+
+<nav th:replace="~{fragments :: navbar}"></nav>
+
+<div class="container my-5">
+    <h1 style="color: var(--color-primary); margin-bottom: 30px;">
+        <i class="fas fa-receipt me-2"></i> Detalle del Pedido
+    </h1>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header" style="background-color: var(--color-primary); color: white;">
+                    <h5 class="mb-0">Información del Pedido</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p><strong>Número:</strong> <span th:text="${pedido.numeroPedido}"></span></p>
+
+                            <p><strong>Fecha:</strong> <span th:text="${#temporals.format(pedido.fechaPedido, 'dd/MM/yyyy HH:mm')}"></span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Estado:</strong>
+                                <span th:class="'badge bg-' + ${pedido.estado.colorBadge}"
+                                      th:text="${pedido.estado.nombre}">
+                                </span>
+                            </p>
+                            <p><strong>Método de Pago:</strong>
+                                <span th:text="${pedido.metodoPago != null ? pedido.metodoPago.nombre : 'No especificado'}"></span>
+                            </p>
+                        </div>
+                    </div>
+                    <p><strong>Dirección:</strong> <span th:text="${pedido.direccionEnvio}"></span></p>
+                    <p th:if="${pedido.notas != null && pedido.notas != ''}"><strong>Notas:</strong> <span th:text="${pedido.notas}"></span></p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header" style="background-color: var(--color-primary); color: white;">
+                    <h5 class="mb-0">Productos</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table align-middle">
+                        <thead>
+                        <tr style="border-bottom: 2px solid var(--color-primary);">
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Precio</th>
+                            <th>Subtotal</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="detalle : ${pedido.detalles}">
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <img th:if="${detalle.producto.imagenUrl != null}"
+                                         th:src="${detalle.producto.imagenUrl}"
+                                         style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;"
+                                         th:alt="${detalle.producto.nombre}">
+                                    <div th:if="${detalle.producto.imagenUrl == null}"
+                                         style="width: 50px; height: 50px; background-color: #eee; border-radius: 5px;"></div>
+
+                                    <div>
+                                        <strong th:text="${detalle.producto.nombre}"></strong>
+                                    </div>
+                                </div>
+                            </td>
+                            <td th:text="${detalle.cantidad}"></td>
+                            <td>S/ <span th:text="${#numbers.formatDecimal(detalle.precioUnitario, 1, 'COMMA', 2, 'POINT')}"></span></td>
+                            <td>S/ <span th:text="${#numbers.formatDecimal(detalle.subtotal, 1, 'COMMA', 2, 'POINT')}"></span></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card" style="position: sticky; top: 20px;">
+                <div class="card-header" style="background-color: var(--color-primary); color: white;">
+                    <h5 class="mb-0">Resumen</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal:</span>
+                        <strong>S/ <span th:text="${#numbers.formatDecimal(pedido.subtotal, 1, 'COMMA', 2, 'POINT')}"></span></strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3 pb-3" style="border-bottom: 1px solid #ddd;">
+                        <span>Envío:</span>
+                        <strong th:if="${pedido.costoEnvio == 0}" class="text-success">GRATIS</strong>
+                        <strong th:if="${pedido.costoEnvio > 0}">S/ <span th:text="${#numbers.formatDecimal(pedido.costoEnvio, 1, 'COMMA', 2, 'POINT')}"></span></strong>
+                    </div>
+                    <div class="d-flex justify-content-between" style="font-size: 1.2rem;">
+                        <strong>Total:</strong>
+                        <strong style="color: var(--color-primary);">S/ <span th:text="${#numbers.formatDecimal(pedido.total, 1, 'COMMA', 2, 'POINT')}"></span></strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a th:href="@{/mis-pedidos}" class="btn btn-outline-primary">Volver</a>
+    </div>
+</div>
+
+<footer th:replace="~{fragments :: footer}"></footer>
+<div th:replace="~{fragments :: scripts}"></div>
+
+</body>
+</html>

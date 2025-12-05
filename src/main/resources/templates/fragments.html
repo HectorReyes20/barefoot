@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title}">Barefoot Store</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link th:href="@{/css/fragments.css}" rel="stylesheet">
+</head>
+
+<nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/inicio}">
+            <i class="fas fa-shoe-prints me-2"></i> Barefoot Store
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mx-auto">
+
+                <li class="nav-item">
+                    <a class="nav-link"
+                       th:href="@{/inicio}"
+                       th:classappend="${requestURI != null && requestURI.contains('inicio') ? ' active' : ''}">
+                        <i class="fas fa-home me-1"></i> Inicio
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link"
+                       th:href="@{/productos}"
+                       th:classappend="${requestURI != null && requestURI.contains('/productos') ? 'active' : ''}">
+                        <i class="fas fa-shopping-bag me-1"></i> Productos
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link"
+                       th:href="@{/mis-pedidos}"
+                       th:classappend="${requestURI != null && requestURI.contains('/mis-pedidos') ? 'active' : ''}">
+                        <i class="fas fa-history me-1"></i> Mi Historial
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link"
+                       th:href="@{/nosotros}"
+                       th:classappend="${requestURI != null && requestURI.contains('/nosotros') ? 'active' : ''}">
+                        <i class="fas fa-info-circle me-1"></i> Nosotros
+                    </a>
+                </li>
+
+            </ul>
+
+            <ul class="navbar-nav ms-auto align-items-center">
+
+                <li class="nav-item me-3">
+                    <a class="nav-link position-relative" th:href="@{/carrito}" title="Carrito de compras">
+                        <span class="cart-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="cart-badge"
+                                  th:if="${session.cantidadCarrito != null && session.cantidadCarrito > 0}"
+                                  th:text="${session.cantidadCarrito}">
+                            </span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item" th:unless="${usuarioLogueado}">
+                    <a th:href="@{/login}" class="btn btn-login">
+                        <i class="fas fa-sign-in-alt me-2"></i> Iniciar Sesión
+                    </a>
+                </li>
+
+                <li class="nav-item dropdown" th:if="${usuarioLogueado}">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button"
+                       data-bs-toggle="dropdown">
+
+                        <div class="user-avatar me-2" th:text="${#strings.substring(nombreUsuario ?: 'U', 0, 1)}"></div>
+                        <span th:text="${nombreUsuario}">Usuario</span>
+                    </a>
+
+                    <ul class="dropdown-menu dropdown-menu-end">
+
+                        <li>
+                            <a class="dropdown-item disabled">
+                                <small class="text-muted">
+                                    <i class="fas fa-envelope me-2"></i>
+                                    <span th:text="${usuarioEmail}">email@example.com</span>
+                                </small>
+                            </a>
+                        </li>
+
+                        <li><hr class="dropdown-divider"></li>
+
+                        <li>
+                            <a class="dropdown-item" th:href="@{/perfil}">
+                                <i class="fas fa-user"></i> Mi Perfil
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item" th:href="@{/mis-pedidos}">
+                                <i class="fas fa-box"></i> Mis Pedidos
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item" th:href="@{/favoritos}">
+                                <i class="fas fa-heart"></i> Favoritos
+                            </a>
+                        </li>
+
+                        <li th:if="${usuarioRol == 'ADMIN'}"><hr class="dropdown-divider"></li>
+
+                        <li th:if="${usuarioRol == 'ADMIN'}">
+                            <a class="dropdown-item text-primary" th:href="@{/admin/dashboard}">
+                                <i class="fas fa-tachometer-alt"></i> Panel Admin
+                            </a>
+                        </li>
+
+                        <li><hr class="dropdown-divider"></li>
+
+                        <li>
+                            <a class="dropdown-item text-danger" th:href="@{/logout}">
+                                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                            </a>
+                        </li>
+
+                    </ul>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<footer th:fragment="footer" class="footer-custom">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <h5 class="mb-3">
+                    <i class="fas fa-shoe-prints me-2"></i> Barefoot Store
+                </h5>
+                <p class="text-white-50">
+                    Calzado barefoot personalizado que respeta la anatomía natural de tus pies.
+                    Salud, comodidad y estilo en cada paso.
+                </p>
+                <div class="social-links mt-3">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-whatsapp"></i></a>
+                    <a href="#"><i class="fab fa-tiktok"></i></a>
+                </div>
+            </div>
+
+            <div class="col-md-2 mb-4">
+                <h6 class="mb-3">Productos</h6>
+                <div class="footer-links">
+                    <a href="#">Casual</a>
+                    <a href="#">Deportivo</a>
+                    <a href="#">Formal</a>
+                    <a href="#">Infantil</a>
+                </div>
+            </div>
+
+            <div class="col-md-2 mb-4">
+                <h6 class="mb-3">Información</h6>
+                <div class="footer-links">
+                    <a href="#">Sobre Nosotros</a>
+                    <a href="#">Envíos</a>
+                    <a href="#">Devoluciones</a>
+                    <a href="#">Contacto</a>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <h6 class="mb-3">Newsletter</h6>
+                <p class="text-white-50 small">Suscríbete y recibe ofertas exclusivas</p>
+                <form class="d-flex">
+                    <input type="email" class="form-control me-2" placeholder="Tu email">
+                    <button class="btn btn-login" type="submit">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <hr style="border-color: rgba(255,255,255,0.1);">
+
+        <div class="row">
+            <div class="col-md-6 text-center text-md-start">
+                <small class="text-white-50">
+                    &copy; 2025 Barefoot Store Perú. Todos los derechos reservados.
+                </small>
+            </div>
+
+            <div class="col-md-6 text-center text-md-end">
+                <small class="text-white-50">
+                    <a href="#" class="text-white-50 me-3">Términos</a>
+                    <a href="#" class="text-white-50">Privacidad</a>
+                </small>
+            </div>
+        </div>
+
+    </div>
+</footer>
+
+<div th:fragment="scripts">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</div>
+
+</html>

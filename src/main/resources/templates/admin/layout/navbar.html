@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<div class="top-navbar" th:fragment="navbar(tituloPagina)" xmlns:th="http://www.w3.org/1999/xhtml">
+
+  <h2 th:text="${tituloPagina}"><i class="fas fa-tachometer-alt me-2"></i> Título</h2>
+
+  <div class="user-info">
+    <span><strong>Administrador:</strong> <span th:text="${nombreUsuario}">Admin</span></span>
+    <div class="user-avatar">
+      <i class="fas fa-user-shield"></i>
+    </div>
+  </div>
+</div>
