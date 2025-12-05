@@ -28,6 +28,7 @@ public class PedidoService {
 
     // Crear pedido
     public Pedido crearPedido(Pedido pedido) {
+
         // Validar stock de productos
         for (DetallePedido detalle : pedido.getDetalles()) {
             Producto producto = detalle.getProducto();
@@ -61,9 +62,9 @@ public class PedidoService {
         return pedidoRepository.findAllByOrderByFechaPedidoDesc(pageable);
     }
 
-    // Obtener pedido por ID
+    // Obtener pedido por ID (VERSIÓN CORRECTA SIN MERGE CONFLICT)
     public Optional<Pedido> obtenerPedidoPorId(Long id) {
-        return pedidoRepository.findById(id);
+        return pedidoRepository.findByIdWithDetallesAndProductos(id);
     }
 
     // Obtener pedido por número
@@ -165,7 +166,7 @@ public class PedidoService {
                 .toList();
     }
 
-    // Actualizar información del pedido
+    // Actualizar información editable del pedido
     public Pedido actualizarPedido(Long id, Pedido pedidoActualizado) {
         Optional<Pedido> pedidoOpt = pedidoRepository.findById(id);
 

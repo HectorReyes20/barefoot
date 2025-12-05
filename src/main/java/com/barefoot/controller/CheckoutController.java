@@ -26,9 +26,11 @@ public class CheckoutController {
     @Autowired
     private ProductoService productoService;
 
-    // Mostrar página de checkout
+
+    // ------------------ MOSTRAR CHECKOUT ------------------
     @GetMapping
     public String mostrarCheckout(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
+
         // Verificar autenticación
         if (session.getAttribute("usuarioId") == null) {
             redirectAttributes.addFlashAttribute("mensaje", "Debes iniciar sesión para continuar");
@@ -36,7 +38,7 @@ public class CheckoutController {
             return "redirect:/login";
         }
 
-        // Verificar que el carrito no esté vacío
+        // Carrito vacío
         if (carritoService.estaVacio(session)) {
             redirectAttributes.addFlashAttribute("mensaje", "El carrito está vacío");
             redirectAttributes.addFlashAttribute("tipoMensaje", "warning");
@@ -57,7 +59,8 @@ public class CheckoutController {
         return "checkout/checkout";
     }
 
-    // Procesar el pedido
+
+    // ------------------ PROCESAR PEDIDO ------------------
     @PostMapping("/procesar")
     public String procesarPedido(
             @RequestParam String direccionEnvio,
@@ -67,30 +70,29 @@ public class CheckoutController {
             RedirectAttributes redirectAttributes) {
 
         try {
-            // Verificar autenticación
+
+            // Validación de usuario
             if (session.getAttribute("usuarioId") == null) {
                 throw new RuntimeException("Debes iniciar sesión");
             }
 
-            // Verificar que el carrito no esté vacío
             if (carritoService.estaVacio(session)) {
                 throw new RuntimeException("El carrito está vacío");
             }
 
-            // Obtener usuario
             Usuario usuario = (Usuario) session.getAttribute("usuario");
             if (usuario == null) {
                 throw new RuntimeException("Usuario no encontrado");
             }
 
-            // Crear el pedido
+            // Crear pedido
             Pedido pedido = new Pedido();
             pedido.setUsuario(usuario);
             pedido.setDireccionEnvio(direccionEnvio);
             pedido.setMetodoPago(Pedido.MetodoPago.valueOf(metodoPago));
             pedido.setNotas(notas);
 
-            // Calcular totales
+            // Totales
             List<ItemCarrito> carrito = carritoService.obtenerCarrito(session);
             Double subtotal = carritoService.calcularTotal(session);
             Double costoEnvio = calcularCostoEnvio(subtotal);
@@ -99,11 +101,12 @@ public class CheckoutController {
             pedido.setCostoEnvio(costoEnvio);
             pedido.setDescuento(0.0);
             pedido.setTotal(subtotal + costoEnvio);
+            pedido.setEstado(Pedido.EstadoPedido.PENDIENTE);
 
-            // Crear los detalles del pedido
+            // Crear detalles
             List<DetallePedido> detalles = new ArrayList<>();
             for (ItemCarrito item : carrito) {
-                // Verificar stock nuevamente
+
                 Producto producto = productoService.obtenerProductoPorId(item.getProductoId())
                         .orElseThrow(() -> new RuntimeException("Producto no encontrado: " + item.getNombre()));
 
@@ -118,17 +121,23 @@ public class CheckoutController {
 
             pedido.setDetalles(detalles);
 
-            // Guardar el pedido (esto también reducirá el stock)
+            // Guardar
             Pedido pedidoGuardado = pedidoService.crearPedido(pedido);
 
-            // Vaciar el carrito
+            // Vaciar carrito
             carritoService.vaciarCarrito(session);
 
+            // Métodos de pago especiales
+            if ("STRIPE".equals(metodoPago) || "TARJETA_CREDITO".equals(metodoPago)) {
+                return "redirect:/pago/procesar/" + pedidoGuardado.getId();
+            }
+
+            // Pago normal
             redirectAttributes.addFlashAttribute("mensaje", "¡Pedido realizado con éxito!");
             redirectAttributes.addFlashAttribute("tipoMensaje", "success");
-            redirectAttributes.addFlashAttribute("numeroPedido", pedidoGuardado.getNumeroPedido());
 
             return "redirect:/checkout/confirmacion/" + pedidoGuardado.getId();
+
 
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("mensaje", "Error al procesar el pedido: " + e.getMessage());
@@ -137,7 +146,8 @@ public class CheckoutController {
         }
     }
 
-    // Página de confirmación
+
+    // ------------------ CONFIRMACIÓN ------------------
     @GetMapping("/confirmacion/{id}")
     public String mostrarConfirmacion(
             @PathVariable Long id,
@@ -145,7 +155,6 @@ public class CheckoutController {
             Model model,
             RedirectAttributes redirectAttributes) {
 
-        // Verificar autenticación
         if (session.getAttribute("usuarioId") == null) {
             return "redirect:/login";
         }
@@ -154,8 +163,8 @@ public class CheckoutController {
             Pedido pedido = pedidoService.obtenerPedidoPorId(id)
                     .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
 
-            // Verificar que el pedido pertenezca al usuario
             Usuario usuario = (Usuario) session.getAttribute("usuario");
+
             if (!pedido.getUsuario().getId().equals(usuario.getId())) {
                 throw new RuntimeException("No tienes permiso para ver este pedido");
             }
@@ -171,13 +180,32 @@ public class CheckoutController {
         }
     }
 
-    // Calcular costo de envío
-    private Double calcularCostoEnvio(Double subtotal) {
-        // Envío gratis para compras mayores a S/ 400
-        if (subtotal >= 400) {
-            return 0.0;
+
+    // ------------------ AUTENTICACIÓN EN CHECKOUT ------------------
+    @GetMapping("/autenticacion")
+    public String mostrarAutenticacion(HttpSession session, Model model) {
+
+        if (carritoService.estaVacio(session)) {
+            return "redirect:/productos";
         }
-        // Costo fijo de envío
+
+        Double subtotal = carritoService.calcularTotal(session);
+        Double costoEnvio = calcularCostoEnvio(subtotal);
+        Double total = subtotal + costoEnvio;
+
+        model.addAttribute("subtotal", subtotal);
+        model.addAttribute("costoEnvio", costoEnvio);
+        model.addAttribute("total", total);
+        model.addAttribute("cantidadItems", carritoService.obtenerCarrito(session).size());
+
+        return "checkout/autenticacion";
+    }
+
+
+    // ------------------ COSTO ENVÍO ------------------
+    private Double calcularCostoEnvio(Double subtotal) {
+        if (subtotal >= 400) return 0.0;
         return 15.0;
     }
+
 }
