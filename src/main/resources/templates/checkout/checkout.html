@@ -102,8 +102,11 @@
                                        required>
                                 <label class="form-check-label w-100"
                                        th:for="'metodo_' + ${metodo}">
-                                    <i class="fas fa-credit-card me-2"></i>
+                                    <span th:text="${metodo.icono}" class="me-2">💳</span>
                                     <span th:text="${metodo.nombre}">Método</span>
+                                    <span th:if="${metodo.requierePasarela}" class="badge bg-primary ms-2">
+                                        Pago Online
+                                     </span>
                                 </label>
                             </div>
                         </div>

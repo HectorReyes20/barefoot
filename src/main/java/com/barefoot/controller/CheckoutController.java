@@ -60,7 +60,7 @@ public class CheckoutController {
     }
 
 
-    // ------------------ PROCESAR PEDIDO ------------------
+    // ------------------ PROCESAR PEDIDO (ACTUALIZADO) ------------------
     @PostMapping("/procesar")
     public String procesarPedido(
             @RequestParam String direccionEnvio,
@@ -70,8 +70,7 @@ public class CheckoutController {
             RedirectAttributes redirectAttributes) {
 
         try {
-
-            // Validación de usuario
+            // 1. Validaciones básicas
             if (session.getAttribute("usuarioId") == null) {
                 throw new RuntimeException("Debes iniciar sesión");
             }
@@ -85,14 +84,16 @@ public class CheckoutController {
                 throw new RuntimeException("Usuario no encontrado");
             }
 
-            // Crear pedido
+            // 2. Crear objeto Pedido base
             Pedido pedido = new Pedido();
             pedido.setUsuario(usuario);
             pedido.setDireccionEnvio(direccionEnvio);
-            pedido.setMetodoPago(Pedido.MetodoPago.valueOf(metodoPago));
+            // Convertimos el String a Enum aquí para usarlo más adelante
+            Pedido.MetodoPago metodo = Pedido.MetodoPago.valueOf(metodoPago);
+            pedido.setMetodoPago(metodo);
             pedido.setNotas(notas);
 
-            // Totales
+            // 3. Cálculos de Totales
             List<ItemCarrito> carrito = carritoService.obtenerCarrito(session);
             Double subtotal = carritoService.calcularTotal(session);
             Double costoEnvio = calcularCostoEnvio(subtotal);
@@ -103,7 +104,7 @@ public class CheckoutController {
             pedido.setTotal(subtotal + costoEnvio);
             pedido.setEstado(Pedido.EstadoPedido.PENDIENTE);
 
-            // Crear detalles
+            // 4. Crear Detalles y Verificar Stock
             List<DetallePedido> detalles = new ArrayList<>();
             for (ItemCarrito item : carrito) {
 
@@ -121,25 +122,26 @@ public class CheckoutController {
 
             pedido.setDetalles(detalles);
 
-            // Guardar
+            // 5. Guardar Pedido en BD
             Pedido pedidoGuardado = pedidoService.crearPedido(pedido);
 
-            // Vaciar carrito
+            // 6. Vaciar carrito
             carritoService.vaciarCarrito(session);
 
-            // Métodos de pago especiales
-            if ("STRIPE".equals(metodoPago) || "TARJETA_CREDITO".equals(metodoPago)) {
+            // 7. 🔥 REDIRIGIR SEGÚN EL MÉTODO DE PAGO (NUEVA LÓGICA)
+
+            // Si el método requiere tarjeta/pasarela (ej: Visa, MasterCard)
+            if (metodo.isRequierePasarela()) {
                 return "redirect:/pago/procesar/" + pedidoGuardado.getId();
             }
 
-            // Pago normal
-            redirectAttributes.addFlashAttribute("mensaje", "¡Pedido realizado con éxito!");
-            redirectAttributes.addFlashAttribute("tipoMensaje", "success");
-
-            return "redirect:/checkout/confirmacion/" + pedidoGuardado.getId();
+            // Si es pago manual (Yape, Plin, Transferencia, Contra entrega)
+            // Nota: Asegúrate de tener un controlador que atienda "/pago/manual/{id}"
+            return "redirect:/pago/manual/" + pedidoGuardado.getId();
 
 
         } catch (Exception e) {
+            // Manejo de errores
             redirectAttributes.addFlashAttribute("mensaje", "Error al procesar el pedido: " + e.getMessage());
             redirectAttributes.addFlashAttribute("tipoMensaje", "danger");
             return "redirect:/checkout";
@@ -165,6 +167,7 @@ public class CheckoutController {
 
             Usuario usuario = (Usuario) session.getAttribute("usuario");
 
+            // Seguridad: Verificar que el pedido sea del usuario logueado
             if (!pedido.getUsuario().getId().equals(usuario.getId())) {
                 throw new RuntimeException("No tienes permiso para ver este pedido");
             }
@@ -202,7 +205,7 @@ public class CheckoutController {
     }
 
 
-    // ------------------ COSTO ENVÍO ------------------
+    // ------------------ MÉTODO AUXILIAR: COSTO ENVÍO ------------------
     private Double calcularCostoEnvio(Double subtotal) {
         if (subtotal >= 400) return 0.0;
         return 15.0;

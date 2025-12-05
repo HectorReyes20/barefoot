@@ -56,9 +56,30 @@ public class Transaccion {
     }
 
     public enum Pasarela {
-        STRIPE,
-        IZIPAY,
-        PAGOSEGURO
+        STRIPE("Stripe", "💳"),
+        YAPE("Yape", "📱"),
+        PLIN("Plin", "📱"),
+        TRANSFERENCIA("Transferencia", "🏦"),
+        CONTRAENTREGA("Contra Entrega", "💵"),
+        PAYPAL("PayPal", "🌐"),
+        IZIPAY("Izipay", "💳"),
+        PAGOSEGURO("PagoSeguro", "💳");
+
+        private final String nombre;
+        private final String icono;
+
+        Pasarela(String nombre, String icono) {
+            this.nombre = nombre;
+            this.icono = icono;
+        }
+
+        public String getNombre() {
+            return nombre;
+        }
+
+        public String getIcono() {
+            return icono;
+        }
     }
 
     @PrePersist

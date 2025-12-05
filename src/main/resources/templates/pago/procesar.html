@@ -228,6 +228,7 @@
 
         submitButton.disabled = true;
         spinner.style.display = 'inline-block';
+        submitButton.querySelector('#button-text').textContent = 'Procesando...';
 
         try {
             // Paso 1: Iniciar pago en el servidor
@@ -237,12 +238,17 @@
                 body: 'pedidoId=' + pedidoId
             });
 
+            if (!initResponse.ok) {
+                throw new Error('Error al contactar el servidor');
+            }
+
             const initData = await initResponse.json();
 
             if (initData.error) {
                 showError(initData.error);
                 submitButton.disabled = false;
                 spinner.style.display = 'none';
+                submitButton.querySelector('#button-text').textContent = 'Pagar S/ ...';
                 return;
             }
 
@@ -263,8 +269,9 @@
                 showError(error.message);
                 submitButton.disabled = false;
                 spinner.style.display = 'none';
+                submitButton.querySelector('#button-text').textContent = 'Reintentar Pago';
             } else if (paymentIntent.status === 'succeeded') {
-                // Paso 3: Confirmar pago en servidor
+                // Paso 3: Confirmar en servidor
                 const confirmResponse = await fetch('/pago/api/confirmar-stripe', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -274,7 +281,7 @@
                 const confirmData = await confirmResponse.json();
 
                 if (confirmData.exito) {
-                    showSuccess('¡Pago completado exitosamente!');
+                    showSuccess('¡Pago completado exitosamente! Redirigiendo...');
                     setTimeout(() => {
                         window.location.href = confirmData.redirect;
                     }, 2000);
@@ -282,13 +289,16 @@
                     showError(confirmData.error || 'Error al confirmar el pago');
                     submitButton.disabled = false;
                     spinner.style.display = 'none';
+                    submitButton.querySelector('#button-text').textContent = 'Reintentar';
                 }
             }
 
         } catch (err) {
-            showError('Error: ' + err.message);
+            console.error('Error completo:', err);
+            showError('Error inesperado: ' + err.message);
             submitButton.disabled = false;
             spinner.style.display = 'none';
+            submitButton.querySelector('#button-text').textContent = 'Reintentar Pago';
         }
     });
 

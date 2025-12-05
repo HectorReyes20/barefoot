@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:insert="~{fragments :: head('Completar Pago - Barefoot Store')}"></th:block>
+    <style>
+        .pago-manual-container {
+            background: var(--color-surface);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 30px auto;
+        }
+        .info-pago {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid var(--color-primary);
+        }
+        .dato-pago {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .dato-pago:last-child {
+            border-bottom: none;
+        }
+        .dato-pago strong {
+            color: var(--color-primary);
+        }
+        .dato-pago button {
+            background: none;
+            border: none;
+            color: #007bff;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .qr-code {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .qr-code img {
+            max-width: 250px;
+            border: 3px solid var(--color-primary);
+            border-radius: 10px;
+            padding: 10px;
+            background: white;
+        }
+        .instrucciones {
+            background: #e8f5e9;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            white-space: pre-line;
+        }
+        .alert-importante {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+<nav th:replace="~{fragments :: navbar}"></nav>
+
+<div class="container my-5">
+    <h1 style="color: var(--color-primary); text-align: center; margin-bottom: 40px;">
+        <span th:text="${pedido.metodoPago.icono}">💳</span>
+        Completar Pago con <span th:text="${pedido.metodoPago.nombre}">Método</span>
+    </h1>
+
+    <div class="pago-manual-container">
+
+        <!-- YAPE -->
+        <div th:if="${metodoPago == 'YAPE'}">
+            <div class="qr-code">
+                <h4>Escanea este código QR con tu app Yape</h4>
+                <img th:src="@{/images/qr-yape.png}" alt="QR Yape"
+                     onerror="this.src='https://via.placeholder.com/250x250?text=QR+Yape'">
+            </div>
+
+            <div class="info-pago">
+                <div class="dato-pago">
+                    <strong>Número de Yape:</strong>
+                    <span>
+                        <span th:text="${infoPago.numero}">997 256 008</span>
+                        <button onclick="copiar(this.previousElementSibling.textContent)" title="Copiar">
+                            📋 Copiar
+                        </button>
+                    </span>
+                </div>
+                <div class="dato-pago">
+                    <strong>Titular:</strong>
+                    <span th:text="${infoPago.titular}">Barefoot Store</span>
+                </div>
+                <div class="dato-pago">
+                    <strong>Monto a pagar:</strong>
+                    <span class="h4 text-success mb-0">
+                        S/ <span th:text="${#numbers.formatDecimal(pedido.total, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="instrucciones">
+                <strong>📱 Instrucciones:</strong>
+                <p th:text="${infoPago.instrucciones}"></p>
+            </div>
+        </div>
+
+        <!-- PLIN -->
+        <div th:if="${metodoPago == 'PLIN'}">
+            <div class="qr-code">
+                <h4>Escanea este código QR con tu app Plin</h4>
+                <img th:src="@{/images/qr-plin.png}" alt="QR Plin"
+                     onerror="this.src='https://via.placeholder.com/250x250?text=QR+Plin'">
+            </div>
+
+            <div class="info-pago">
+                <div class="dato-pago">
+                    <strong>Número de Plin:</strong>
+                    <span>
+                        <span th:text="${infoPago.numero}">997 256 008</span>
+                        <button onclick="copiar(this.previousElementSibling.textContent)" title="Copiar">
+                            📋 Copiar
+                        </button>
+                    </span>
+                </div>
+                <div class="dato-pago">
+                    <strong>Titular:</strong>
+                    <span th:text="${infoPago.titular}">Barefoot Store</span>
+                </div>
+                <div class="dato-pago">
+                    <strong>Monto a pagar:</strong>
+                    <span class="h4 text-success mb-0">
+                        S/ <span th:text="${#numbers.formatDecimal(pedido.total, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="instrucciones">
+                <strong>📱 Instrucciones:</strong>
+                <p th:text="${infoPago.instrucciones}"></p>
+            </div>
+        </div>
+
+        <!-- TRANSFERENCIA BANCARIA -->
+        <div th:if="${metodoPago == 'TRANSFERENCIA'}">
+            <div class="info-pago">
+                <div class="dato-pago">
+                    <strong>Banco:</strong>
+                    <span th:text="${infoPago.banco}">BCP</span>
+                </div>
+                <div class="dato-pago">
+                    <strong>Tipo de Cuenta:</strong>
+                    <span th:text="${infoPago.tipoCuenta}">Cuenta Corriente Soles</span>
+                </div>
+                <div class="dato-pago">
+                    <strong>Número de Cuenta:</strong>
+                    <span>
+                        <span th:text="${infoPago.numeroCuenta}">194-2345678-0-90</span>
+                        <button onclick="copiar(this.previousElementSibling.textContent)" title="Copiar">
+                            📋 Copiar
+                        </button>
+                    </span>
+                </div>
+                <div class="dato-pago">
+                    <strong>CCI:</strong>
+                    <span>
+                        <span th:text="${infoPago.cci}">002-194-002345678090-15</span>
+                        <button onclick="copiar(this.previousElementSibling.textContent)" title="Copiar">
+                            📋 Copiar
+                        </button>
+                    </span>
+                </div>
+                <div class="dato-pago">
+                    <strong>Titular:</strong>
+                    <span th:text="${infoPago.titular}">Barefoot Store SAC</span>
+                </div>
+                <div class="dato-pago">
+                    <strong>RUC:</strong>
+                    <span th:text="${infoPago.ruc}">20123456789</span>
+                </div>
+                <div class="dato-pago">
+                    <strong>Monto a transferir:</strong>
+                    <span class="h4 text-success mb-0">
+                        S/ <span th:text="${#numbers.formatDecimal(pedido.total, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="instrucciones">
+                <strong>🏦 Instrucciones:</strong>
+                <p th:text="${infoPago.instrucciones}"></p>
+            </div>
+        </div>
+
+        <!-- CONTRA ENTREGA -->
+        <div th:if="${metodoPago == 'CONTRAENTREGA'}">
+            <div class="alert-importante">
+                <h5><i class="fas fa-hand-holding-usd me-2"></i> Pago Contra Entrega</h5>
+                <p>Tu pedido ha sido registrado exitosamente. Pagarás en efectivo al momento de recibir tu producto.</p>
+            </div>
+
+            <div class="info-pago">
+                <div class="dato-pago">
+                    <strong>Monto a pagar:</strong>
+                    <span class="h4 text-success mb-0">
+                        S/ <span th:text="${#numbers.formatDecimal(pedido.total, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                    </span>
+                </div>
+                <div class="dato-pago">
+                    <strong>Dirección de entrega:</strong>
+                    <span th:text="${pedido.direccionEnvio}">Dirección</span>
+                </div>
+            </div>
+
+            <div class="instrucciones">
+                <strong>💵 Instrucciones:</strong>
+                <p th:text="${infoPago.instrucciones}"></p>
+            </div>
+
+            <!-- Botón directo para contra entrega -->
+            <form th:action="@{/pago/manual/confirmar}" method="post">
+                <input type="hidden" name="pedidoId" th:value="${pedido.id}">
+                <input type="hidden" name="numeroOperacion" value="CONTRAENTREGA">
+                <button type="submit" class="btn btn-success btn-lg w-100 mt-3">
+                    <i class="fas fa-check me-2"></i> Confirmar Pedido
+                </button>
+            </form>
+
+            <div class="text-center mt-3">
+                <a th:href="@{/mis-pedidos}" class="btn btn-outline-secondary">Ver Mis Pedidos</a>
+            </div>
+
+            <div th:replace="~{fragments :: scripts}"></div>
+            <script>
+                // Ocultar el formulario de operación para contra entrega
+                document.addEventListener('DOMContentLoaded', function() {
+                    const operacionForm = document.getElementById('form-operacion');
+                    if (operacionForm) {
+                        operacionForm.style.display = 'none';
+                    }
+                });
+            </script>
+        </div>
+
+        <!-- FORMULARIO PARA INGRESAR NÚMERO DE OPERACIÓN (todos excepto contra entrega) -->
+        <div th:if="${metodoPago != 'CONTRAENTREGA'}" id="form-operacion">
+            <div class="alert-importante">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Importante:</strong> Después de realizar el pago, ingresa el número de operación para que podamos confirmar tu pedido.
+            </div>
+
+            <form th:action="@{/pago/manual/confirmar}" method="post" id="formPagoManual">
+                <input type="hidden" name="pedidoId" th:value="${pedido.id}">
+
+                <div class="mb-4">
+                    <label for="numeroOperacion" class="form-label">
+                        <strong>Número de Operación / Voucher *</strong>
+                    </label>
+                    <input type="text"
+                           class="form-control form-control-lg"
+                           id="numeroOperacion"
+                           name="numeroOperacion"
+                           placeholder="Ej: 123456789"
+                           required
+                           minlength="6">
+                    <small class="text-muted">
+                        Este número aparece en tu comprobante o app después de realizar el pago
+                    </small>
+                </div>
+
+                <button type="submit" class="btn btn-success btn-lg w-100">
+                    <i class="fas fa-check-circle me-2"></i> Confirmar Pago
+                </button>
+            </form>
+
+            <div class="text-center mt-3">
+                <a th:href="@{/mis-pedidos}" class="btn btn-outline-secondary">Confirmar Más Tarde</a>
+            </div>
+        </div>
+
+        <!-- Resumen del pedido -->
+        <div class="info-pago mt-4">
+            <h5 class="mb-3">Resumen de tu Pedido</h5>
+            <div class="dato-pago">
+                <span>Número de Pedido:</span>
+                <strong th:text="${pedido.numeroPedido}">PED-000</strong>
+            </div>
+            <div class="dato-pago">
+                <span>Cantidad de productos:</span>
+                <strong th:text="${pedido.cantidadTotalProductos}">0</strong>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<footer th:replace="~{fragments :: footer}"></footer>
+<div th:replace="~{fragments :: scripts}"></div>
+
+<script>
+    function copiar(texto) {
+        const temp = document.createElement('textarea');
+        temp.value = texto.trim();
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand('copy');
+        document.body.removeChild(temp);
+
+        alert('✅ Copiado: ' + texto.trim());
+    }
+
+    // Validación del formulario
+    const form = document.getElementById('formPagoManual');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const numeroOperacion = document.getElementById('numeroOperacion');
+            if (numeroOperacion && numeroOperacion.value.trim().length < 6) {
+                e.preventDefault();
+                alert('Por favor ingresa un número de operación válido (mínimo 6 caracteres)');
+                numeroOperacion.focus();
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

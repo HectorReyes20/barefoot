@@ -123,21 +123,34 @@ public class Pedido {
     }
 
     public enum MetodoPago {
-        TARJETA_CREDITO("Tarjeta de Crédito"),
-        TARJETA_DEBITO("Tarjeta de Débito"),
-        TRANSFERENCIA("Transferencia Bancaria"),
-        YAPE("Yape"),
-        PLIN("Plin"),
-        CONTRAENTREGA("Contra Entrega");
+        TARJETA_CREDITO("Tarjeta de Crédito", "💳", true),
+        TARJETA_DEBITO("Tarjeta de Débito", "💳", true),
+        YAPE("Yape", "📱", false),
+        PLIN("Plin", "📱", false),
+        TRANSFERENCIA("Transferencia Bancaria", "🏦", false),
+        CONTRAENTREGA("Contra Entrega", "💵", false),
+        PAYPAL("PayPal", "🌐", true);
 
         private final String nombre;
+        private final String icono;
+        private final boolean requierePasarela;
 
-        MetodoPago(String nombre) {
+        MetodoPago(String nombre, String icono, boolean requierePasarela) {
             this.nombre = nombre;
+            this.icono = icono;
+            this.requierePasarela = requierePasarela;
         }
 
         public String getNombre() {
             return nombre;
+        }
+
+        public String getIcono() {
+            return icono;
+        }
+
+        public boolean isRequierePasarela() {
+            return requierePasarela;
         }
     }
 }
