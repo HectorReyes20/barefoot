@@ -1,6 +1,4 @@
 .hero-section {
-    /* CAMBIO: Reemplazado degradado verde por el nuevo degradado café y naranja.
-       (Estos son los valores RGB de #4E342E y #D35400) */
     background: linear-gradient(135deg, rgba(78, 52, 46, 0.95) 0%, rgba(211, 84, 0, 0.95) 100%),
                 url('https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=1200') center/cover;
     color: white;
@@ -17,23 +15,23 @@
 }
 .search-bar button {
     border-radius: 0 50px 50px 0;
-    background: var(--accent-color); /* ¡Esto ya estaba perfecto! */
+    background: var(--accent-color);
     border: none;
     padding: 15px 30px;
-    color: white; /* CAMBIO: Aseguramos texto blanco sobre el naranja */
+    color: white;
     font-weight: 600;
 }
 .filters-section {
-    background: var(--color-surface); /* CAMBIO: De 'white' a variable */
+    background: var(--color-surface);
     padding: 25px;
     border-radius: 15px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     position: sticky;
-    top: 100px; /* Ajustado para el navbar sticky */
+    top: 100px;
 }
 .filter-title {
     font-weight: bold;
-    color: var(--primary-color); /* ¡Perfecto! */
+    color: var(--primary-color);
     margin-bottom: 15px;
     font-size: 1.1rem;
 }
@@ -48,7 +46,7 @@
 .filter-option.active { color: var(--primary-color); font-weight: 600; }
 
 .product-card {
-    background: var(--color-surface); /* CAMBIO: De 'white' a variable */
+    background: var(--color-surface);
     border: none;
     border-radius: 15px;
     overflow: hidden;
@@ -66,7 +64,7 @@
     position: relative;
     overflow: hidden;
     height: 280px;
-    background: var(--color-background); /* CAMBIO: De '#f8f8f8' a variable */
+    background: var(--color-background);
 }
 .product-card img {
     width: 100%;
@@ -79,7 +77,7 @@
     position: absolute;
     top: 15px;
     right: 15px;
-    background: #dc3545; /* El rojo para descuentos es universal, lo dejamos */
+    background: #dc3545;
     color: white;
     padding: 8px 15px;
     border-radius: 20px;
@@ -90,8 +88,8 @@
     position: absolute;
     top: 15px;
     left: 15px;
-    background: var(--accent-color); /* CAMBIO: De amarillo a naranja */
-    color: white; /* CAMBIO: De '#333' a blanco para mejor contraste */
+    background: var(--accent-color);
+    color: white;
     padding: 8px 15px;
     border-radius: 20px;
     font-weight: bold;
@@ -105,7 +103,7 @@
 }
 .product-card .card-title {
     font-weight: bold;
-    color: var(--color-text); /* CAMBIO: De '#333' a variable */
+    color: var(--color-text);
     margin-bottom: 10px;
     font-size: 1.2rem;
 }
@@ -118,7 +116,7 @@
 .product-price {
     font-size: 1.8rem;
     font-weight: bold;
-    color: var(--primary-color); /* ¡Perfecto! */
+    color: var(--primary-color);
     margin-bottom: 10px;
 }
 .product-price-original {
@@ -134,7 +132,7 @@
 }
 .product-stock.low { color: #dc3545; font-weight: 600; }
 .btn-ver-detalle {
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); /* ¡Perfecto! */
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     color: white;
     border: none;
     padding: 12px;
@@ -145,7 +143,6 @@
 }
 .btn-ver-detalle:hover {
     transform: translateY(-2px);
-    /* CAMBIO: Sombra actualizada al color café (RGB de #4E342E) */
     box-shadow: 0 5px 15px rgba(78, 52, 46, 0.3);
     color: white;
 }
@@ -157,7 +154,7 @@
 .no-products i { font-size: 5rem; margin-bottom: 20px; }
 
 .results-header {
-    background: var(--color-surface); /* CAMBIO: De 'white' a variable */
+    background: var(--color-surface);
     padding: 20px;
     border-radius: 10px;
     margin-bottom: 30px;
@@ -171,41 +168,34 @@
     padding: 8px 15px;
 }
 .breadcrumb {
-    background: var(--color-surface); /* CAMBIO: De 'white' a variable */
+    background: var(--color-surface);
     padding: 15px 20px;
     border-radius: 10px;
     margin-bottom: 30px;
-
-    /* ¡Aquí cambiamos el separador! */
     --bs-breadcrumb-divider: '>';
 }
 
-/* Estilo para los enlaces (ej. "Inicio") */
 .breadcrumb-item a {
-    color: var(--primary-color); /* ¡Perfecto! */
+    color: var(--primary-color);
     font-weight: 500;
     text-decoration: none;
     transition: all 0.2s;
 }
 
-/* Efecto al pasar el mouse */
 .breadcrumb-item a:hover {
-    color: var(--secondary-color); /* ¡Perfecto! */
+    color: var(--secondary-color);
 }
 
-/* Estilo para el elemento actual (activo) */
 .breadcrumb-item.active {
-    color: #6c757d; /* Un gris estándar para el texto inactivo */
+    color: #6c757d;
     font-weight: 500;
 }
 
-/* Estilo para los iconos */
 .breadcrumb-item i {
-    color: var(--accent-color); /* ¡Perfecto! */
+    color: var(--accent-color);
     font-size: 0.9rem;
 }
 
-/* Hacemos que el icono del elemento activo sea gris, igual que el texto */
 .breadcrumb-item.active i {
     color: #6c757d;
 }

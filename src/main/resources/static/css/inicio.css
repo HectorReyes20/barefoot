@@ -1,32 +1,15 @@
-/* ============================= */
-/* 🎨 ==== SISTEMA DE DISEÑO: PALETA DE COLORES (Opción 2: Naranja Vibrante) ==== */
-/* ============================= */
 :root {
-    /** El color principal de tu marca. Un café profundo y elegante. */
-    --color-primary: #4E342E; /* Marrón Chocolate Oscuro */
-
-    /** El color de acento para botones (CTAs) y enlaces. */
-    --color-accent: #F39C12;  /* Naranja Vibrante / Ámbar */
-
-    /** Color para los fondos principales de la página */
-    --color-background: #FBF9F6; /* Un blanco roto / crema muy sutil */
-
-    /** Color para las superficies (cards, pop-ups) */
-    --color-surface: #FFFFFF;    /* Blanco puro para contraste */
-
-    /** Color de texto principal. Más suave que el negro puro. */
-    --color-text: #3E3E3E;       /* Un gris/marrón muy oscuro */
-
-    /** Color de texto para usar sobre fondos oscuros (ej. el footer) */
+    --color-primary: #4E342E;
+    --color-accent: #F39C12;
+    --color-background: #FBF9F6;
+    --color-surface: #FFFFFF;
+    --color-text: #3E3E3E;
     --color-text-light: #FFFFFF;
-
-    /* Variables del Chatbot y Fragmentos (heredarán la nueva paleta) */
     --primary-color: var(--color-primary);
     --secondary-color: var(--color-accent);
-    --accent-color: var(--color-accent); /* Asegura que fragments.css también tome el naranja */
+    --accent-color: var(--color-accent);
 }
 
-/* 🎨 ==== Estilos Generales ==== */
 body {
     font-family: 'Poppins', sans-serif;
     color: var(--color-text);
@@ -37,12 +20,10 @@ body {
 
 h1, h2, h3, h4, h5 {
     font-weight: 600;
-    /* El color se hereda del body */
 }
 
 a {
     text-decoration: none;
-    /* Recomendación: añade un color base para enlaces */
     color: var(--color-primary);
     transition: color 0.3s ease;
 }
@@ -50,11 +31,7 @@ a:hover {
     color: var(--color-accent);
 }
 
-/* ============================= */
-/* 🌄 ==== HERO SECTION ==== */
-/* ============================= */
 .hero-section {
-    /* Cambiamos el degradado de verdes por uno elegante de marrón y oro */
     background: linear-gradient(135deg, rgba(78, 52, 46, 0.9) 0%, rgba(192, 160, 128, 0.8) 100%),
                 url('https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=1200') center/cover;
     color: var(--color-text-light);
@@ -75,7 +52,6 @@ a:hover {
 
 .btn-hero {
     background-color: var(--color-accent);
-    /* El texto oscuro sobre el fondo dorado tiene mejor legibilidad */
     color: var(--color-primary);
     padding: 15px 40px;
     border-radius: 50px;
@@ -86,18 +62,15 @@ a:hover {
 }
 
 .btn-hero:hover {
-    background-color: #AE8C6D; /* Un tono de oro más oscuro para el hover */
+    background-color: #AE8C6D;
     transform: scale(1.05);
 }
 
-/* ============================= */
-/* 💬 ==== BIENVENIDA ==== */
-/* ============================= */
 .welcome-box {
     background: var(--color-surface);
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07); /* Sombra más sutil */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
     margin: -50px auto 50px;
     max-width: 800px;
     position: relative;
@@ -108,9 +81,6 @@ a:hover {
     color: var(--color-accent);
 }
 
-/* ============================= */
-/* 🌿 ==== FEATURES ==== */
-/* ============================= */
 .features {
     padding: 80px 0;
 }
@@ -126,7 +96,7 @@ a:hover {
     border-radius: 15px;
     padding: 40px;
     text-align: center;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05); /* Sombra más sutil */
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
     height: 100%;
 }
@@ -147,12 +117,8 @@ a:hover {
     margin-bottom: 15px;
 }
 
-/* ============================= */
-/* 👟 ==== PRODUCTOS ==== */
-/* ============================= */
 .products-section {
     padding: 80px 0;
-    /* El fondo de la sección ahora es el crema, las cards serán blancas */
     background-color: var(--color-background);
 }
 
@@ -166,7 +132,7 @@ a:hover {
     border: none;
     border-radius: 15px;
     overflow: hidden;
-    background: var(--color-surface); /* Aseguramos que la card sea blanca */
+    background: var(--color-surface);
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
 }
@@ -177,8 +143,10 @@ a:hover {
 }
 
 .product-card img {
+    width:100%;
     height: 250px;
     object-fit: cover;
+    object-position: center;
 }
 
 .product-card .card-body {
@@ -201,13 +169,10 @@ a:hover {
 }
 
 .btn-add:hover {
-    background-color: #3E2723; /* Marrón más oscuro para hover */
+    background-color: #3E2723;
     transform: scale(1.05);
 }
 
-/* ============================= */
-/* 🦶 ==== FOOTER ==== */
-/* ============================= */
 footer {
     background-color: var(--color-primary);
     color: var(--color-text-light);
@@ -224,15 +189,6 @@ footer a:hover {
     text-decoration: underline;
 }
 
-/* ============================================
-   CHATBOT
-   ============================================ */
-/* ¡BUENAS NOTICIAS!
-   Tu CSS del chatbot ya usaba variables (--primary-color y --secondary-color).
-   Al definir estas variables en el :root (al inicio del CSS),
-   el chatbot adoptará AUTOMÁTICAMENTE tu nueva paleta marrón y dorada
-   sin necesidad de cambiar una sola línea aquí.
-*/
 .chatbot-container {
     position: fixed;
     bottom: 20px;
@@ -322,7 +278,7 @@ footer a:hover {
     width: 30px;
     height: 30px;
     display: flex;
-    align: center;
+    align-items: center;
     justify-content: center;
     border-radius: 50%;
     transition: background 0.3s;
@@ -336,7 +292,7 @@ footer a:hover {
     flex: 1;
     padding: 20px;
     overflow-y: auto;
-    background: var(--color-background); /* Usamos nuestro fondo general */
+    background: var(--color-background);
 }
 
 .chatbot-messages::-webkit-scrollbar {
@@ -384,8 +340,8 @@ footer a:hover {
 }
 
 .message.bot .message-content {
-    background: var(--color-surface); /* Blanco */
-    color: var(--color-text); /* Texto oscuro */
+    background: var(--color-surface);
+    color: var(--color-text);
     border-bottom-left-radius: 5px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
@@ -396,56 +352,53 @@ footer a:hover {
     border-bottom-right-radius: 5px;
 }
 
-.chatbot-input {
-    padding: 15px;
-    border-top: 1px solid #e0e0e0;
+.chatbot-options {
     display: flex;
-    gap: 10px;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 280px;
+    padding: 12px;
     background: var(--color-surface);
+    border-radius: 15px;
+    margin-top: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
-.chatbot-input input {
-    flex: 1;
-    border: 1px solid #ddd;
-    border-radius: 25px;
-    padding: 10px 15px;
-    font-size: 14px;
-    outline: none;
-    transition: border-color 0.3s;
-    background: var(--color-background); /* Fondo de input sutil */
+.options-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin-bottom: 8px;
+    padding-left: 4px;
+}
+
+.chatbot-option-btn {
+    background: var(--color-background);
+    border: 2px solid rgba(78, 52, 46, 0.1);
+    border-radius: 20px;
+    padding: 12px 16px;
+    font-size: 13px;
     color: var(--color-text);
-}
-
-.chatbot-input input:focus {
-    border-color: var(--primary-color);
-}
-
-.chatbot-input button {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-    border: none;
-    color: white;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.2s;
-    font-size: 16px;
+    transition: all 0.3s ease;
+    text-align: left;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    font-family: 'Poppins', sans-serif;
 }
 
-.chatbot-input button:hover {
-    transform: scale(1.1);
+.chatbot-option-btn:hover {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+    color: var(--color-text-light);
+    border-color: var(--color-primary);
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(78, 52, 46, 0.25);
 }
 
-.chatbot-input button:active {
-    transform: scale(0.95);
+.chatbot-option-btn:active {
+    transform: translateX(5px) scale(0.98);
 }
 
-/* ============================================
-   RESPONSIVE
-   ============================================ */
 @media (max-width: 768px) {
     .chatbot-window {
         width: calc(100% - 40px);
@@ -464,5 +417,14 @@ footer a:hover {
 
     .hero-section p {
         font-size: 1.1rem;
+    }
+
+    .chatbot-options {
+        max-width: 100%;
+    }
+
+    .chatbot-option-btn {
+        font-size: 12px;
+        padding: 10px 14px;
     }
 }

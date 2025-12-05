@@ -10,7 +10,7 @@ public class BarefootApplication {
 		SpringApplication.run(BarefootApplication.class, args);
 		System.out.println("\n=================================================");
 		System.out.println("  Barefoot E-commerce Aplicación Iniciada!");
-		System.out.println("  Acceso: http://localhost:8080/login");
+		System.out.println("  Acceso: http://localhost:8080/inicio");
 		System.out.println("=================================================\n");
 	}
 

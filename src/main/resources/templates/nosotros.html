@@ -2,60 +2,71 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <th:block th:insert="~{fragments :: head('Sobre Nosotros - Barefoot Store')}"></th:block>
-    <link rel="stylesheet" th:href="@{/css/nosotros.css}"> <style>
-    /* Estilos básicos para la página Nosotros (puedes moverlos a nosotros.css) */
-     :root { /* Hereda de inicio.css si está cargado, si no, define aquí */
-        --color-primary: #4E342E;
-        --color-accent: #F39C12;
-        --color-background: #FBF9F6;
-        --color-surface: #FFFFFF;
-        --color-text: #3E3E3E;
-    }
-    .hero-nosotros {
-        background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1588392382834-a891154bca4d?w=1200') center/cover; /* Imagen genérica de naturaleza/pies */
-        padding: 100px 0;
-        color: white;
-        text-align: center;
-    }
-    .section {
-        padding: 60px 0;
-    }
-    .section-title {
-        color: var(--color-primary);
-        font-weight: bold;
-        margin-bottom: 40px;
-        text-align: center;
-    }
-    .map-container {
-        position: relative;
-        overflow: hidden;
-        padding-top: 56.25%; /* 16:9 Aspect Ratio */
-        border-radius: 15px;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-    }
-    .map-container iframe {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        border: 0;
-    }
-    .info-card {
-        background-color: var(--color-surface);
-        padding: 30px;
-        border-radius: 15px;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-        height: 100%;
-        text-align: center;
-    }
-    .info-card i {
-        font-size: 2.5rem;
-        color: var(--color-accent);
-        margin-bottom: 20px;
-    }
-</style>
+    <link rel="stylesheet" th:href="@{/css/nosotros.css}">
+
+    <style>
+        /* Estilos básicos para la página Nosotros */
+        :root {
+            --color-primary: #4E342E;
+            --color-accent: #F39C12;
+            --color-background: #FBF9F6;
+            --color-surface: #FFFFFF;
+            --color-text: #3E3E3E;
+        }
+
+        .hero-nosotros {
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+                        url('https://images.unsplash.com/photo-1588392382834-a891154bca4d?w=1200') center/cover;
+            padding: 100px 0;
+            color: white;
+            text-align: center;
+        }
+
+        .section {
+            padding: 60px 0;
+        }
+
+        .section-title {
+            color: var(--color-primary);
+            font-weight: bold;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .map-container {
+            position: relative;
+            overflow: hidden;
+            padding-top: 56.25%;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .map-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        .info-card {
+            background-color: var(--color-surface);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            height: 100%;
+            text-align: center;
+        }
+
+        .info-card i {
+            font-size: 2.5rem;
+            color: var(--color-accent);
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
+
 <body>
 
 <nav th:replace="~{fragments :: navbar}"></nav>
@@ -71,13 +82,27 @@
     <div class="container">
         <h2 class="section-title">Nuestra Historia</h2>
         <div class="row align-items-center">
+
             <div class="col-md-6 mb-4 mb-md-0">
-                <img src="https://images.unsplash.com/photo-1516962080544-eac695c93791?w=600" alt="Taller artesanal" class="img-fluid rounded shadow" height="400px">
+                <img src="https://images.unsplash.com/photo-1516962080544-eac695c93791?w=600"
+                     alt="Taller artesanal"
+                     class="img-fluid rounded shadow"
+                     height="400">
             </div>
+
             <div class="col-md-6">
-                <p>Barefoot Store nació en Lima, Perú, de la mano de entusiastas del movimiento natural y la salud podológica. Observamos cómo el calzado convencional a menudo restringe la función natural del pie, causando incomodidad y problemas a largo plazo.</p>
-                <p>Decidimos crear una alternativa: calzado que respeta la anatomía del pie, permitiendo que se mueva y fortalezca como la naturaleza lo diseñó. Combinamos la filosofía barefoot con diseño moderno y la posibilidad de personalización para crear zapatos verdaderamente únicos.</p>
-                <p>Cada par es confeccionado con cuidado, utilizando materiales de calidad, pensando en tu comodidad y bienestar en cada paso.</p>
+                <p>
+                    Barefoot Store nació en Lima, Perú, de la mano de entusiastas del movimiento natural y la salud podológica.
+                    Observamos cómo el calzado convencional a menudo restringe la función natural del pie, causando
+                    incomodidad y problemas a largo plazo.
+                </p>
+                <p>
+                    Decidimos crear una alternativa: calzado que respeta la anatomía del pie, permitiendo que se mueva y se fortalezca
+                    como la naturaleza lo diseñó. Combinamos la filosofía barefoot con diseño moderno y personalización.
+                </p>
+                <p>
+                    Cada par es confeccionado con cuidado, utilizando materiales de calidad, pensando en tu comodidad y bienestar.
+                </p>
             </div>
         </div>
     </div>
@@ -87,20 +112,29 @@
     <div class="container">
         <h2 class="section-title">Misión y Visión</h2>
         <div class="row text-center">
+
             <div class="col-md-6 mb-4">
                 <div class="info-card">
                     <i class="fas fa-bullseye"></i>
                     <h3>Nuestra Misión</h3>
-                    <p class="text-muted">Ofrecer calzado barefoot personalizable de alta calidad que promueva la salud podológica, la comodidad y la libertad de movimiento, permitiendo a nuestros clientes expresar su estilo único mientras cuidan sus pies.</p>
+                    <p class="text-muted">
+                        Ofrecer calzado barefoot personalizable de alta calidad que promueva la salud podológica,
+                        la comodidad y la libertad de movimiento.
+                    </p>
                 </div>
             </div>
+
             <div class="col-md-6 mb-4">
                 <div class="info-card">
                     <i class="fas fa-eye"></i>
                     <h3>Nuestra Visión</h3>
-                    <p class="text-muted">Ser la marca líder en calzado barefoot personalizable en Perú y Latinoamérica, reconocida por nuestra innovación, calidad artesanal y compromiso con el bienestar y la conexión natural del cuerpo.</p>
+                    <p class="text-muted">
+                        Ser la marca líder en calzado barefoot personalizable en Perú y Latinoamérica,
+                        reconocida por innovación, calidad artesanal y bienestar.
+                    </p>
                 </div>
             </div>
+
         </div>
     </div>
 </section>
@@ -108,26 +142,37 @@
 <section class="section bg-light">
     <div class="container">
         <h2 class="section-title">Encuéntranos</h2>
+
         <div class="row">
+
             <div class="col-lg-6 mb-4 mb-lg-0">
                 <h4><i class="fas fa-map-marker-alt me-2"></i> Nuestra Tienda Taller</h4>
-                <p>Visítanos para ver nuestros modelos, materiales y recibir asesoría personalizada.</p>
+                <p>Visítanos para ver nuestros modelos y recibir asesoría personalizada.</p>
+
                 <address>
                     <strong>Barefoot Store Perú</strong><br>
                     Av. Principal 123, Urb. El Artesano<br>
-                    Villa María del Triunfo, Lima<br>
-                    Perú<br>
-                    <i class="fas fa-phone me-1"></i> <a href="tel:+51922928818">+51 922 928 818</a><br>
-                    <i class="fas fa-envelope me-1"></i> <a href="mailto:contacto@barefootstore.pe">contacto@barefootstore.pe</a>
+                    Villa María del Triunfo, Lima – Perú<br>
+                    <i class="fas fa-phone me-1"></i>
+                    <a href="tel:+51922928818">+51 922 928 818</a><br>
+                    <i class="fas fa-envelope me-1"></i>
+                    <a href="mailto:contacto@barefootstore.pe">contacto@barefootstore.pe</a>
                 </address>
-                <h5><i class="far fa-clock me-2"></i> Horario de Atención</h5>
-                <p>Lunes a Sábado: 9:00 AM - 7:00 PM</p>
+
+                <h5><i class="far fa-clock me-2"></i> Horario</h5>
+                <p>Lunes a Sábado: 9:00 AM – 7:00 PM</p>
             </div>
+
             <div class="col-lg-6">
                 <div class="map-container">
-                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15607.72979210086!2d-76.9405616191833!3d-12.16453185311913!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9105b9f0e1fabb01%3A0x6b77ff0a5a40b991!2sVilla%20Mar%C3%ADa%20del%20Triunfo!5e0!3m2!1ses-419!2spe!4v1729640030588!5m2!1ses-419!2spe" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    <iframe
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15607.72979210086!2d-76.9405616191833!3d-12.16453185311913!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9105b9f0e1fabb01%3A0x6b77ff0a5a40b991!2sVilla%20Mar%C3%ADa%20del%20Triunfo!5e0!3m2!1ses-419!2spe!4v1729640030588!5m2!1ses-419!2spe"
+                            allowfullscreen
+                            loading="lazy">
+                    </iframe>
                 </div>
             </div>
+
         </div>
     </div>
 </section>

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:insert="~{fragments :: head('Autenticación - Checkout')}"></th:block>
+    <style>
+        .auth-checkout-container {
+            background: linear-gradient(135deg, #f5f1ed 0%, #f9f7f4 100%);
+            padding: 60px 0;
+            min-height: calc(100vh - 200px);
+        }
+        .auth-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+        .auth-section {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .auth-section h2 {
+            color: var(--color-primary);
+            margin-bottom: 30px;
+            font-weight: 700;
+            font-size: 1.8rem;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+        .btn-auth {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-auth:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(78, 52, 46, 0.3);
+        }
+        .divider {
+            text-align: center;
+            margin: 30px 0;
+            position: relative;
+        }
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e0e0e0;
+        }
+        .divider span {
+            background: white;
+            padding: 0 15px;
+            color: #999;
+            position: relative;
+        }
+        .resumen-carrito {
+            background: var(--color-background);
+            padding: 30px;
+            border-radius: 15px;
+            position: sticky;
+            top: 100px;
+        }
+        .resumen-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .resumen-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .resumen-total {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid var(--color-primary);
+        }
+        .resumen-total h4 {
+            color: var(--color-primary);
+            font-size: 1.5rem;
+        }
+        .guest-option {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #e0e0e0;
+            text-align: center;
+        }
+        .guest-option p {
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .guest-link {
+            background: #f5f1ed;
+            color: var(--color-primary);
+            border: 2px solid var(--color-primary);
+            padding: 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        .guest-link:hover {
+            background: var(--color-primary);
+            color: white;
+        }
+        .error-message {
+            color: #d32f2f;
+            background: #ffebee;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #d32f2f;
+        }
+        .success-message {
+            color: #388e3c;
+            background: #e8f5e9;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #388e3c;
+        }
+        @media (max-width: 768px) {
+            .auth-content {
+                grid-template-columns: 1fr;
+            }
+            .resumen-carrito {
+                position: static;
+            }
+            .auth-section {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<nav th:replace="~{fragments :: navbar}"></nav>
+
+<div class="auth-checkout-container">
+    <div class="container">
+        <h1 class="mb-5" style="text-align: center; color: var(--color-primary);">
+            <i class="fas fa-credit-card me-2"></i> Finalizar Compra
+        </h1>
+
+        <div class="auth-content">
+            <!-- SECCIÓN DE LOGIN -->
+            <div>
+                <div class="auth-section">
+                    <h2><i class="fas fa-sign-in-alt me-2"></i> Iniciar Sesión</h2>
+
+                    <div th:if="${param.error}" class="error-message">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        Email o contraseña incorrectos
+                    </div>
+
+                    <form th:action="@{/login}" method="post">
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" required placeholder="tu@email.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password">Contraseña</label>
+                            <input type="password" id="password" name="password" required placeholder="Tu contraseña">
+                        </div>
+
+                        <input type="hidden" name="redirect" value="checkout">
+
+                        <button type="submit" class="btn-auth">
+                            <i class="fas fa-lock me-2"></i> Iniciar Sesión
+                        </button>
+                    </form>
+
+                    <div class="divider">
+                        <span>O</span>
+                    </div>
+
+                    <p style="text-align: center; color: #666; margin-bottom: 20px;">
+                        ¿No tienes cuenta?
+                    </p>
+                </div>
+
+                <!-- SECCIÓN DE REGISTRO -->
+                <div class="auth-section" style="margin-top: 30px;">
+                    <h2><i class="fas fa-user-plus me-2"></i> Crear Cuenta</h2>
+
+                    <form th:action="@{/registro}" method="post">
+                        <div class="form-group">
+                            <label for="nombre">Nombre</label>
+                            <input type="text" id="nombre" name="nombre" required placeholder="Tu nombre">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="apellido">Apellido</label>
+                            <input type="text" id="apellido" name="apellido" required placeholder="Tu apellido">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email-registro">Email</label>
+                            <input type="email" id="email-registro" name="email" required placeholder="tu@email.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="telefono">Teléfono (opcional)</label>
+                            <input type="tel" id="telefono" name="telefono" placeholder="+51 987 654 321">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password-registro">Contraseña</label>
+                            <input type="password" id="password-registro" name="password" required placeholder="Crea una contraseña">
+                        </div>
+
+                        <input type="hidden" name="redirect" value="checkout">
+
+                        <button type="submit" class="btn-auth">
+                            <i class="fas fa-check-circle me-2"></i> Crear Cuenta y Continuar
+                        </button>
+                    </form>
+
+                    <div class="guest-option">
+                        <p style="font-size: 0.9rem; color: #999;">
+                            <i class="fas fa-info-circle me-1"></i> Después de registrarte, se te redirigirá al checkout
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RESUMEN DEL CARRITO -->
+            <div>
+                <div class="resumen-carrito">
+                    <h3 style="color: var(--color-primary); margin-bottom: 25px;">
+                        <i class="fas fa-shopping-cart me-2"></i> Resumen de tu Compra
+                    </h3>
+
+                    <div class="resumen-item">
+                        <span>
+                            <strong>Cantidad de productos:</strong>
+                        </span>
+                        <span th:text="${cantidadItems}">0</span>
+                    </div>
+
+                    <div class="resumen-item">
+                        <span>
+                            <strong>Subtotal:</strong>
+                        </span>
+                        <span>
+                            S/ <span th:text="${#numbers.formatDecimal(subtotal, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                        </span>
+                    </div>
+
+                    <div class="resumen-item">
+                        <span>
+                            <strong>Costo de Envío:</strong>
+                        </span>
+                        <span th:if="${subtotal >= 400}" class="text-success">
+                            <strong><i class="fas fa-check-circle me-1"></i> GRATIS</strong>
+                        </span>
+                        <span th:if="${subtotal < 400}">
+                            S/ <span th:text="${#numbers.formatDecimal(costoEnvio, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                        </span>
+                    </div>
+
+                    <div class="resumen-total">
+                        <h5>Total:</h5>
+                        <h4>
+                            S/ <span th:text="${#numbers.formatDecimal(total, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                        </h4>
+                    </div>
+
+                    <div th:if="${subtotal < 400}" class="alert alert-info mt-4" style="background: #e3f2fd; border-left: 4px solid #2196f3;">
+                        <i class="fas fa-truck me-2"></i>
+                        <strong>¡Buena noticia!</strong> Te faltan solo S/
+                        <span th:text="${#numbers.formatDecimal(400 - subtotal, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                        para envío gratis
+                    </div>
+
+                    <div class="guest-option">
+                        <p style="font-size: 0.9rem;">
+                            ¿Prefieres comprar como invitado?
+                        </p>
+                        <p style="font-size: 0.85rem; color: #999;">
+                            También puedes crear una cuenta después de realizar tu compra
+                        </p>
+                    </div>
+
+                    <hr style="margin: 20px 0;">
+
+                    <a th:href="@{/carrito}" class="guest-link">
+                        <i class="fas fa-arrow-left me-2"></i> Volver al Carrito
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{fragments :: footer}"></footer>
+<div th:replace="~{fragments :: scripts}"></div>
+
+</body>
+</html>
+

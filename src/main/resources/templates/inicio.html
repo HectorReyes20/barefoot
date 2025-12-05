@@ -6,15 +6,13 @@
 </head>
 <body>
 
-<!-- Navbar -->
 <nav th:replace="~{fragments :: navbar}"></nav>
 
-<!-- Hero Section -->
 <section class="hero-section">
     <div class="container">
         <h1>
-            Bienvenido<span th:if="${session.usuarioNombre != null}">,
-                <span th:text="${session.usuarioNombre}">Usuario</span>
+            Bienvenido<span th:if="${usuarioLogueado}">,
+                <span th:text="${nombreUsuario}">Usuario</span>
             </span>!
         </h1>
         <p>Descubre el calzado barefoot que transformará tu forma de caminar</p>
@@ -24,8 +22,7 @@
     </div>
 </section>
 
-<!-- Welcome Message (solo si está logueado) -->
-<div class="container" th:if="${session.usuarioId != null}">
+<div class="container" th:if="${usuarioLogueado}">
     <div class="welcome-box">
         <div class="row align-items-center">
             <div class="col-md-8">
@@ -44,7 +41,6 @@
     </div>
 </div>
 
-<!-- Features Section -->
 <section class="features">
     <div class="container">
         <div class="section-title text-center mb-5">
@@ -77,16 +73,16 @@
     </div>
 </section>
 
-<!-- Products Section -->
 <section class="products-section" id="productos">
     <div class="container">
         <div class="section-title text-center mb-5">
             <h2>Nuestra Colección</h2>
             <p class="text-muted">Descubre los modelos más populares</p>
         </div>
+
         <div class="row g-4">
             <div class="col-md-4">
-                <div class="product-card card">
+                <div class="product-card card h-100">
                     <img src="https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=500" class="card-img-top" alt="Zapato Casual">
                     <div class="card-body">
                         <h5 class="card-title">Urban Barefoot</h5>
@@ -100,8 +96,9 @@
                     </div>
                 </div>
             </div>
+
             <div class="col-md-4">
-                <div class="product-card card">
+                <div class="product-card card h-100">
                     <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500" class="card-img-top" alt="Zapato Deportivo">
                     <div class="card-body">
                         <h5 class="card-title">Sport Flex</h5>
@@ -115,8 +112,9 @@
                     </div>
                 </div>
             </div>
+
             <div class="col-md-4">
-                <div class="product-card card">
+                <div class="product-card card h-100">
                     <img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?w=500" class="card-img-top" alt="Zapato Formal">
                     <div class="card-body">
                         <h5 class="card-title">Classic Barefoot</h5>
@@ -130,9 +128,12 @@
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 </section>
+
+<!-- CHATBOT -->
 <div class="chatbot-container">
     <button class="chatbot-button" id="chatbotToggle">
         <i class="fas fa-comments"></i>
@@ -157,20 +158,13 @@
             </div>
         </div>
 
-        <div class="chatbot-input">
-            <input type="text" id="chatbotInput" placeholder="Escribe tu mensaje...">
-            <button id="chatbotSend">
-                <i class="fas fa-paper-plane"></i>
-            </button>
-        </div>
     </div>
 </div>
 
-<!-- Footer -->
 <footer th:replace="~{fragments :: footer}"></footer>
-
-<!-- Scripts -->
 <div th:replace="~{fragments :: scripts}"></div>
+
 <script th:src="@{/js/chatbot.js}"></script>
+
 </body>
 </html>
