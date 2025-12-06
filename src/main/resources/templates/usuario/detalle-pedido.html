@@ -104,11 +104,51 @@
             </div>
         </div>
     </div>
+    <!-- BOTÓN PARA COMPLETAR PAGO PENDIENTE -->
+    <div th:if="${transaccion != null && transaccion.estado.name() == 'PENDIENTE' && pedido.estado.name() != 'CANCELADO'}"
+         class="alert alert-warning mt-4">
+        <h5>
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            Pago Pendiente de Confirmación
+        </h5>
+        <p>
+            Tu pedido está registrado pero el pago aún no ha sido confirmado.
+            <br>
+            <strong>Método:</strong> <span th:text="${transaccion.pasarela.nombre}"></span>
+        </p>
+        <p th:if="${transaccion.referenciaExterna != null}">
+            <strong>N° Operación:</strong>
+            <code th:text="${transaccion.referenciaExterna}"></code>
+        </p>
+        <a th:href="@{/pago/manual/{id}(id=${pedido.id})}" class="btn btn-warning">
+            <i class="fas fa-credit-card me-2"></i> Completar Pago Ahora
+        </a>
+    </div>
+
+    <div th:if="${(transaccion == null || transaccion.estado.name() == 'FALLIDO')
+                  && pedido.estado.name() != 'CANCELADO'}"
+         class="alert alert-info mt-4">
+        <h5>
+            <i class="fas fa-credit-card me-2"></i> El pedido está pendiente de pago
+        </h5>
+        <p>Aún no has completado el pago de este pedido. Haz clic abajo para proceder.</p>
+
+        <a th:href="@{/pago/manual/{id}(id=${pedido.id})}" class="btn btn-success btn-lg">
+            <i class="fas fa-money-bill-wave me-2"></i>
+            Pagar Ahora (S/ <span th:text="${#numbers.formatDecimal(pedido.total, 1, 'COMMA', 2, 'POINT')}"></span>)
+        </a>
+    </div>
+
+    <div th:if="${pedido.estado.name() == 'CANCELADO'}" class="alert alert-danger mt-4">
+        <h5><i class="fas fa-times-circle me-2"></i> Pedido Cancelado</h5>
+        <p>Este pedido ha sido cancelado y ya no requiere pago.</p>
+    </div>
 
     <div class="mt-4">
         <a th:href="@{/mis-pedidos}" class="btn btn-outline-primary">Volver</a>
     </div>
 </div>
+
 
 <footer th:replace="~{fragments :: footer}"></footer>
 <div th:replace="~{fragments :: scripts}"></div>

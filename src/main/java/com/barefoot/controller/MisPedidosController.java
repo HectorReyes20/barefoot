@@ -1,8 +1,10 @@
 package com.barefoot.controller;
 
 import com.barefoot.model.Pedido;
+import com.barefoot.model.Transaccion;
 import com.barefoot.model.Usuario;
 import com.barefoot.repository.PedidoRepository;
+import com.barefoot.repository.TransaccionRepository;
 import com.barefoot.service.PedidoService;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,9 @@ import java.util.Optional;
 @Controller
 @RequestMapping("/mis-pedidos")
 public class MisPedidosController {
+
+    @Autowired
+    private TransaccionRepository transaccionRepository;
 
     @Autowired
     private PedidoService pedidoService;
@@ -69,21 +74,26 @@ public class MisPedidosController {
                 return "redirect:/login";
             }
 
-            Usuario usuario = (Usuario) session.getAttribute("usuario"); // Recuperar usuario para el navbar
+            Usuario usuario = (Usuario) session.getAttribute("usuario");
 
             Optional<Pedido> pedidoOpt = pedidoService.obtenerPedidoPorId(id);
 
-            // Verificar si existe y si pertenece al usuario logueado
             if (pedidoOpt.isEmpty() || !pedidoOpt.get().getUsuario().getId().equals(usuarioId)) {
                 redirectAttributes.addFlashAttribute("mensaje", "Pedido no encontrado o no autorizado");
                 redirectAttributes.addFlashAttribute("tipoMensaje", "danger");
                 return "redirect:/mis-pedidos";
             }
 
-            model.addAttribute("pedido", pedidoOpt.get());
-            model.addAttribute("usuarioNombre", usuario != null ? usuario.getNombre() : "");
+            Pedido pedido = pedidoOpt.get();
 
-            // CORRECCIÓN: "detalle-pedido" en lugar de "usuario/detalle-pedido"
+            // 🔥 NUEVO: Buscar si hay una transacción pendiente
+            Optional<Transaccion> transaccionPendiente = transaccionRepository
+                    .findFirstByPedidoOrderByFechaCreacionDesc(pedido);
+
+            model.addAttribute("pedido", pedido);
+            model.addAttribute("usuarioNombre", usuario != null ? usuario.getNombre() : "");
+            model.addAttribute("transaccion", transaccionPendiente.orElse(null));
+
             return "usuario/detalle-pedido";
 
         } catch (Exception e) {

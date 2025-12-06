@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <head th:replace="~{admin/layout/head :: head(titulo='Detalle de Transacción - Barefoot Admin')}"></head>
+</head>
+<body>
+
+<div th:replace="~{admin/layout/sidebar :: sidebar(paginaActiva='pagos')}"></div>
+
+<div class="main-content">
+
+    <div class="top-bar">
+        <h2>
+            <i class="fas fa-file-invoice-dollar me-2"></i>
+            Detalle de Transacción
+        </h2>
+        <a th:href="@{/admin/pagos}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i> Volver
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="content-card">
+                <h4>
+                    <i class="fas fa-info-circle me-2"></i>
+                    Información de la Transacción
+                </h4>
+
+                <table class="table">
+                    <tr>
+                        <th>ID Transacción:</th>
+                        <td th:text="${transaccion.id}">1</td>
+                    </tr>
+                    <tr>
+                        <th>Estado:</th>
+                        <td>
+                            <span th:if="${transaccion.estado.name() == 'PENDIENTE'}"
+                                  class="badge bg-warning">
+                                <i class="fas fa-clock me-1"></i> Pendiente
+                            </span>
+                            <span th:if="${transaccion.estado.name() == 'COMPLETADO'}"
+                                  class="badge bg-success">
+                                <i class="fas fa-check-circle me-1"></i> Completado
+                            </span>
+                            <span th:if="${transaccion.estado.name() == 'FALLIDO'}"
+                                  class="badge bg-danger">
+                                <i class="fas fa-times-circle me-1"></i> Fallido
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Método de Pago:</th>
+                        <td>
+                            <span th:text="${transaccion.pasarela.icono}">💳</span>
+                            <span th:text="${transaccion.pasarela.nombre}">Método</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Monto:</th>
+                        <td class="h4 text-success">
+                            S/ <span th:text="${#numbers.formatDecimal(transaccion.monto, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                        </td>
+                    </tr>
+                    <tr th:if="${transaccion.referenciaExterna != null}">
+                        <th>N° Operación:</th>
+                        <td>
+                            <code style="font-size: 1.1rem;" th:text="${transaccion.referenciaExterna}">123456</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Fecha Creación:</th>
+                        <td th:text="${#temporals.format(transaccion.fechaCreacion, 'dd/MM/yyyy HH:mm:ss')}">
+                            Fecha
+                        </td>
+                    </tr>
+                    <tr th:if="${transaccion.fechaConfirmacion != null}">
+                        <th>Fecha Confirmación:</th>
+                        <td th:text="${#temporals.format(transaccion.fechaConfirmacion, 'dd/MM/yyyy HH:mm:ss')}">
+                            Fecha
+                        </td>
+                    </tr>
+                    <tr th:if="${transaccion.messageError != null}">
+                        <th>Motivo Rechazo:</th>
+                        <td class="text-danger" th:text="${transaccion.messageError}">Error</td>
+                    </tr>
+                </table>
+
+                <!-- Acciones -->
+                <div th:if="${transaccion.estado.name() == 'PENDIENTE'}" class="mt-4">
+                    <form th:action="@{/admin/pagos/{id}/confirmar(id=${transaccion.id})}"
+                          method="post"
+                          style="display: inline;"
+                          onsubmit="return confirm('¿Confirmar este pago?');">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-check me-2"></i> Confirmar Pago
+                        </button>
+                    </form>
+
+                    <button type="button" class="btn btn-danger"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modalRechazar">
+                        <i class="fas fa-times me-2"></i> Rechazar Pago
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="content-card">
+                <h4>
+                    <i class="fas fa-shopping-bag me-2"></i>
+                    Información del Pedido
+                </h4>
+
+                <table class="table">
+                    <tr>
+                        <th>N° Pedido:</th>
+                        <td>
+                            <strong th:text="${transaccion.pedido.numeroPedido}">PED-001</strong>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Cliente:</th>
+                        <td>
+                            <span th:text="${transaccion.pedido.usuario.nombre + ' ' + transaccion.pedido.usuario.apellido}">
+                                Cliente
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Email:</th>
+                        <td th:text="${transaccion.pedido.usuario.email}">email</td>
+                    </tr>
+                    <tr>
+                        <th>Teléfono:</th>
+                        <td th:text="${transaccion.pedido.usuario.telefono}">Teléfono</td>
+                    </tr>
+                    <tr>
+                        <th>Estado Pedido:</th>
+                        <td>
+                            <span th:class="'badge bg-' + ${transaccion.pedido.estado.colorBadge}"
+                                  th:text="${transaccion.pedido.estado.nombre}">
+                                Estado
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Total Pedido:</th>
+                        <td>
+                            S/ <span th:text="${#numbers.formatDecimal(transaccion.pedido.total, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                        </td>
+                    </tr>
+                </table>
+
+                <a th:href="@{/admin/pedidos/{id}(id=${transaccion.pedido.id})}"
+                   class="btn btn-primary mt-3">
+                    <i class="fas fa-external-link-alt me-2"></i> Ver Pedido Completo
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Rechazar -->
+    <div class="modal fade" id="modalRechazar" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Rechazar Pago</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form th:action="@{/admin/pagos/{id}/rechazar(id=${transaccion.id})}" method="post">
+                    <div class="modal-body">
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Esta acción cancelará el pedido asociado.
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Motivo del rechazo *</label>
+                            <textarea name="motivo" class="form-control" rows="3"
+                                      placeholder="Ej: Número de operación inválido"
+                                      required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-ban me-1"></i> Rechazar Pago
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
