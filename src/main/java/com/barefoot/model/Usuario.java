@@ -39,6 +39,12 @@ public class Usuario {
     @Column(name = "activo")
     private boolean activo = true;
 
+    @Column(name = "reset_token")
+    private String resetToken;
+
+    @Column(name = "token_expiration")
+    private LocalDateTime tokenExpiration;
+
     @PrePersist
     protected void onCreate() {
         fechaRegistro = LocalDateTime.now();
