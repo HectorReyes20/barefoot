@@ -413,37 +413,31 @@
     }
 
     function validarYAgregar() {
-        // 1. Validación de Login
-        if (!isLoggedIn) {
-            // Guardar url actual para volver (opcional)
-            window.location.href = '/login';
-            return;
-        }
+        // IMPORTANTE: Hemos quitado el bloqueo de "if (!isLoggedIn)..."
+        // Ahora dejamos que el servidor maneje la redirección si no hay sesión.
 
-        // 2. Construir objeto de personalización JSON
-        const modeloNombre = document.getElementById('select-modelo').options[document.getElementById('select-modelo').selectedIndex].dataset.nombre;
+        // 1. Construir el String de personalización
+        const selectModelo = document.getElementById('select-modelo');
+        const modeloNombre = selectModelo.options[selectModelo.selectedIndex].dataset.nombre;
         const talla = document.getElementById('select-talla').value;
         const material = document.getElementById('select-material').value;
 
-        const personalizacionObj = {
-            modelo: modeloNombre,
-            talla: talla,
-            material: material,
-            colores: estadoActual
-        };
+        // Creamos un resumen legible para guardar en la BD
+        let personalizacionString = `Modelo: ${modeloNombre}, Talla: ${talla}, Material: ${material}`;
 
-        // Convertir a string para enviar al backend
-        // Ejemplo string: "Modelo: Urban Custom | Talla: 42 | Material: Cuero | Colores: {Suela: Rojo, Cuerpo: Negro}"
-        // O simplemente JSON
+        // Agregamos los colores seleccionados (si el usuario eligió alguno)
+        if (Object.keys(estadoActual).length > 0) {
+            personalizacionString += ', Diseño: ' + Object.entries(estadoActual)
+                .map(([parte, color]) => `${parte}: ${color}`)
+                .join(', ');
+        } else {
+            personalizacionString += ', Diseño: Estándar';
+        }
 
-        // Vamos a crear un string legible para que se vea bien en el carrito/admin sin procesar JSON extra
-        let personalizacionString = `Modelo: ${modeloNombre}, Talla: ${talla}, Material: ${material}, Diseño: `;
-        const detallesColores = Object.entries(estadoActual).map(([parte, color]) => `${parte}: ${color}`).join(', ');
-        personalizacionString += detallesColores;
-
+        // 2. Asignar al input oculto y enviar
         document.getElementById('input-personalizacion').value = personalizacionString;
 
-        // 3. Enviar formulario
+        // Esto enviará los datos al método /carrito/agregar que modificamos
         document.getElementById('form-add-cart').submit();
     }
     /*]]>*/
