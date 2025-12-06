@@ -68,6 +68,13 @@
 
                                     <div>
                                         <strong th:text="${detalle.producto.nombre}"></strong>
+
+                                        <p th:if="${detalle.personalizacion != null}"
+                                           class="text-muted small mb-0"
+                                           style="font-size: 0.85rem; margin-top: 4px;">
+                                            <i class="fas fa-palette me-1"></i>
+                                            <span th:text="${detalle.personalizacion}"></span>
+                                        </p>
                                     </div>
                                 </div>
                             </td>

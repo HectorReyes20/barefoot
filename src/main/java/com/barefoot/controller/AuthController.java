@@ -14,7 +14,8 @@ public class AuthController {
 
     @Autowired
     private UsuarioService usuarioService;
-
+    @Autowired // <--- AGREGAR ESTO
+    private com.barefoot.service.CarritoService carritoService;
     @GetMapping("/login")
     public String mostrarLogin() {
         return "login";
@@ -34,28 +35,31 @@ public class AuthController {
             HttpSession session,
             Model model) {
 
-        Optional<Usuario> usuario = usuarioService.autenticar(email, password);
+        Optional<Usuario> usuarioOpt = usuarioService.autenticar(email, password);
 
-        if (usuario.isPresent()) {
-            Usuario user = usuario.get();
-
+        if (usuarioOpt.isPresent()) {
+            Usuario user = usuarioOpt.get();
             session.setAttribute("usuario", user);
             session.setAttribute("usuarioId", user.getId());
             session.setAttribute("usuarioNombre", user.getNombre());
             session.setAttribute("usuarioRol", user.getRol().toString());
+            carritoService.fusionarCarrito(session, usuarioOpt.get());
 
-            // Si viene de checkout, redirigir a checkout
-            if (redirect != null && redirect.equals("checkout")) {
+            // --- NUEVA LÓGICA: Verificar pendiente ---
+            if (session.getAttribute("pendiente_prod_id") != null) {
+                return "redirect:/carrito/procesar-pendiente";
+            }
+            // ----------------------------------------
+
+            if ("checkout".equals(redirect)) {
                 return "redirect:/checkout";
             }
-
             if (user.getRol() == Usuario.Rol.ADMIN) {
                 return "redirect:/admin/dashboard";
-            } else {
-                return "redirect:/inicio";
             }
+            return "redirect:/inicio";
         } else {
-            model.addAttribute("error", "Email o contraseña incorrectos");
+            model.addAttribute("error", "Credenciales inválidas");
             return "login";
         }
     }
