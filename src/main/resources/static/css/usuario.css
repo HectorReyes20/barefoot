@@ -1,0 +1,121 @@
+:root {
+    --primary-color: #4E342E;
+    --accent-color: #CCA474;
+    --bg-color: #FBF9F6;
+    --card-bg: #FFFFFF;
+    --border-color: rgba(78, 52, 46, 0.15);
+}
+
+body { background-color: var(--bg-color); color: #444; }
+.font-serif { font-family: 'Playfair Display', serif; }
+.border-light-brown { border-color: var(--border-color) !important; }
+
+/* --- PERFIL HEADER --- */
+.profile-hero {
+    background-color: white;
+    padding: 60px 0;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 40px;
+}
+
+.avatar-circle {
+    width: 80px; height: 80px;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem;
+    box-shadow: 0 5px 15px rgba(78, 52, 46, 0.2);
+}
+
+/* --- MENÚ LATERAL (PILLS) --- */
+.nav-pills-custom .nav-link {
+    color: #666;
+    background-color: transparent;
+    border-radius: 8px;
+    padding: 15px 20px;
+    margin-bottom: 8px;
+    font-weight: 500;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+}
+
+.nav-pills-custom .nav-link:hover {
+    background-color: #F8F5F2;
+    color: var(--primary-color);
+}
+
+.nav-pills-custom .nav-link.active {
+    background-color: #F3ECE7; /* Color activo suave */
+    color: var(--primary-color);
+    font-weight: 700;
+    border-color: var(--border-color);
+}
+
+.nav-pills-custom .nav-link i { width: 25px; color: var(--accent-color); }
+
+/* --- TARJETAS DE CONTENIDO --- */
+.card-elegant {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.02);
+    overflow: hidden;
+}
+
+.card-header-elegant {
+    background-color: white;
+    border-bottom: 1px solid var(--border-color);
+    padding: 20px 25px;
+}
+
+.card-header-elegant h5 {
+    margin: 0;
+    color: var(--primary-color);
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+}
+
+/* --- TABLAS (PEDIDOS) --- */
+.table-elegant {
+    margin-bottom: 0;
+}
+.table-elegant th {
+    background-color: #F8F5F2;
+    color: var(--primary-color);
+    font-weight: 600;
+    border-bottom: 2px solid var(--border-color);
+    padding: 15px;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+.table-elegant td {
+    padding: 20px 15px;
+    vertical-align: middle;
+    color: #555;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* --- STATUS BADGES --- */
+.badge-status {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+.badge-PENDIENTE { background-color: #FFF3CD; color: #856404; }
+.badge-CONFIRMADO, .badge-ENVIADO { background-color: #D1ECF1; color: #0C5460; }
+.badge-ENTREGADO { background-color: #D4EDDA; color: #155724; }
+.badge-CANCELADO { background-color: #F8D7DA; color: #721C24; }
+
+/* --- FAVORITOS --- */
+.fav-card {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+.fav-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}

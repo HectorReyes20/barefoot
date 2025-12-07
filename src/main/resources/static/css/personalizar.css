@@ -1,0 +1,172 @@
+/* src/main/resources/static/css/personalizar.css */
+
+:root {
+    --primary-color: #4E342E;
+    --accent-color: #CCA474;
+    --bg-color: #FBF9F6;
+    --border-color: rgba(78, 52, 46, 0.15);
+    --card-bg: #FFFFFF;
+}
+
+body {
+    background-color: var(--bg-color);
+}
+
+.font-serif {
+    font-family: 'Playfair Display', serif;
+}
+
+.text-primary-dark {
+    color: #2C1E1A;
+}
+
+.border-light-brown {
+    border-color: var(--border-color) !important;
+}
+
+/* --- TARJETA PRINCIPAL --- */
+.customizer-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    min-height: 80vh; /* Altura mínima para que se vea imponente */
+}
+
+/* --- ÁREA DE PREVISUALIZACIÓN (IZQUIERDA) --- */
+.preview-area {
+    background-color: #F8F5F2;
+    /* Patrón de puntos sutil para fondo técnico */
+    background-image: radial-gradient(#4E342E 0.5px, transparent 0.5px);
+    background-size: 30px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 40px;
+    border-right: 1px solid var(--border-color);
+}
+
+/* Contenedor del SVG */
+.svg-container {
+    width: 100%;
+    max-width: 650px;
+    display: none; /* Oculto por defecto */
+    filter: drop-shadow(0 15px 25px rgba(0,0,0,0.15)); /* Sombra realista al zapato */
+    transition: all 0.3s ease;
+}
+
+.svg-container.active {
+    display: block; /* Solo se muestra el activo */
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* --- ÁREA DE CONTROLES (DERECHA) --- */
+.controls-area {
+    padding: 40px;
+    background: var(--card-bg);
+    overflow-y: auto; /* Si la pantalla es pequeña, hace scroll interno */
+    max-height: 100%;
+}
+
+.option-group {
+    margin-bottom: 30px;
+}
+
+.option-title {
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    display: block;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 8px;
+}
+
+/* Botones de colores */
+.color-picker-container {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.color-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #eee; /* Borde suave por defecto */
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.color-btn:hover {
+    transform: scale(1.1);
+}
+
+.color-btn.selected {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(78, 52, 46, 0.1); /* Anillo de selección */
+    transform: scale(1.1);
+}
+
+/* Formularios */
+.form-select-custom {
+    border: 1px solid var(--border-color);
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    color: #444;
+    background-color: #fff;
+    cursor: pointer;
+}
+
+.form-select-custom:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(78, 52, 46, 0.1);
+    outline: none;
+}
+
+/* Botón Agregar */
+.btn-add-custom {
+    background-color: var(--primary-color);
+    color: white;
+    width: 100%;
+    padding: 15px;
+    border-radius: 8px;
+    font-weight: 600;
+    border: 1px solid var(--primary-color);
+    font-size: 1.1rem;
+    transition: all 0.3s;
+    letter-spacing: 1px;
+    margin-top: 20px;
+}
+
+.btn-add-custom:hover {
+    background-color: #2C1E1A;
+    border-color: #2C1E1A;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(78, 52, 46, 0.2);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+    .customizer-card {
+        flex-direction: column;
+    }
+    .preview-area {
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        min-height: 400px;
+    }
+    .controls-area {
+        height: auto;
+    }
+}

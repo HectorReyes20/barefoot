@@ -1,76 +1,71 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <th:block th:insert="~{fragments :: head('Iniciar Sesión - Barefoot Store')}"></th:block>
-    <link rel="stylesheet" th:href="@{/css/login.css}">
+    <th:block th:insert="~{fragments :: head('Iniciar Sesión - Barefoot')}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/autenticacion.css}">
 </head>
-
 <body>
-<div class="container">
-    <div class="login-container">
-        <div class="login-left">
-            <h1><i class="fas fa-shoe-prints"></i> Barefoot Store</h1>
-            <p>Calzado personalizado que respeta la forma natural de tus pies. Comodidad, salud y estilo en cada paso.</p>
-            <div class="mt-4">
-                <i class="fas fa-check-circle me-2"></i> Diseños 100% personalizables<br>
-                <i class="fas fa-check-circle me-2 mt-2"></i> Materiales premium<br>
-                <i class="fas fa-check-circle me-2 mt-2"></i> Envío a todo el Perú
+
+<nav th:replace="~{fragments :: navbar}"></nav>
+
+<div class="auth-wrapper">
+    <div class="auth-card">
+
+        <div class="auth-banner">
+            <div class="auth-banner-content">
+                <h2 class="font-serif">Bienvenido de nuevo</h2>
+                <p>Continúa explorando la colección más natural para tus pies. Tu confort es nuestra prioridad.</p>
             </div>
         </div>
 
-        <div class="login-right">
-            <div class="login-header">
-                <h2>Iniciar Sesión</h2>
-                <p class="text-muted">Bienvenido de vuelta</p>
+        <div class="auth-form-container">
+            <div class="auth-header">
+                <h2 class="auth-title font-serif">Iniciar Sesión</h2>
+                <p class="text-muted small">Ingresa tus credenciales para acceder</p>
             </div>
 
-            <div th:if="${error}" class="alert alert-danger" role="alert">
-                <i class="fas fa-exclamation-circle me-2"></i>
-                <span th:text="${error}"></span>
+            <div th:if="${error}" class="alert alert-danger py-2 small rounded-2 mb-4 text-center border-0 bg-danger bg-opacity-10 text-danger fw-bold" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i> <span th:text="${error}">Error</span>
+            </div>
+
+            <div th:if="${mensaje}" th:class="'alert py-2 small rounded-2 mb-4 text-center border-0 fw-bold alert-' + ${tipoMensaje}" role="alert">
+                <span th:text="${mensaje}">Mensaje</span>
             </div>
 
             <form th:action="@{/login}" method="post">
-                <div class="mb-3">
-                    <label for="email" class="form-label">
-                        <i class="fas fa-envelope me-1"></i> Email
-                    </label>
-                    <input type="email" class="form-control" id="email" name="email"
-                           placeholder="tu@email.com" required autofocus>
+                <div class="form-group">
+                    <label class="form-label">Correo Electrónico</label>
+                    <input type="email" class="form-control" name="email" placeholder="ejemplo@correo.com" required autofocus>
                 </div>
 
-                <div class="mb-3">
-                    <label for="password" class="form-label">
-                        <i class="fas fa-lock me-1"></i> Contraseña
-                    </label>
-                    <input type="password" class="form-control" id="password" name="password"
-                           placeholder="••••••••" required>
+                <div class="form-group">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="form-label mb-0">Contraseña</label>
+                        <a th:href="@{/forgot-password}" class="small auth-link fw-normal" style="font-size: 0.8rem;">¿Olvidaste tu contraseña?</a>
+                    </div>
+                    <input type="password" class="form-control" name="password" placeholder="••••••••" required>
                 </div>
 
-                <div class="mb-3 form-check">
-                    <input type="checkbox" class="form-check-input" id="remember">
-                    <label class="form-check-label" for="remember">
-                        Recordarme
-                    </label>
-                </div>
+                <input type="hidden" name="redirect" th:if="${param.redirect}" th:value="${param.redirect}">
 
-                <button type="submit" class="btn btn-login">
-                    <i class="fas fa-sign-in-alt me-2"></i> Iniciar Sesión
+                <button type="submit" class="btn-auth">
+                    Ingresar <i class="fas fa-arrow-right ms-2 small"></i>
                 </button>
-
-                <div class="text-end mb-3">
-                    <a th:href="@{/forgot-password}" class="text-decoration-none small">
-                        ¿Olvidaste tu contraseña?
-                    </a>
-                </div>
             </form>
 
-            <div class="register-link">
-                <p class="mb-0">¿No tienes una cuenta? <a th:href="@{/registro}">Regístrate aquí</a></p>
+            <div class="text-divider"><span>o</span></div>
+
+            <div class="text-center">
+                <p class="small text-muted mb-0">
+                    ¿Aún no tienes cuenta?
+                    <a th:href="@{/registro}" class="auth-link ms-1">Regístrate gratis</a>
+                </p>
             </div>
         </div>
     </div>
 </div>
 
+<footer th:replace="~{fragments :: footer}"></footer>
 <div th:replace="~{fragments :: scripts}"></div>
 </body>
 </html>

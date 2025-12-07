@@ -89,19 +89,25 @@ public class UsuarioAreaController {
         Long usuarioId = (Long) session.getAttribute("usuarioId");
         if (usuarioId == null) return "redirect:/login";
 
-        // Buscamos el usuario real de la BD para no perder datos (password, rol, etc)
+        // 1. Obtener usuario de la BD
         Usuario usuarioDB = usuarioRepository.findById(usuarioId).get();
 
-        // Actualizamos solo lo permitido
+        // 2. Actualizar datos
         usuarioDB.setNombre(usuarioForm.getNombre());
         usuarioDB.setApellido(usuarioForm.getApellido());
         usuarioDB.setTelefono(usuarioForm.getTelefono());
-        // El email generalmente no se cambia tan fácil por seguridad, pero puedes agregarlo si quieres
+        // El email no se cambia por seguridad
 
-        usuarioRepository.save(usuarioDB);
+        // 3. Guardar en BD
+        Usuario usuarioGuardado = usuarioRepository.save(usuarioDB);
 
-        // Actualizamos nombre en sesión por si cambió
-        session.setAttribute("usuarioNombre", usuarioForm.getNombre());
+        // 4. --- ACTUALIZACIÓN CLAVE DE SESIÓN ---
+        // Actualizamos el objeto completo 'usuario' en la sesión.
+        // GlobalControllerAdvice lee de aquí para pintar el navbar.
+        session.setAttribute("usuario", usuarioGuardado);
+
+        // También actualizamos la variable suelta si la usas en algún lado
+        session.setAttribute("usuarioNombre", usuarioGuardado.getNombre());
 
         redirectAttributes.addFlashAttribute("mensaje", "Datos actualizados correctamente");
         redirectAttributes.addFlashAttribute("tipoMensaje", "success");

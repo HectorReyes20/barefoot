@@ -3,137 +3,232 @@
 <head>
     <th:block th:insert="~{fragments :: head('Inicio - Barefoot Store')}"></th:block>
     <link rel="stylesheet" th:href="@{/css/inicio.css}">
+
+    <link rel="stylesheet" th:href="@{/css/chatbot.css}">
 </head>
 <body>
 
 <nav th:replace="~{fragments :: navbar}"></nav>
 
-<section class="hero-section">
-    <div class="container">
-        <h1>
-            Bienvenido<span th:if="${usuarioLogueado}">,
-                <span th:text="${nombreUsuario}">Usuario</span>
-            </span>!
-        </h1>
-        <p>Descubre el calzado barefoot que transformará tu forma de caminar</p>
-        <a href="#productos" class="btn btn-hero">
-            <i class="fas fa-palette me-2"></i> Personaliza tu calzado
-        </a>
-    </div>
-</section>
+<header class="hero-split">
+    <div class="container h-100">
+        <div class="row h-100 align-items-center">
+            <div class="col-lg-5 py-4 py-lg-0 animate__animated animate__fadeInLeft ps-lg-5">
+                <span class="text-uppercase text-accent ls-2 fw-bold small mb-2 d-block">Minimalismo Natural</span>
 
-<div class="container" th:if="${usuarioLogueado}">
-    <div class="welcome-box">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <h4 class="mb-2">
-                    <i class="fas fa-sparkles me-2 icon-highlight"></i>
-                    ¡Estamos felices de tenerte aquí!
-                </h4>
-                <p class="mb-0 text-muted">Explora nuestra colección de calzado barefoot diseñado para la salud de tus pies</p>
+                <h1 class="display-4 font-serif fw-bold mb-3 text-primary-dark">
+                    Siente la tierra bajo tus pies.
+                </h1>
+
+                <p class="lead text-muted mb-4 fs-6"> Calzado diseñado para respetar la forma de tu pie, no para cambiarla. Personaliza tu par y camina libre.
+                </p>
+
+                <div class="d-flex gap-3">
+                    <a th:href="@{/productos}" class="btn btn-primary-elegant">Ver Colección</a>
+                    <a th:href="@{/personalizar}" class="btn btn-outline-elegant">Diseñar Ahora</a>
+                </div>
             </div>
-            <div class="col-md-4 text-end">
-                <a href="#productos" class="btn btn-outline-success">
-                    <i class="fas fa-gift me-2"></i> Ver ofertas
+            <div class="col-lg-7 h-100 position-relative d-none d-lg-block">
+                <div class="hero-image-wrapper animate__animated animate__fadeInRight">
+                    <img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?w=800" alt="Barefoot Shoe" class="img-fluid rounded-start-5 shadow-lg">
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="container mt-5" th:if="${usuarioLogueado}">
+    <div class="alert alert-custom fade show border-0 shadow-sm d-flex justify-content-between align-items-center" role="alert">
+        <div>
+            <strong>Bienvenido de nuevo, <span th:text="${nombreUsuario}">User</span>.</strong>
+            <span class="text-muted small ms-2">Continúa donde lo dejaste.</span>
+        </div>
+        <a th:href="@{/perfil}" class="btn btn-sm btn-link text-accent text-decoration-none">Ir al perfil &rarr;</a>
+    </div>
+</div>
+
+<section class="section-padding">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="font-serif">Explora por Estilo</h2>
+            <div class="separator mx-auto"></div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <a th:href="@{/productos/categoria/Casual}" class="category-card">
+                    <div class="category-img">
+                        <img src="https://images.unsplash.com/photo-1520256862855-398228c41684?w=500" alt="Casual">
+                    </div>
+                    <div class="category-info">
+                        <h3>Casual</h3>
+                        <span>Ver productos</span>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a th:href="@{/productos/categoria/Deportivo}" class="category-card">
+                    <div class="category-img">
+                        <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500" alt="Deportivo">
+                    </div>
+                    <div class="category-info">
+                        <h3>Deportivo</h3>
+                        <span>Ver productos</span>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a th:href="@{/productos/categoria/Formal}" class="category-card">
+                    <div class="category-img">
+                        <img src="https://images.unsplash.com/photo-1533867617858-e7b97e060509?w=500" alt="Formal">
+                    </div>
+                    <div class="category-info">
+                        <h3>Formal</h3>
+                        <span>Ver productos</span>
+                    </div>
                 </a>
             </div>
         </div>
     </div>
-</div>
+</section>
 
-<section class="features">
+<section class="section-padding bg-white">
     <div class="container">
-        <div class="section-title text-center mb-5">
-            <h2>¿Por qué elegir Barefoot?</h2>
-            <p class="text-muted">Salud, comodidad y estilo en cada paso</p>
-        </div>
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="feature-card">
-                    <i class="fas fa-heartbeat feature-icon"></i>
-                    <h3>Salud Podológica</h3>
-                    <p>Diseñados para respetar la anatomía natural del pie, mejorando tu postura y reduciendo dolores</p>
-                </div>
+        <div class="row align-items-center">
+            <div class="col-lg-5 mb-4 mb-lg-0">
+                <span class="text-uppercase text-accent fw-bold small mb-2 d-block">Filosofía</span>
+                <h2 class="font-serif mb-4 display-5 fw-bold">Confort redefinido.</h2>
+                <p class="text-muted mb-4 lead" style="font-size: 1.1rem;">
+                    Nuestros zapatos eliminan todo lo innecesario. Sin tacón, sin soportes rígidos, sin punteras estrechas. Solo tú y el movimiento natural.
+                </p>
+                <ul class="list-unstyled feature-list">
+                    <li class="d-flex align-items-center">
+                        <i class="fas fa-check-circle text-accent me-3 fa-lg"></i>
+                        Puntera ancha para libertad de dedos
+                    </li>
+                    <li class="d-flex align-items-center">
+                        <i class="fas fa-check-circle text-accent me-3 fa-lg"></i>
+                        Suela fina y ultra flexible
+                    </li>
+                    <li class="d-flex align-items-center">
+                        <i class="fas fa-check-circle text-accent me-3 fa-lg"></i>
+                        Zero Drop (Tacón plano)
+                    </li>
+                </ul>
             </div>
-            <div class="col-md-4">
-                <div class="feature-card">
-                    <i class="fas fa-palette feature-icon"></i>
-                    <h3>100% Personalizable</h3>
-                    <p>Elige colores, materiales y diseños. Crea el zapato perfecto que refleje tu personalidad</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="feature-card">
-                    <i class="fas fa-star feature-icon"></i>
-                    <h3>Calidad Premium</h3>
-                    <p>Materiales de primera calidad, fabricación artesanal y diseño contemporáneo</p>
+            <div class="col-lg-6 offset-lg-1">
+                <div class="row g-4">
+                    <div class="col-6">
+                        <div class="info-box p-4 rounded-3 text-center h-100">
+                            <i class="fas fa-feather-alt fa-3x text-primary-dark mb-3"></i>
+                            <h5 class="fw-bold text-primary">Ultraligeros</h5>
+                            <p class="small text-muted mb-0">Diseñados para sentirse como una segunda piel. Menos de 200g.</p>
+                        </div>
+                    </div>
+                    <div class="col-6 mt-5">
+                        <div class="info-box p-4 rounded-3 text-center h-100">
+                            <i class="fas fa-leaf fa-3x text-primary-dark mb-3"></i>
+                            <h5 class="fw-bold text-primary">Sostenibles</h5>
+                            <p class="small text-muted mb-0">Materiales éticos, cuero vegetal y procesos responsables.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<section class="products-section" id="productos">
+<section class="section-padding" id="productos">
     <div class="container">
-        <div class="section-title text-center mb-5">
-            <h2>Nuestra Colección</h2>
-            <p class="text-muted">Descubre los modelos más populares</p>
+        <div class="d-flex justify-content-between align-items-end mb-5">
+            <h2 class="font-serif m-0">Tendencias</h2>
+            <a th:href="@{/productos}" class="text-decoration-none text-accent fw-bold">Ver catálogo completo &rarr;</a>
         </div>
 
         <div class="row g-4">
-            <div class="col-md-4">
-                <div class="product-card card h-100">
-                    <img src="https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=500" class="card-img-top" alt="Zapato Casual">
-                    <div class="card-body">
-                        <h5 class="card-title">Urban Barefoot</h5>
-                        <p class="card-text text-muted">Elegante y cómodo para el día a día</p>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="price">S/ 299.00</span>
-                            <button class="btn btn-add">
-                                <i class="fas fa-shopping-cart me-1"></i> Agregar
-                            </button>
+            <div class="col-md-3">
+                <div class="product-item">
+                    <div class="product-thumb">
+                        <img src="https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=500" alt="Zapato">
+                        <div class="product-action">
+                            <button class="btn btn-white rounded-circle shadow"><i class="fas fa-shopping-cart"></i></button>
+                            <a th:href="@{/productos}" class="btn btn-white rounded-circle shadow"><i class="fas fa-eye"></i></a>
                         </div>
+                    </div>
+                    <div class="product-content mt-3">
+                        <span class="text-uppercase small text-muted">Deportivo</span>
+                        <h5 class="mb-1"><a href="#" class="text-dark text-decoration-none">Active Motion</a></h5>
+                        <div class="price fw-bold text-accent">S/ 329.00</div>
                     </div>
                 </div>
             </div>
-
-            <div class="col-md-4">
-                <div class="product-card card h-100">
-                    <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500" class="card-img-top" alt="Zapato Deportivo">
-                    <div class="card-body">
-                        <h5 class="card-title">Sport Flex</h5>
-                        <p class="card-text text-muted">Máxima flexibilidad para tu actividad</p>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="price">S/ 349.00</span>
-                            <button class="btn btn-add">
-                                <i class="fas fa-shopping-cart me-1"></i> Agregar
-                            </button>
+            <div class="col-md-3">
+                <div class="product-item">
+                    <div class="product-thumb">
+                        <img src="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=500" alt="Zapato">
+                        <div class="product-action">
+                            <button class="btn btn-white rounded-circle shadow"><i class="fas fa-shopping-cart"></i></button>
+                            <a th:href="@{/productos}" class="btn btn-white rounded-circle shadow"><i class="fas fa-eye"></i></a>
                         </div>
+                    </div>
+                    <div class="product-content mt-3">
+                        <span class="text-uppercase small text-muted">Casual</span>
+                        <h5 class="mb-1"><a href="#" class="text-dark text-decoration-none">Limited Edition</a></h5>
+                        <div class="price fw-bold text-accent">S/ 459.00</div>
                     </div>
                 </div>
             </div>
-
-            <div class="col-md-4">
-                <div class="product-card card h-100">
-                    <img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?w=500" class="card-img-top" alt="Zapato Formal">
-                    <div class="card-body">
-                        <h5 class="card-title">Classic Barefoot</h5>
-                        <p class="card-text text-muted">Elegancia profesional y confort</p>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="price">S/ 399.00</span>
-                            <button class="btn btn-add">
-                                <i class="fas fa-shopping-cart me-1"></i> Agregar
-                            </button>
+            <div class="col-md-3">
+                <div class="product-item">
+                    <div class="product-thumb">
+                        <img src="https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?w=500" alt="Zapato">
+                        <div class="product-action">
+                            <button class="btn btn-white rounded-circle shadow"><i class="fas fa-shopping-cart"></i></button>
+                            <a th:href="@{/productos}" class="btn btn-white rounded-circle shadow"><i class="fas fa-eye"></i></a>
                         </div>
+                    </div>
+                    <div class="product-content mt-3">
+                        <span class="text-uppercase small text-muted">Senderismo</span>
+                        <h5 class="mb-1"><a href="#" class="text-dark text-decoration-none">Mountain Trek</a></h5>
+                        <div class="price fw-bold text-accent">S/ 419.00</div>
                     </div>
                 </div>
             </div>
-
+            <div class="col-md-3">
+                <div class="product-item">
+                    <div class="product-thumb">
+                        <span class="badge bg-danger position-absolute top-0 start-0 m-3">Sale</span>
+                        <img src="https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=500" alt="Zapato">
+                        <div class="product-action">
+                            <button class="btn btn-white rounded-circle shadow"><i class="fas fa-shopping-cart"></i></button>
+                            <a th:href="@{/productos}" class="btn btn-white rounded-circle shadow"><i class="fas fa-eye"></i></a>
+                        </div>
+                    </div>
+                    <div class="product-content mt-3">
+                        <span class="text-uppercase small text-muted">Running</span>
+                        <h5 class="mb-1"><a href="#" class="text-dark text-decoration-none">Speed Natural</a></h5>
+                        <div class="price fw-bold text-accent">S/ 359.00</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </section>
 
-<!-- CHATBOT -->
+<section class="cta-banner mt-5">
+    <div class="container">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-8">
+                <h2 class="font-serif text-white mb-4">¿No encuentras tu estilo? Créalo.</h2>
+                <p class="text-white-50 mb-5 lead">
+                    Desde el color de la suela hasta los cordones. Diseña un par único que hable de ti.
+                </p>
+                <a th:href="@{/personalizar}" class="btn btn-light btn-lg px-5 rounded-0 fw-bold">Empezar a Crear</a>
+            </div>
+        </div>
+    </div>
+</section>
+
 <div class="chatbot-container">
     <button class="chatbot-button" id="chatbotToggle">
         <i class="fas fa-comments"></i>
@@ -141,9 +236,12 @@
 
     <div class="chatbot-window" id="chatbotWindow">
         <div class="chatbot-header">
-            <div>
-                <h5><i class="fas fa-robot me-2"></i>Asistente Barefoot</h5>
-                <small>En línea</small>
+            <div class="d-flex align-items-center gap-2">
+                <i class="fas fa-robot"></i>
+                <div>
+                    <h5 class="m-0">Asistente Barefoot</h5>
+                    <small>Respuesta inmediata</small>
+                </div>
             </div>
             <button class="chatbot-close" id="chatbotClose">
                 <i class="fas fa-times"></i>
@@ -153,17 +251,18 @@
         <div class="chatbot-messages" id="chatbotMessages">
             <div class="message bot">
                 <div class="message-content">
-                    ¡Hola! 👋 Soy tu asistente de Barefoot Store. ¿En qué puedo ayudarte?
+                    ¡Hola! 👋 Bienvenido a Barefoot Store. ¿En qué puedo ayudarte hoy?
                 </div>
             </div>
         </div>
 
+        <div class="chatbot-input-area" style="display:none;"> <input type="text" id="chatbotInput" class="form-control" placeholder="Escribe aquí...">
+        </div>
     </div>
 </div>
 
 <footer th:replace="~{fragments :: footer}"></footer>
 <div th:replace="~{fragments :: scripts}"></div>
-
 <script th:src="@{/js/chatbot.js}"></script>
 
 </body>

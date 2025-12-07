@@ -1,0 +1,223 @@
+/* src/main/resources/static/css/autenticacion.css */
+
+:root {
+    --primary-color: #4E342E;
+    --primary-dark: #2C1E1A;
+    --accent-color: #CCA474;
+    --bg-color: #FBF9F6;
+    --border-color: rgba(78, 52, 46, 0.15);
+    --text-color: #444;
+}
+
+body {
+    background-color: var(--bg-color);
+    font-family: 'Lato', sans-serif;
+    color: var(--text-color);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Tipografía */
+.font-serif {
+    font-family: 'Playfair Display', serif;
+}
+
+/* Contenedor Principal */
+.auth-wrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 120px 20px 60px; /* Espacio superior para navbar fijo */
+}
+
+/* Tarjeta de Autenticación */
+.auth-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 15px 40px rgba(78, 52, 46, 0.05);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    width: 100%;
+    max-width: 950px;
+    display: flex;
+    min-height: 550px; /* Altura mínima para presencia */
+}
+
+/* --- COLUMNA IZQUIERDA (Imagen/Banner) --- */
+.auth-banner {
+    background-color: var(--primary-color);
+    /* Imagen elegante de fondo */
+    background-image: url('https://images.unsplash.com/photo-1549298916-b41d501d3772?w=800');
+    background-size: cover;
+    background-position: center;
+    width: 45%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    padding: 40px;
+}
+
+/* Capa oscura sobre la imagen para leer el texto */
+.auth-banner::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(44, 30, 26, 0.85); /* Marrón oscuro semitransparente */
+    backdrop-filter: blur(2px);
+}
+
+.auth-banner-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+}
+
+.auth-banner h2 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.auth-banner p {
+    font-size: 1.1rem;
+    opacity: 0.8;
+    font-weight: 300;
+}
+
+/* --- COLUMNA DERECHA (Formulario) --- */
+.auth-form-container {
+    width: 55%;
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.auth-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+/* Inputs y Etiquetas */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #666;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: #FDFBF9;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    color: var(--primary-color);
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    background-color: white;
+    box-shadow: 0 0 0 4px rgba(78, 52, 46, 0.05);
+    outline: none;
+}
+
+/* Checkbox personalizado */
+.form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* Botones */
+.btn-auth {
+    background-color: var(--primary-color);
+    color: white;
+    width: 100%;
+    padding: 14px;
+    border-radius: 8px;
+    border: 1px solid var(--primary-color);
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    letter-spacing: 0.5px;
+    margin-top: 10px;
+}
+
+.btn-auth:hover {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(78, 52, 46, 0.2);
+}
+
+/* Enlaces */
+.auth-link {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.auth-link:hover {
+    color: var(--primary-color);
+    text-decoration: underline;
+}
+
+.text-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 25px 0;
+    color: #999;
+    font-size: 0.9rem;
+}
+
+.text-divider::before, .text-divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #eee;
+}
+
+.text-divider span {
+    padding: 0 10px;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .auth-card {
+        flex-direction: column;
+        max-width: 500px;
+    }
+
+    .auth-banner {
+        width: 100%;
+        padding: 40px 20px;
+        min-height: 200px;
+    }
+
+    .auth-form-container {
+        width: 100%;
+        padding: 40px 30px;
+    }
+}
