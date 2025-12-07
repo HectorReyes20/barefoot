@@ -100,9 +100,15 @@
                         <span th:if="${producto.stock > 0}">Agregar al Carrito</span>
                         <span th:if="${producto.stock == 0}">Agotado</span>
                     </button>
-                    <button class="btn btn-favorite" onclick="toggleFavorite(event)">
-                        <i class="far fa-heart"></i>
-                    </button>
+                    <a th:href="@{/favoritos/toggle/{id}(id=${producto.id})}"
+                       class="btn btn-favorite"
+                       style="transition: all 0.3s ease;"
+                       th:title="${favoritosIds != null && #lists.contains(favoritosIds, producto.id)} ? 'Quitar de favoritos' : 'Añadir a favoritos'">
+
+                        <i class="fa-heart"
+                           th:classappend="${favoritosIds != null && #lists.contains(favoritosIds, producto.id)} ? 'fas text-danger' : 'far'">
+                        </i>
+                    </a>
                 </div>
             </div>
         </div>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:insert="~{fragments :: head('Mis Favoritos')}"></th:block>
+</head>
+<body>
+<nav th:replace="~{fragments :: navbar}"></nav>
+
+<div class="container my-5" style="min-height: 60vh;">
+    <h2 class="mb-4"><i class="fas fa-heart text-danger me-2"></i>Mis Productos Favoritos</h2>
+
+    <div th:if="${favoritos.isEmpty()}" class="text-center py-5">
+        <i class="far fa-heart fa-4x text-muted mb-3"></i>
+        <h4 class="text-muted">Aún no tienes favoritos</h4>
+        <a th:href="@{/productos}" class="btn btn-outline-primary mt-3">Ir al Catálogo</a>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-4 g-4" th:unless="${favoritos.isEmpty()}">
+        <div class="col" th:each="fav : ${favoritos}">
+            <div class="card h-100 border-0 shadow-sm product-card">
+                <a th:href="@{/productos/detalle/{id}(id=${fav.producto.id})}">
+                    <img th:if="${fav.producto.imagenUrl != null}"
+                         th:src="${fav.producto.imagenUrl}" class="card-img-top"
+                         style="height: 200px; object-fit: cover;">
+                    <div th:if="${fav.producto.imagenUrl == null}"
+                         class="bg-light d-flex align-items-center justify-content-center"
+                         style="height: 200px;">
+                        <i class="fas fa-image fa-2x text-muted"></i>
+                    </div>
+                </a>
+
+                <div class="card-body">
+                    <h5 class="card-title text-truncate" th:text="${fav.producto.nombre}">Nombre</h5>
+                    <p class="card-text fw-bold text-primary">S/ <span th:text="${fav.producto.precio}">0.00</span></p>
+                </div>
+
+                <div class="card-footer bg-white border-top-0 d-flex justify-content-between">
+                    <a th:href="@{/favoritos/toggle/{id}(id=${fav.producto.id})}"
+                       class="btn btn-outline-danger btn-sm w-100"
+                       title="Quitar de favoritos">
+                        <i class="fas fa-trash-alt me-1"></i> Quitar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{fragments :: footer}"></footer>
+<div th:replace="~{fragments :: scripts}"></div>
+</body>
+</html>
