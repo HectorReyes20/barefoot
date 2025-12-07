@@ -19,9 +19,9 @@ public class PersonalizarController {
         // Obtenemos productos que sirvan de base para sacar precios e IDs
         // Usaremos el ID 1 como base para Modelo 1 (Urban), ID 4 para Modelo 2 (Sport), ID 7 para Modelo 3 (Classic)
         // Esto es un ejemplo, asegúrate de que estos IDs existan en tu DB 'barefoot_db'
-        Producto modelo1 = productoService.obtenerProductoPorId(1L).orElse(new Producto());
-        Producto modelo2 = productoService.obtenerProductoPorId(4L).orElse(new Producto());
-        Producto modelo3 = productoService.obtenerProductoPorId(7L).orElse(new Producto());
+        Producto modelo1 = productoService.obtenerProductoPorId(20L).orElse(new Producto());
+        Producto modelo2 = productoService.obtenerProductoPorId(21L).orElse(new Producto());
+        Producto modelo3 = productoService.obtenerProductoPorId(22L).orElse(new Producto());
 
         model.addAttribute("modelo1", modelo1);
         model.addAttribute("modelo2", modelo2);
