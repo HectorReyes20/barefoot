@@ -1,10 +1,126 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <th:block th:insert="~{admin/layout/head :: head(titulo='Alertas de Inventario')}"></th:block>
+    <style>
+        .main-content {
+            margin-left: 250px;
+            padding: 30px;
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        .alert-card { transition: transform 0.2s; border: none; }
+        .alert-card:hover { transform: translateY(-3px); }
+        .btn-icon { width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+        @media (max-width: 768px) { .main-content { margin-left: 0; } }
+    </style>
 </head>
 <body>
 
+<div th:replace="~{admin/layout/sidebar :: sidebar(paginaActiva='inventario')}"></div>
+
+<div class="main-content">
+
+    <div th:if="${mensaje}" th:class="'alert alert-' + ${tipoMensaje} + ' alert-dismissible fade show shadow-sm'" role="alert">
+        <i class="fas fa-info-circle me-2"></i><span th:text="${mensaje}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold m-0 text-warning"><i class="fas fa-bell me-2"></i>Centro de Alertas</h2>
+            <p class="text-muted m-0">Productos que requieren atención inmediata</p>
+        </div>
+        <div class="d-flex gap-2">
+            <form th:action="@{/admin/inventario/alertas/marcar-todas-leidas}" method="post">
+                <button type="submit" class="btn btn-outline-success">
+                    <i class="fas fa-check-double me-2"></i> Marcar todas leídas
+                </button>
+            </form>
+            <a th:href="@{/admin/inventario}" class="btn btn-secondary">Volver</a>
+        </div>
+    </div>
+
+    <div th:if="${!#lists.isEmpty(alertasCriticas)}" class="mb-5">
+        <h5 class="text-danger fw-bold mb-3"><i class="fas fa-fire me-2"></i>Atención Inmediata (Stock Crítico)</h5>
+
+        <div class="row g-3">
+            <div class="col-md-6 col-xl-4" th:each="alerta : ${alertasCriticas}">
+                <div class="card alert-card shadow-sm border-start border-danger border-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="badge bg-danger">CRÍTICO</span>
+                            <small class="text-muted" th:text="${#temporals.format(alerta.fechaCreacion, 'dd/MM HH:mm')}">Hoy</small>
+                        </div>
+                        <h5 class="card-title fw-bold text-dark" th:text="${alerta.producto.nombre}">Producto</h5>
+                        <p class="card-text text-muted mb-3">
+                            Quedan solo <strong class="text-danger fs-5" th:text="${alerta.stockActual}">0</strong> unidades.
+                        </p>
+
+                        <div class="d-flex gap-2 mt-3">
+                            <a th:href="@{/admin/inventario/movimientos/nuevo(productoId=${alerta.producto.id}, tipo='ENTRADA')}"
+                               class="btn btn-sm btn-danger flex-grow-1">
+                                <i class="fas fa-plus-circle me-1"></i> Reponer
+                            </a>
+                            <form th:action="@{/admin/inventario/alertas/{id}/marcar-leida(id=${alerta.id})}" method="post">
+                                <button type="submit" class="btn btn-sm btn-outline-secondary" title="Marcar como leída">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${!#lists.isEmpty(alertasActivas)}" class="mb-4">
+        <h5 class="text-warning-emphasis fw-bold mb-3"><i class="fas fa-exclamation-circle me-2"></i>Avisos de Stock Bajo</h5>
+
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="list-group list-group-flush">
+                <div th:each="alerta : ${alertasActivas}" class="list-group-item p-3 d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-warning-subtle text-warning p-2 rounded-circle">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0 fw-bold" th:text="${alerta.producto.nombre}">Producto</h6>
+                            <small class="text-muted" th:text="${alerta.mensaje}">Mensaje de alerta...</small>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-light text-dark border me-3">
+                            Stock: <span th:text="${alerta.stockActual}">5</span>
+                        </span>
+
+                        <form th:action="@{/admin/inventario/alertas/{id}/marcar-leida(id=${alerta.id})}" method="post">
+                            <button type="submit" class="btn btn-sm btn-light text-success" title="Marcar leída">
+                                <i class="fas fa-check"></i>
+                            </button>
+                        </form>
+                        <form th:action="@{/admin/inventario/alertas/{id}/desactivar(id=${alerta.id})}" method="post">
+                            <button type="submit" class="btn btn-sm btn-light text-danger" title="Borrar alerta">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(alertasActivas) && #lists.isEmpty(alertasCriticas)}" class="text-center py-5">
+        <div class="mb-3">
+            <i class="fas fa-shield-alt fa-4x text-success opacity-50"></i>
+        </div>
+        <h3 class="fw-bold text-success">¡Todo bajo control!</h3>
+        <p class="text-muted">No tienes alertas de inventario pendientes.</p>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

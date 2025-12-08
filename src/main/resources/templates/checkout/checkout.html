@@ -17,28 +17,43 @@
         .form-section:last-child {
             border-bottom: none;
         }
-        .metodo-pago {
-            border: 2px solid #e0e0e0;
-            padding: 15px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-bottom: 10px;
-        }
-        .metodo-pago:hover {
-            border-color: var(--color-primary);
-            background: #f8f9fa;
-        }
-        .metodo-pago input[type="radio"]:checked + label {
-            color: var(--color-primary);
-            font-weight: bold;
-        }
         .resumen-checkout {
             background: var(--color-background);
             padding: 30px;
             border-radius: 15px;
             position: sticky;
             top: 100px;
+        }
+        /* Estilo para el paso actual */
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: #aaa;
+        }
+        .step.active {
+            color: var(--color-primary);
+        }
+        .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #eee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+        .step.active .step-number {
+            background: var(--color-primary);
+            color: white;
         }
     </style>
 </head>
@@ -47,11 +62,26 @@
 <nav th:replace="~{fragments :: navbar}"></nav>
 
 <div class="container my-5">
-    <h1 class="mb-4">
-        <i class="fas fa-credit-card me-2"></i> Finalizar Compra
+
+    <div class="step-indicator">
+        <div class="step active">
+            <div class="step-number">1</div>
+            <span>Envío</span>
+        </div>
+        <div class="step">
+            <div class="step-number">2</div>
+            <span>Pago</span>
+        </div>
+        <div class="step">
+            <div class="step-number">3</div>
+            <span>Confirmación</span>
+        </div>
+    </div>
+
+    <h1 class="mb-4 text-center">
+        <i class="fas fa-truck me-2"></i> Datos de Envío
     </h1>
 
-    <!-- Mensajes -->
     <div th:if="${mensaje}" th:class="'alert alert-' + ${tipoMensaje}" role="alert">
         <span th:text="${mensaje}"></span>
     </div>
@@ -61,75 +91,51 @@
             <form th:action="@{/checkout/procesar}" method="post" id="checkoutForm">
 
                 <div class="checkout-container">
-                    <!-- Información de Envío -->
                     <div class="form-section">
-                        <h4><i class="fas fa-truck me-2"></i> Información de Envío</h4>
+                        <h4><i class="fas fa-map-marker-alt me-2"></i> ¿Dónde lo enviamos?</h4>
 
                         <div class="mb-3">
-                            <label class="form-label">Nombre Completo *</label>
+                            <label class="form-label">Nombre Completo</label>
                             <input type="text" class="form-control"
-                                   th:value="${nombreUsuario + ' ' + session.usuario.apellido}"
-                                   readonly>
+                                   th:value="${usuario.nombre + ' ' + usuario.apellido}"
+                                   readonly style="background-color: #f8f9fa;">
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Email *</label>
+                            <label class="form-label">Email de Contacto</label>
                             <input type="email" class="form-control"
-                                   th:value="${usuarioEmail}"
-                                   readonly>
+                                   th:value="${usuario.email}"
+                                   readonly style="background-color: #f8f9fa;">
                         </div>
 
                         <div class="mb-3">
-                            <label for="direccionEnvio" class="form-label">Dirección de Envío *</label>
+                            <label for="direccionEnvio" class="form-label">Dirección de Entrega *</label>
+
                             <textarea class="form-control" id="direccionEnvio" name="direccionEnvio"
                                       rows="3" required
-                                      placeholder="Calle, número, distrito, ciudad, referencias"></textarea>
+                                      placeholder="Ej: Av. Larco 123, Miraflores, Lima. (Ref: Frente al parque)"></textarea>
+
                             <small class="text-muted">
-                                Incluye referencias para facilitar la entrega
+                                Sé lo más específico posible para asegurar la entrega.
                             </small>
                         </div>
                     </div>
 
-                    <!-- Método de Pago -->
                     <div class="form-section">
-                        <h4><i class="fas fa-money-bill-wave me-2"></i> Método de Pago</h4>
-
-                        <div th:each="metodo : ${metodosPago}" class="metodo-pago">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="metodoPago"
-                                       th:id="'metodo_' + ${metodo}"
-                                       th:value="${metodo}"
-                                       required>
-                                <label class="form-check-label w-100"
-                                       th:for="'metodo_' + ${metodo}">
-                                    <span th:text="${metodo.icono}" class="me-2">💳</span>
-                                    <span th:text="${metodo.nombre}">Método</span>
-                                    <span th:if="${metodo.requierePasarela}" class="badge bg-primary ms-2">
-                                        Pago Online
-                                     </span>
-                                </label>
-                            </div>
-                        </div>
+                        <h4><i class="fas fa-comment-alt me-2"></i> Notas para el repartidor (Opcional)</h4>
+                        <textarea class="form-control" name="notas" rows="2"
+                                  placeholder="Ej: Tocar timbre 302, dejar en recepción..."></textarea>
                     </div>
 
-                    <!-- Notas Adicionales -->
-                    <div class="form-section">
-                        <h4><i class="fas fa-comment me-2"></i> Notas del Pedido (Opcional)</h4>
-                        <textarea class="form-control" name="notas" rows="3"
-                                  placeholder="Instrucciones especiales para tu pedido..."></textarea>
-                    </div>
-
-                    <!-- Términos y Condiciones -->
-                    <div class="form-check mb-3">
+                    <div class="form-check mb-4">
                         <input class="form-check-input" type="checkbox" id="terminos" required>
                         <label class="form-check-label" for="terminos">
-                            Acepto los <a href="#" target="_blank">términos y condiciones</a> y la
-                            <a href="#" target="_blank">política de privacidad</a>
+                            Confirmo que mis datos de envío son correctos.
                         </label>
                     </div>
 
-                    <button type="submit" class="btn btn-checkout w-100">
-                        <i class="fas fa-lock me-2"></i> Realizar Pedido
+                    <button type="submit" class="btn btn-primary w-100 py-3 fs-5">
+                        Continuar al Pago <i class="fas fa-arrow-right ms-2"></i>
                     </button>
                 </div>
             </form>
@@ -137,31 +143,28 @@
 
         <div class="col-lg-5">
             <div class="resumen-checkout">
-                <h4 class="mb-4">Resumen del Pedido</h4>
+                <h4 class="mb-4">Resumen de tu Pedido</h4>
 
-                <!-- Lista de Productos -->
-                <div class="mb-3">
+                <div class="mb-3" style="max-height: 300px; overflow-y: auto;">
                     <div th:each="item : ${carrito}" class="d-flex align-items-center mb-3 pb-3 border-bottom">
-                        <img th:if="${item.imagenUrl != null}"
-                             th:src="${item.imagenUrl}"
-                             style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;"
-                             th:alt="${item.nombre}">
+                        <div style="width: 60px; height: 60px; background: #eee; border-radius: 8px; overflow: hidden; flex-shrink: 0;">
+                            <img th:if="${item.imagenUrl != null}" th:src="${item.imagenUrl}" style="width: 100%; height: 100%; object-fit: cover;">
+                            <i th:if="${item.imagenUrl == null}" class="fas fa-shoe-prints text-muted m-3"></i>
+                        </div>
+
                         <div class="flex-grow-1 ms-3">
-                            <h6 class="mb-0" th:text="${item.nombre}">Producto</h6>
+                            <h6 class="mb-0 text-truncate" style="max-width: 150px;" th:text="${item.nombre}">Producto</h6>
                             <small class="text-muted">
-                                Cantidad: <span th:text="${item.cantidad}">1</span>
+                                Cant: <span th:text="${item.cantidad}">1</span> x S/ <span th:text="${#numbers.formatDecimal(item.precio, 1, 'COMMA', 2, 'POINT')}"></span>
                             </small>
                             <p th:if="${item.personalizacion != null}" class="text-info small mb-0">
-                                <i class="fas fa-palette"></i> Personalizado
+                                <i class="fas fa-pen-fancy"></i> <span th:text="${item.personalizacion}"></span>
                             </p>
                         </div>
-                        <strong>S/ <span th:text="${#numbers.formatDecimal(item.subtotal, 1, 'COMMA', 2, 'POINT')}">0.00</span></strong>
+                        <strong class="text-end">S/ <span th:text="${#numbers.formatDecimal(item.subtotal, 1, 'COMMA', 2, 'POINT')}">0.00</span></strong>
                     </div>
                 </div>
 
-                <hr>
-
-                <!-- Cálculos -->
                 <div class="d-flex justify-content-between mb-2">
                     <span>Subtotal:</span>
                     <strong>S/ <span th:text="${#numbers.formatDecimal(subtotal, 1, 'COMMA', 2, 'POINT')}">0.00</span></strong>
@@ -169,17 +172,10 @@
 
                 <div class="d-flex justify-content-between mb-2">
                     <span>Costo de Envío:</span>
-                    <span th:if="${costoEnvio == 0}" class="text-success">
-                        <strong>¡GRATIS!</strong>
-                    </span>
+                    <span th:if="${costoEnvio == 0}" class="text-success fw-bold">GRATIS</span>
                     <span th:if="${costoEnvio > 0}">
                         S/ <span th:text="${#numbers.formatDecimal(costoEnvio, 1, 'COMMA', 2, 'POINT')}">0.00</span>
                     </span>
-                </div>
-
-                <div th:if="${subtotal < 400}" class="alert alert-info small mb-3">
-                    <i class="fas fa-info-circle me-1"></i>
-                    Envío gratis en compras mayores a S/ 400
                 </div>
 
                 <hr>
@@ -191,9 +187,8 @@
                     </h3>
                 </div>
 
-                <div class="alert alert-success small">
-                    <i class="fas fa-shield-alt me-1"></i>
-                    Compra 100% segura y protegida
+                <div class="alert alert-light border small text-center">
+                    <i class="fas fa-lock me-1"></i> El pago se realizará en el siguiente paso.
                 </div>
             </div>
         </div>
@@ -204,32 +199,25 @@
 <div th:replace="~{fragments :: scripts}"></div>
 
 <script>
-    // Validación del formulario
+    // Validación simple del formulario
     document.getElementById('checkoutForm').addEventListener('submit', function(e) {
         const direccion = document.getElementById('direccionEnvio').value.trim();
-        const metodoPago = document.querySelector('input[name="metodoPago"]:checked');
         const terminos = document.getElementById('terminos').checked;
 
         if (!direccion) {
             e.preventDefault();
-            alert('Por favor ingresa la dirección de envío');
-            return false;
-        }
-
-        if (!metodoPago) {
-            e.preventDefault();
-            alert('Por favor selecciona un método de pago');
+            alert('⚠️ Por favor ingresa la dirección de envío');
+            document.getElementById('direccionEnvio').focus();
             return false;
         }
 
         if (!terminos) {
             e.preventDefault();
-            alert('Debes aceptar los términos y condiciones');
+            alert('⚠️ Debes confirmar que los datos son correctos');
             return false;
         }
 
-        // Confirmar pedido
-        return confirm('¿Confirmas que deseas realizar este pedido?');
+        // Todo OK, se envía al controlador
     });
 </script>
 

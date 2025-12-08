@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:insert="~{fragments :: head('Pagar con Yape')}"></th:block>
+    <style>
+        body {
+            background-color: #f5f5f5;
+        }
+        .yape-container {
+            max-width: 500px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+            border: 1px solid #e0e0e0;
+        }
+        .yape-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .yape-logo {
+            width: 40px;
+            height: 40px;
+            background-color: #742284;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-family: sans-serif;
+        }
+        .form-content {
+            padding: 25px;
+        }
+        .input-group-text {
+            background-color: white;
+            border-right: none;
+            font-weight: 600;
+            color: #333;
+        }
+        .form-control {
+            border-left: none;
+            padding-left: 5px;
+        }
+        .form-control:focus {
+            box-shadow: none;
+            border-color: #ced4da;
+        }
+        .input-group:focus-within {
+            border: 1px solid #742284;
+            border-radius: 5px;
+            box-shadow: 0 0 0 0.2rem rgba(116, 34, 132, 0.1);
+        }
+        .warning-box {
+            background-color: #fff9e6; /* Color crema de la foto */
+            border: 1px solid #ffeeba;
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            gap: 10px;
+            align-items: start;
+            margin-top: 20px;
+            color: #664d03;
+            font-size: 0.9rem;
+        }
+        .btn-yapear {
+            background-color: #742284; /* Morado Yape */
+            color: white;
+            width: 100%;
+            padding: 15px;
+            border-radius: 25px; /* Botón redondeado como en la app */
+            border: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-top: 25px;
+            transition: background 0.3s;
+        }
+        .btn-yapear:hover {
+            background-color: #5a1a66;
+        }
+        label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #555;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<nav th:replace="~{fragments :: navbar}"></nav>
+
+<div class="container">
+
+    <div th:if="${mensaje}" class="alert alert-danger text-center shadow-sm"
+         style="max-width: 500px; margin: 20px auto;">
+        <span th:text="${mensaje}"></span>
+    </div>
+
+    <div class="yape-container">
+
+        <div class="yape-header">
+            <div class="yape-logo">Y</div> <h5 class="m-0 fw-bold">Yape</h5>
+        </div>
+
+        <div class="form-content">
+            <p class="text-muted mb-4">
+                Ingresa tu número de celular y el código de aprobación de tu app Yape para finalizar la compra:
+            </p>
+
+            <form th:action="@{/pago/yape/confirmar}" method="post">
+
+                <div class="mb-3">
+                    <label>Celular</label>
+                    <div class="input-group">
+                        <span class="input-group-text border-end-0">+51</span>
+                        <input type="tel"
+                               name="celular"
+                               class="form-control border-start-0"
+                               placeholder="Ingresa tu número de celular"
+                               maxlength="9"
+                               required>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label>Código de aprobación</label>
+                    <input type="text"
+                           name="codigoAprobacion"
+                           class="form-control"
+                           style="border: 1px solid #ced4da; border-radius: 5px; padding: 10px;"
+                           placeholder="Ingresa código de aprobación"
+                           maxlength="6"
+                           required>
+
+                    <small class="text-success mt-1 d-block" style="font-size: 0.75rem;">
+                        <i class="fas fa-magic"></i> Demo: Usa <b>654321</b> para aprobar
+                    </small>
+                </div>
+
+                <div class="warning-box">
+                    <i class="fas fa-exclamation-circle mt-1"></i>
+                    <div>
+                        El código es válido por 2 min, ingrésalo y luego presiona Yapear.
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-yapear">
+                    Yapear S/ <span th:text="${#numbers.formatDecimal(total, 1, 'COMMA', 2, 'POINT')}"></span>
+                </button>
+
+                <div class="text-center mt-3">
+                    <a th:href="@{/pago/procesar}" class="text-muted text-decoration-none small">
+                        Cambiar medio de pago
+                    </a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments :: scripts}"></div>
+
+<script>
+    // Script simple para que el campo de celular solo acepte números
+    document.querySelector('input[name="celular"]').addEventListener('input', function (e) {
+        this.value = this.value.replace(/[^0-9]/g, '');
+    });
+
+    // Script para el código de aprobación
+    document.querySelector('input[name="codigoAprobacion"]').addEventListener('input', function (e) {
+        this.value = this.value.replace(/[^0-9]/g, '');
+    });
+</script>
+
+</body>
+</html>

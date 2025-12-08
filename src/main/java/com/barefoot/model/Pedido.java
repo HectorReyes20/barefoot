@@ -41,9 +41,10 @@ public class Pedido {
     @Column(nullable = false)
     private Double total;
 
+    // ESTADO INICIAL: CONFIRMADO (Ya que solo se crea si paga)
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private EstadoPedido estado = EstadoPedido.PENDIENTE;
+    private EstadoPedido estado = EstadoPedido.CONFIRMADO;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "metodo_pago")
@@ -68,9 +69,8 @@ public class Pedido {
     protected void onCreate() {
         fechaPedido = LocalDateTime.now();
         fechaActualizacion = LocalDateTime.now();
-
         if (numeroPedido == null) {
-            numeroPedido = generarNumeroPedido();
+            numeroPedido = "PED-" + System.currentTimeMillis();
         }
     }
 
@@ -79,30 +79,11 @@ public class Pedido {
         fechaActualizacion = LocalDateTime.now();
     }
 
-    private String generarNumeroPedido() {
-        return "PED-" + System.currentTimeMillis();
-    }
-
-    public void calcularTotal() {
-        this.subtotal = detalles.stream()
-                .mapToDouble(DetallePedido::getSubtotal)
-                .sum();
-        this.total = subtotal - descuento + costoEnvio;
-    }
-
-    public int getCantidadTotalProductos() {
-        return detalles.stream()
-                .mapToInt(DetallePedido::getCantidad)
-                .sum();
-    }
-
     public enum EstadoPedido {
-        PENDIENTE("Pendiente", "warning"),
-        CONFIRMADO("Confirmado", "info"),
+        CONFIRMADO("Confirmado", "success"),
         PREPARANDO("Preparando", "primary"),
-        ENVIADO("Enviado", "info"),
         EN_CAMINO("En Camino", "info"),
-        ENTREGADO("Entregado", "success"),
+        ENTREGADO("Entregado", "secondary"),
         CANCELADO("Cancelado", "danger");
 
         private final String nombre;
@@ -112,45 +93,43 @@ public class Pedido {
             this.nombre = nombre;
             this.colorBadge = colorBadge;
         }
-
-        public String getNombre() {
-            return nombre;
-        }
-
-        public String getColorBadge() {
-            return colorBadge;
-        }
+        public String getNombre() { return nombre; }
+        public String getColorBadge() { return colorBadge; }
     }
 
     public enum MetodoPago {
-        TARJETA_CREDITO("Tarjeta de Crédito", "💳", true),
-        TARJETA_DEBITO("Tarjeta de Débito", "💳", true),
-        YAPE("Yape", "📱", false),
-        PLIN("Plin", "📱", false),
-        TRANSFERENCIA("Transferencia Bancaria", "🏦", false),
-        CONTRAENTREGA("Contra Entrega", "💵", false),
-        PAYPAL("PayPal", "🌐", true);
+        STRIPE("Tarjeta de Crédito/Débito", "💳"),
+        YAPE("Yape", "📱");
 
         private final String nombre;
         private final String icono;
-        private final boolean requierePasarela;
 
-        MetodoPago(String nombre, String icono, boolean requierePasarela) {
+        MetodoPago(String nombre, String icono) {
             this.nombre = nombre;
             this.icono = icono;
-            this.requierePasarela = requierePasarela;
         }
+        public String getNombre() { return nombre; }
+        public String getIcono() { return icono; }
+    }
 
-        public String getNombre() {
-            return nombre;
+    // --- MÉTODOS AUXILIARES PARA LA VISTA ---
+
+    public int getCantidadTotalProductos() {
+        if (detalles == null || detalles.isEmpty()) {
+            return 0;
         }
+        return detalles.stream()
+                .mapToInt(DetallePedido::getCantidad)
+                .sum();
+    }
 
-        public String getIcono() {
-            return icono;
-        }
-
-        public boolean isRequierePasarela() {
-            return requierePasarela;
+    // También agrega este por si acaso lo usas en otro lado
+    public void calcularTotal() {
+        if (detalles != null) {
+            this.subtotal = detalles.stream()
+                    .mapToDouble(DetallePedido::getSubtotal)
+                    .sum();
+            this.total = subtotal - descuento + costoEnvio;
         }
     }
 }

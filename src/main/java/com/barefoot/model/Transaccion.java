@@ -17,8 +17,9 @@ public class Transaccion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // CAMBIO CRÍTICO: nullable = true (antes era false)
     @ManyToOne
-    @JoinColumn(name = "pedido_id", nullable = false)
+    @JoinColumn(name = "pedido_id", nullable = true)
     private Pedido pedido;
 
     @Column(nullable = false)
@@ -32,9 +33,16 @@ public class Transaccion {
     @Column(nullable = false)
     private Pasarela pasarela;
 
+    /**
+     * Para Stripe: Payment Intent ID
+     * Para Yape: Código de aprobación de 6 dígitos
+     */
     @Column(length = 255)
     private String referenciaExterna;
 
+    /**
+     * Solo para Stripe: Client Secret para el frontend
+     */
     @Column(length = 500)
     private String tokenPago;
 
@@ -48,22 +56,16 @@ public class Transaccion {
     private LocalDateTime fechaConfirmacion;
 
     public enum EstadoTransaccion {
-        PENDIENTE,
-        PROCESANDO,
-        COMPLETADO,
-        FALLIDO,
-        REEMBOLSADO
+        PENDIENTE,      // Yape esperando confirmación del admin, Stripe procesando
+        PROCESANDO,     // Stripe en proceso
+        COMPLETADO,     // Pago confirmado (Stripe automático, Yape por admin)
+        FALLIDO,        // Pago rechazado o falló
+        REEMBOLSADO     // Pago devuelto
     }
 
     public enum Pasarela {
-        STRIPE("Stripe", "💳"),
-        YAPE("Yape", "📱"),
-        PLIN("Plin", "📱"),
-        TRANSFERENCIA("Transferencia", "🏦"),
-        CONTRAENTREGA("Contra Entrega", "💵"),
-        PAYPAL("PayPal", "🌐"),
-        IZIPAY("Izipay", "💳"),
-        PAGOSEGURO("PagoSeguro", "💳");
+        STRIPE("Tarjeta de Crédito/Débito", "💳"),
+        YAPE("Yape", "📱");
 
         private final String nombre;
         private final String icono;
@@ -89,5 +91,25 @@ public class Transaccion {
             estado = EstadoTransaccion.PENDIENTE;
         }
     }
-}
 
+    /**
+     * Helper para saber si es pago con tarjeta
+     */
+    public boolean esPagoTarjeta() {
+        return this.pasarela == Pasarela.STRIPE;
+    }
+
+    /**
+     * Helper para saber si es pago Yape
+     */
+    public boolean esPagoYape() {
+        return this.pasarela == Pasarela.YAPE;
+    }
+
+    /**
+     * Obtener descripción legible del método de pago
+     */
+    public String getMetodoPagoDescripcion() {
+        return pasarela.getIcono() + " " + pasarela.getNombre();
+    }
+}
