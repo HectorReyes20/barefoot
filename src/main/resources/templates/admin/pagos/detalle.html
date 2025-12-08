@@ -63,9 +63,20 @@
                         </td>
                     </tr>
                     <tr th:if="${transaccion.referenciaExterna != null}">
-                        <th>N° Operación:</th>
+                        <th>Código de Aprobación:</th>
                         <td>
-                            <code style="font-size: 1.1rem;" th:text="${transaccion.referenciaExterna}">123456</code>
+                            <div class="d-flex align-items-center gap-2">
+                                <code style="font-size: 1.2rem; color: #6e1c74; font-weight: bold;"
+                                      id="txtCodigo"
+                                      th:text="${transaccion.referenciaExterna}">123456</code>
+
+                                <button class="btn btn-sm btn-outline-secondary"
+                                        type="button"
+                                        onclick="copiarCodigo()"
+                                        title="Copiar código">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     <tr>
@@ -198,5 +209,13 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function copiarCodigo() {
+        const codigo = document.getElementById('txtCodigo').innerText;
+        navigator.clipboard.writeText(codigo).then(() => {
+            alert('Código ' + codigo + ' copiado al portapapeles');
+        });
+    }
+</script>
 </body>
 </html>

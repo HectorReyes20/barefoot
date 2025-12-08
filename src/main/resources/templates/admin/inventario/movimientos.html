@@ -1,10 +1,122 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <th:block th:insert="~{admin/layout/head :: head(titulo='Historial de Movimientos')}"></th:block>
+    <style>
+        /* Estilos específicos para esta vista */
+        .badge-tipo { font-size: 0.85rem; padding: 6px 12px; border-radius: 20px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; }
+        .badge-entrada { background-color: #d1e7dd; color: #0f5132; }
+        .badge-salida { background-color: #f8d7da; color: #842029; }
+        .badge-ajuste { background-color: #fff3cd; color: #664d03; }
+
+        .main-content {
+            margin-left: 250px; /* Ancho del sidebar */
+            padding: 30px;
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        @media (max-width: 768px) { .main-content { margin-left: 0; } }
+    </style>
 </head>
 <body>
 
+<div th:replace="~{admin/layout/sidebar :: sidebar(paginaActiva='inventario')}"></div>
+
+<div class="main-content">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark m-0"><i class="fas fa-history me-2 text-secondary"></i>Historial de Movimientos</h2>
+            <p class="text-muted m-0">Registro de todas las entradas y salidas de stock</p>
+        </div>
+        <a th:href="@{/admin/inventario}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Volver al Dashboard
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light py-3">
+                    <tr>
+                        <th class="ps-4 py-3">Fecha</th>
+                        <th>Producto</th>
+                        <th>Tipo Movimiento</th>
+                        <th>Cantidad</th>
+                        <th>Stock Resultante</th>
+                        <th>Motivo / Documento</th>
+                        <th class="pe-4">Usuario</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(movimientos)}">
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="fas fa-box-open fa-3x mb-3 opacity-50"></i>
+                            <p>No hay movimientos registrados.</p>
+                        </td>
+                    </tr>
+                    <tr th:each="mov : ${movimientos}">
+                        <td class="ps-4">
+                            <span class="fw-bold" th:text="${#temporals.format(mov.fechaMovimiento, 'dd/MM/yyyy')}">01/01/2025</span><br>
+                            <small class="text-muted" th:text="${#temporals.format(mov.fechaMovimiento, 'HH:mm')}">10:00</small>
+                        </td>
+                        <td>
+                            <strong class="text-dark" th:text="${mov.producto.nombre}">Zapato X</strong><br>
+                            <small class="text-muted" th:text="${mov.producto.categoria}">Casual</small>
+                        </td>
+                        <td>
+                                <span th:class="'badge-tipo ' +
+                                    (${mov.tipo.name().contains('ENTRADA') || mov.tipo.name().contains('DEVOLUCION')} ? 'badge-entrada' :
+                                    (${mov.tipo.name().contains('SALIDA') || mov.tipo.name().contains('MERMA')} ? 'badge-salida' : 'badge-ajuste'))">
+                                    <i class="fas" th:classappend="${mov.tipo.name().contains('ENTRADA') ? 'fa-arrow-down' : 'fa-arrow-up'}"></i>
+                                    <span th:text="${mov.tipo}">ENTRADA</span>
+                                </span>
+                        </td>
+                        <td>
+                            <strong class="fs-5" th:text="${mov.cantidad}">10</strong>
+                        </td>
+                        <td>
+                            <span class="text-muted" th:text="${mov.stockAnterior}">0</span>
+                            <i class="fas fa-arrow-right mx-2 small text-muted"></i>
+                            <strong th:text="${mov.stockNuevo}">10</strong>
+                        </td>
+                        <td>
+                            <span th:text="${mov.motivo}" class="d-block text-truncate" style="max-width: 150px;">Venta web</span>
+                            <small th:if="${mov.numeroDocumento != null}" class="text-primary">
+                                <i class="fas fa-file-alt me-1"></i> <span th:text="${mov.numeroDocumento}">DOC-001</span>
+                            </small>
+                        </td>
+                        <td class="pe-4">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center" style="width:30px; height:30px;">
+                                    <i class="fas fa-user text-secondary small"></i>
+                                </div>
+                                <span th:text="${mov.usuario != null ? mov.usuario.nombre : 'Sistema'}">Admin</span>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card-footer bg-white border-top-0 py-3" th:if="${totalPages > 1}">
+            <nav>
+                <ul class="pagination justify-content-center m-0">
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{/admin/inventario/movimientos(page=${currentPage - 1})}">Anterior</a>
+                    </li>
+                    <li class="page-item disabled"><a class="page-link" href="#" th:text="'Página ' + (${currentPage + 1}) + ' de ' + ${totalPages}"></a></li>
+                    <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/admin/inventario/movimientos(page=${currentPage + 1})}">Siguiente</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

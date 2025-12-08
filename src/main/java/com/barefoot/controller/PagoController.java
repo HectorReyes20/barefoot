@@ -1,10 +1,9 @@
 package com.barefoot.controller;
 
-import com.barefoot.model.Pedido;
-import com.barefoot.model.Transaccion;
-import com.barefoot.service.PagoManualService;
-import com.barefoot.service.PagoService;
-import com.barefoot.service.PedidoService;
+import com.barefoot.model.*;
+import com.barefoot.repository.PedidoRepository;
+import com.barefoot.repository.TransaccionRepository;
+import com.barefoot.service.*;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,111 +24,86 @@ import java.util.Map;
 public class PagoController {
 
     @Autowired
+    private CarritoService carritoService;
+
+    @Autowired
+    private UsuarioService usuarioService;
+
+    @Autowired
+    private PedidoService pedidoService;
+
+    @Autowired
     private PagoService pagoService;
 
     @Autowired
     private PagoManualService pagoManualService;
 
     @Autowired
-    private PedidoService pedidoService;
+    private TransaccionRepository transaccionRepository;
+
+    @Autowired
+    private PedidoRepository pedidoRepository;
 
     @Value("${stripe.public.key}")
     private String stripePublicKey;
 
-    /**
-     * Mostrar página de pago para un pedido
-     */
-    @GetMapping("/procesar/{pedidoId}")
-    public String mostrarPaginaPago(
-            @PathVariable Long pedidoId,
-            HttpSession session,
-            Model model,
-            RedirectAttributes redirectAttributes) {
+    // ==========================================
+    // 1. PANTALLA DE SELECCIÓN (Usando Carrito)
+    // ==========================================
+    @GetMapping("/procesar")
+    public String mostrarPaginaPago(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
+        Long usuarioId = (Long) session.getAttribute("usuarioId");
+        if (usuarioId == null) return "redirect:/login";
 
-        // Verificar autenticación
-        if (session.getAttribute("usuarioId") == null) {
-            redirectAttributes.addFlashAttribute("mensaje", "Debes iniciar sesión");
-            redirectAttributes.addFlashAttribute("tipoMensaje", "warning");
-            return "redirect:/login";
+        // Obtener datos del carrito (No del pedido)
+        Usuario usuario = usuarioService.findById(usuarioId).get();
+        Carrito carrito = carritoService.obtenerCarrito(usuario);
+
+        if (carrito.getItems().isEmpty()) {
+            redirectAttributes.addFlashAttribute("mensaje", "Tu carrito está vacío.");
+            return "redirect:/productos";
         }
 
-        try {
-            // Obtener pedido
-            Pedido pedido = pedidoService.obtenerPedidoPorId(pedidoId)
-                    .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
+        // Calculamos total + envío fijo
+        double total = carrito.getTotal() + 15.0;
 
-            // Verificar que el pedido pertenece al usuario
-            Long usuarioId = (Long) session.getAttribute("usuarioId");
-            if (!pedido.getUsuario().getId().equals(usuarioId)) {
-                throw new RuntimeException("No tienes permiso para acceder a este pedido");
-            }
+        model.addAttribute("carrito", carrito);
+        model.addAttribute("total", total);
+        model.addAttribute("stripePublicKey", stripePublicKey);
 
-            // Verificar que el pedido está en estado válido para pago
-            if (pedido.getEstado() != Pedido.EstadoPedido.PENDIENTE) {
-                throw new RuntimeException("Este pedido no puede ser pagado");
-            }
-
-            model.addAttribute("pedido", pedido);
-            model.addAttribute("stripePublicKey", stripePublicKey);
-
-            return "pago/procesar";
-
-        } catch (Exception e) {
-            log.error("Error al mostrar página de pago: ", e);
-            redirectAttributes.addFlashAttribute("mensaje", "Error: " + e.getMessage());
-            redirectAttributes.addFlashAttribute("tipoMensaje", "danger");
-            return "redirect:/mis-pedidos";
-        }
+        return "pago/procesar";
     }
 
-    /**
-     * API: Iniciar pago con Stripe
-     */
+    // ==========================================
+    // 2. API STRIPE (Adaptada al Carrito)
+    // ==========================================
     @PostMapping("/api/iniciar-stripe")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> iniciarPagoStripe(
-            @RequestParam Long pedidoId,
-            HttpSession session) {
-
+    public ResponseEntity<Map<String, Object>> iniciarPagoStripe(HttpSession session) {
         Map<String, Object> response = new HashMap<>();
-
         try {
-            // Verificar autenticación
-            if (session.getAttribute("usuarioId") == null) {
-                response.put("error", "No estás autenticado");
-                return ResponseEntity.badRequest().body(response);
-            }
-
-            // Obtener pedido
-            Pedido pedido = pedidoService.obtenerPedidoPorId(pedidoId)
-                    .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
-
-            // Verificar propiedad
             Long usuarioId = (Long) session.getAttribute("usuarioId");
-            if (!pedido.getUsuario().getId().equals(usuarioId)) {
-                response.put("error", "No tienes permiso para este pedido");
-                return ResponseEntity.badRequest().body(response);
-            }
+            if (usuarioId == null) throw new RuntimeException("No autenticado");
 
-            // Crear transacción e iniciar pago
-            Transaccion transaccion = pagoService.iniciarPagoStripe(pedido);
+            Usuario usuario = usuarioService.findById(usuarioId).get();
+            Carrito carrito = carritoService.obtenerCarrito(usuario);
+
+            // Creamos un pedido TEMPORAL solo para que Stripe calcule el monto
+            // Ojo: No lo guardamos en BD todavía
+            Pedido pedidoTemp = new Pedido();
+            pedidoTemp.setTotal(carrito.getTotal() + 15.0);
+
+            Transaccion transaccion = pagoService.iniciarPagoStripe(pedidoTemp);
 
             response.put("exito", true);
             response.put("clientSecret", transaccion.getTokenPago());
-            response.put("transaccionId", transaccion.getId());
-
             return ResponseEntity.ok(response);
-
         } catch (Exception e) {
-            log.error("Error al iniciar pago Stripe: ", e);
             response.put("error", e.getMessage());
             return ResponseEntity.badRequest().body(response);
         }
     }
 
-    /**
-     * API: Confirmar pago con Stripe
-     */
     @PostMapping("/api/confirmar-stripe")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> confirmarPagoStripe(
@@ -136,157 +111,118 @@ public class PagoController {
             HttpSession session) {
 
         Map<String, Object> response = new HashMap<>();
-
         try {
-            // Verificar autenticación
-            if (session.getAttribute("usuarioId") == null) {
-                response.put("error", "No estás autenticado");
-                return ResponseEntity.badRequest().body(response);
-            }
+            Long usuarioId = (Long) session.getAttribute("usuarioId");
+            Usuario usuario = usuarioService.findById(usuarioId).get();
+            Carrito carrito = carritoService.obtenerCarrito(usuario);
 
-            // Confirmar pago
+            // Validar con Stripe
             Transaccion transaccion = pagoService.confirmarPago(paymentIntentId);
 
             if (transaccion.getEstado() == Transaccion.EstadoTransaccion.COMPLETADO) {
+                // SI EL PAGO PASÓ -> CREAMOS EL PEDIDO REAL AHORA
+                String direccion = (String) session.getAttribute("direccionEnvio");
+                if(direccion == null) direccion = "Dirección registrada";
+
+                Pedido nuevoPedido = pedidoService.crearPedidoDesdeCarrito(usuario, carrito, "STRIPE");
+                nuevoPedido.setDireccionEnvio(direccion);
+                pedidoRepository.save(nuevoPedido);
+
+                // Asignar pedido a la transacción y guardar
+                transaccion.setPedido(nuevoPedido);
+                transaccionRepository.save(transaccion);
+
+                // Vaciar carrito
+                carritoService.vaciarCarrito(usuarioId);
+
                 response.put("exito", true);
-                response.put("mensaje", "Pago completado exitosamente");
-                response.put("redirect", "/checkout/confirmacion/" + transaccion.getPedido().getId());
+                response.put("redirect", "/checkout/confirmacion/" + nuevoPedido.getId());
             } else {
-                response.put("error", "El pago no se completó correctamente");
+                response.put("error", "Pago no completado");
             }
-
             return ResponseEntity.ok(response);
-
         } catch (Exception e) {
-            log.error("Error al confirmar pago: ", e);
             response.put("error", e.getMessage());
             return ResponseEntity.badRequest().body(response);
         }
     }
 
-    /**
-     * Webhook de Stripe (opcional para producción)
-     */
-    @PostMapping("/webhook/stripe")
-    @ResponseBody
-    public ResponseEntity<String> webhookStripe(
-            @RequestBody String payload,
-            @RequestHeader("Stripe-Signature") String sigHeader) {
+    // ==========================================
+    // 3. PANTALLA YAPE (Usando Carrito)
+    // ==========================================
+    @GetMapping("/yape")
+    public String mostrarPagoYape(HttpSession session, Model model) {
+        Long usuarioId = (Long) session.getAttribute("usuarioId");
+        if (usuarioId == null) return "redirect:/login";
 
-        // TODO: Implementar verificación de webhook para producción
-        log.info("Webhook recibido de Stripe");
+        Usuario usuario = usuarioService.findById(usuarioId).get();
+        Carrito carrito = carritoService.obtenerCarrito(usuario);
 
-        return ResponseEntity.ok("success");
+        if (carrito.getItems().isEmpty()) return "redirect:/productos";
+
+        double total = carrito.getTotal() + 15.0;
+        Map<String, String> infoYape = pagoManualService.obtenerInformacionPago("YAPE");
+
+        model.addAttribute("total", total);
+        model.addAttribute("infoYape", infoYape);
+
+        return "pago/yape";
     }
 
-    /**
-     * Cancelar pago
-     */
-    @GetMapping("/cancelar/{pedidoId}")
-    public String cancelarPago(
-            @PathVariable Long pedidoId,
+    // ==========================================
+    // 4. CONFIRMAR YAPE -> CREAR PEDIDO
+    // ==========================================
+    @PostMapping("/yape/confirmar")
+    public String confirmarPagoYape(
+            @RequestParam String codigoAprobacion,
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
-        try {
-            redirectAttributes.addFlashAttribute("mensaje", "Pago cancelado");
-            redirectAttributes.addFlashAttribute("tipoMensaje", "warning");
-            return "redirect:/checkout";
-
-        } catch (Exception e) {
-            log.error("Error al cancelar pago: ", e);
-            return "redirect:/mis-pedidos";
-        }
-    }
-    @GetMapping("/manual/{pedidoId}")
-    public String mostrarPagoManual(
-            @PathVariable Long pedidoId,
-            HttpSession session,
-            Model model,
-            RedirectAttributes redirectAttributes) {
-
-        if (session.getAttribute("usuarioId") == null) {
-            redirectAttributes.addFlashAttribute("mensaje", "Debes iniciar sesión");
-            return "redirect:/login";
-        }
+        Long usuarioId = (Long) session.getAttribute("usuarioId");
+        if (usuarioId == null) return "redirect:/login";
 
         try {
-            Pedido pedido = pedidoService.obtenerPedidoPorId(pedidoId)
-                    .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
-
-            Long usuarioId = (Long) session.getAttribute("usuarioId");
-            if (!pedido.getUsuario().getId().equals(usuarioId)) {
-                throw new RuntimeException("No tienes permiso para acceder a este pedido");
+            // A. Validar Código (Simulación)
+            if (!"654321".equals(codigoAprobacion)) {
+                redirectAttributes.addFlashAttribute("mensaje", "Código incorrecto. Intenta de nuevo.");
+                redirectAttributes.addFlashAttribute("tipoMensaje", "danger");
+                return "redirect:/pago/yape";
             }
 
-            if (pedido.getEstado() != Pedido.EstadoPedido.PENDIENTE) {
-                throw new RuntimeException("Este pedido no puede ser pagado");
-            }
+            // B. Crear Pedido y Transacción
+            Usuario usuario = usuarioService.findById(usuarioId).get();
+            Carrito carrito = carritoService.obtenerCarrito(usuario);
 
-            // Obtener información del metodo de pago
-            String metodoPago = pedido.getMetodoPago().name();
-            Map<String, String> infoPago = pagoManualService.obtenerInformacionPago(metodoPago);
+            // Recuperar dirección de la sesión (guardada en CheckoutController)
+            String direccion = (String) session.getAttribute("direccionEnvio");
+            if (direccion == null) direccion = "Dirección por defecto";
 
-            model.addAttribute("pedido", pedido);
-            model.addAttribute("metodoPago", metodoPago);
-            model.addAttribute("infoPago", infoPago);
+            // CREAR PEDIDO CONFIRMADO
+            // OJO: Asegúrate de que el método en PedidoService coincida con estos parámetros
+            Pedido nuevoPedido = pedidoService.crearPedidoDesdeCarrito(usuario, carrito, "YAPE");
+            nuevoPedido.setDireccionEnvio(direccion);
+            pedidoRepository.save(nuevoPedido); // Actualizar dirección
 
-            return "pago/manual";
+            // CREAR TRANSACCIÓN
+            Transaccion t = new Transaccion();
+            t.setPedido(nuevoPedido);
+            t.setMonto(nuevoPedido.getTotal());
+            t.setPasarela(Transaccion.Pasarela.YAPE);
+            t.setEstado(Transaccion.EstadoTransaccion.COMPLETADO);
+            t.setReferenciaExterna(codigoAprobacion);
+            t.setFechaConfirmacion(LocalDateTime.now());
+            transaccionRepository.save(t);
+
+            // C. Vaciar Carrito
+            carritoService.vaciarCarrito(usuario.getId());
+
+            redirectAttributes.addFlashAttribute("mensaje", "¡Pago Exitoso! Pedido generado.");
+            return "redirect:/checkout/confirmacion/" + nuevoPedido.getId();
 
         } catch (Exception e) {
-            log.error("Error al mostrar pago manual: ", e);
+            log.error("Error procesando pago: ", e);
             redirectAttributes.addFlashAttribute("mensaje", "Error: " + e.getMessage());
-            redirectAttributes.addFlashAttribute("tipoMensaje", "danger");
-            return "redirect:/mis-pedidos";
-        }
-    }
-
-    /**
-     * Procesar pago manual
-     */
-    @PostMapping("/manual/confirmar")
-    public String confirmarPagoManual(
-            @RequestParam Long pedidoId,
-            @RequestParam String numeroOperacion,
-            HttpSession session,
-            RedirectAttributes redirectAttributes) {
-
-        if (session.getAttribute("usuarioId") == null) {
-            return "redirect:/login";
-        }
-
-        try {
-            Pedido pedido = pedidoService.obtenerPedidoPorId(pedidoId)
-                    .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
-
-            Long usuarioId = (Long) session.getAttribute("usuarioId");
-            if (!pedido.getUsuario().getId().equals(usuarioId)) {
-                throw new RuntimeException("No tienes permiso");
-            }
-
-            // Registrar transacción manual
-            String metodoPago = pedido.getMetodoPago().name();
-            Transaccion transaccion = pagoManualService.registrarPagoManual(
-                    pedido, metodoPago, numeroOperacion);
-
-            // Si es contra entrega, ya está confirmado
-            if ("CONTRAENTREGA".equals(metodoPago)) {
-                pedido.setEstado(Pedido.EstadoPedido.CONFIRMADO);
-                redirectAttributes.addFlashAttribute("mensaje",
-                        "¡Pedido confirmado! Pagarás al recibir tu producto.");
-            } else {
-                redirectAttributes.addFlashAttribute("mensaje",
-                        "Pago registrado. Te notificaremos cuando sea confirmado.");
-            }
-
-            redirectAttributes.addFlashAttribute("tipoMensaje", "success");
-            return "redirect:/checkout/confirmacion/" + pedido.getId();
-
-        } catch (Exception e) {
-            log.error("Error al confirmar pago manual: ", e);
-            redirectAttributes.addFlashAttribute("mensaje", "Error: " + e.getMessage());
-            redirectAttributes.addFlashAttribute("tipoMensaje", "danger");
-            return "redirect:/pago/manual/" + pedidoId;
+            return "redirect:/pago/yape";
         }
     }
 }

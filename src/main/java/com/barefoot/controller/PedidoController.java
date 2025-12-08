@@ -52,14 +52,19 @@ public class PedidoController {
             model.addAttribute("totalPages", pedidosPage.getTotalPages());
         }
 
-        // Estadísticas
+        // --- ESTADÍSTICAS CORREGIDAS ---
         model.addAttribute("totalPedidos", pedidoService.obtenerTodosPedidos().size());
-        model.addAttribute("pedidosPendientes", pedidoService.contarPedidosPorEstado(Pedido.EstadoPedido.PENDIENTE));
-        model.addAttribute("pedidosEnviados", pedidoService.contarPedidosPorEstado(Pedido.EstadoPedido.ENVIADO));
+
+        // CORRECCIÓN 1: PENDIENTE ya no existe -> Usamos CONFIRMADO (son los que toca preparar)
+        model.addAttribute("pedidosPendientes", pedidoService.contarPedidosPorEstado(Pedido.EstadoPedido.CONFIRMADO));
+
+        // CORRECCIÓN 2: ENVIADO ya no existe -> Usamos EN_CAMINO
+        model.addAttribute("pedidosEnviados", pedidoService.contarPedidosPorEstado(Pedido.EstadoPedido.EN_CAMINO));
+
         model.addAttribute("pedidosEntregados", pedidoService.contarPedidosPorEstado(Pedido.EstadoPedido.ENTREGADO));
         model.addAttribute("ventasTotales", pedidoService.calcularTotalVentas());
 
-        // Estados disponibles
+        // Estados disponibles para el filtro
         model.addAttribute("estados", Pedido.EstadoPedido.values());
         model.addAttribute("nombreUsuario", session.getAttribute("usuarioNombre"));
 

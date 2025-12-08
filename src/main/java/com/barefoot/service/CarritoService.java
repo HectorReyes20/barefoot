@@ -1,9 +1,6 @@
 package com.barefoot.service;
 
-import com.barefoot.model.CarritoItem;
-import com.barefoot.model.ItemCarrito;
-import com.barefoot.model.Producto;
-import com.barefoot.model.Usuario;
+import com.barefoot.model.*;
 import com.barefoot.repository.CarritoItemRepository;
 import com.barefoot.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +23,50 @@ public class CarritoService {
     private UsuarioRepository usuarioRepository;
 
     private static final String CARRITO_SESSION_KEY = "carrito";
+
+    // ==========================================
+    // MÉTODOS NUEVOS (PARA EL PAGO CONTROLLER)
+    // ==========================================
+
+    /**
+     * Método específico para el Checkout/Pago.
+     * Devuelve el objeto 'Carrito' (envoltorio) basado en la BD del usuario.
+     */
+    public Carrito obtenerCarrito(Usuario usuario) {
+        // 1. Buscamos los items en la BD
+        List<CarritoItem> itemsBD = carritoItemRepository.findByUsuario(usuario);
+
+        // 2. Creamos el objeto envoltorio Carrito
+        Carrito carrito = new Carrito();
+
+        // 3. Convertimos Entities a DTOs y los agregamos
+        for (CarritoItem itemBD : itemsBD) {
+            ItemCarrito dto = new ItemCarrito(
+                    itemBD.getProducto(),
+                    itemBD.getCantidad(),
+                    itemBD.getPersonalizacion()
+            );
+            carrito.agregarItem(dto);
+        }
+
+        // El objeto Carrito ya calcula el total automáticamente al agregar items
+        return carrito;
+    }
+
+    /**
+     * Sobrecarga para vaciar carrito solo con ID de usuario (usado al finalizar compra)
+     */
+    @Transactional
+    public void vaciarCarrito(Long usuarioId) {
+        Usuario usuario = new Usuario();
+        usuario.setId(usuarioId);
+        carritoItemRepository.deleteByUsuario(usuario);
+    }
+
+
+    // ==========================================
+    // TUS MÉTODOS ORIGINALES (PARA LA WEB/SESIÓN)
+    // ==========================================
 
     // --- 1. OBTENER CARRITO (HÍBRIDO) ---
     public List<ItemCarrito> obtenerCarrito(HttpSession session) {
@@ -71,7 +112,7 @@ public class CarritoService {
                 carritoItemRepository.save(nuevo);
             }
         } else {
-            // MODO SESIÓN (Tu código original)
+            // MODO SESIÓN
             List<ItemCarrito> carrito = obtenerCarritoSesion(session);
             Optional<ItemCarrito> existente = buscarEnSesion(carrito, producto.getId(), personalizacion);
 
@@ -99,8 +140,6 @@ public class CarritoService {
         if (usuarioId != null) {
             // MODO BD
             Usuario usuario = new Usuario(); usuario.setId(usuarioId);
-            // Nota: Esto actualiza el primer item que encuentre con ese productoId.
-            // Idealmente se debería usar el ID del item del carrito, pero mantenemos productoId por compatibilidad.
             List<CarritoItem> items = carritoItemRepository.findByUsuario(usuario);
             for (CarritoItem item : items) {
                 if (item.getProducto().getId().equals(productoId)) {
@@ -134,21 +173,19 @@ public class CarritoService {
         actualizarContador(session);
     }
 
-    // --- 5. VACIAR CARRITO ---
+    // --- 5. VACIAR CARRITO (HÍBRIDO) ---
     @Transactional
     public void vaciarCarrito(HttpSession session) {
         Long usuarioId = (Long) session.getAttribute("usuarioId");
         if (usuarioId != null) {
-            Usuario usuario = new Usuario(); usuario.setId(usuarioId);
-            carritoItemRepository.deleteByUsuario(usuario);
+            vaciarCarrito(usuarioId); // Reutilizamos el método nuevo
         } else {
             session.removeAttribute(CARRITO_SESSION_KEY);
         }
         session.setAttribute("cantidadCarrito", 0);
     }
 
-    // --- 6. FUSIONAR CARRITO (LO NUEVO) ---
-    // Se llama al iniciar sesión para mover lo temporal a la BD
+    // --- 6. FUSIONAR CARRITO ---
     @Transactional
     public void fusionarCarrito(HttpSession session, Usuario usuario) {
         List<ItemCarrito> carritoSesion = obtenerCarritoSesion(session);
@@ -168,7 +205,6 @@ public class CarritoService {
                     carritoItemRepository.save(nuevo);
                 }
             }
-            // Limpiamos la sesión porque ya está seguro en la BD
             session.removeAttribute(CARRITO_SESSION_KEY);
         }
         actualizarContador(session);

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <th:block th:insert="~{fragments :: head('Procesar Pago - Barefoot Store')}"></th:block>
+    <th:block th:insert="~{fragments :: head('Pago Seguro - Barefoot Store')}"></th:block>
     <script src="https://js.stripe.com/v3/"></script>
     <style>
         .pago-container {
@@ -12,13 +12,10 @@
             max-width: 600px;
             margin: 30px auto;
         }
-        .seccion-pago {
-            margin-bottom: 30px;
-        }
-        .seccion-pago h3 {
+        .header-pago h2 {
             color: var(--color-primary);
-            margin-bottom: 20px;
             font-weight: 700;
+            text-align: center;
         }
         .resumen {
             background: #f5f1ed;
@@ -41,80 +38,70 @@
             font-size: 1.2rem;
             color: var(--color-primary);
         }
-        .form-group {
-            margin-bottom: 20px;
+        .btn-pagar {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #795548 0%, #3e2723 100%) !important;
+            color: white !important;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
         }
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
+        .btn-pagar:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+            background: linear-gradient(135deg, #8d6e63 0%, #4e342e 100%) !important;
+        }
+
+        /* Botón Yape */
+        .btn-yape-container {
+            background-color: #742284;
+            color: white;
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 25px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            box-shadow: 0 4px 6px rgba(116, 34, 132, 0.2);
+        }
+        .btn-yape-container:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(116, 34, 132, 0.4);
+            color: white;
+        }
+
+        /* Estilos Inputs */
+        #email {
+            background-color: #ffffff !important;
+            color: #212529 !important;
+            border: 2px solid #ced4da !important;
             font-weight: 600;
+            font-size: 1.1rem;
         }
         .StripeElement {
             border: 2px solid #e0e0e0;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 1rem;
-        }
-        .StripeElement--focus {
-            border-color: var(--color-primary);
-        }
-        .StripeElement--invalid {
-            border-color: #dc3545;
-        }
-        .error-message {
-            color: #dc3545;
-            font-size: 0.9rem;
-            margin-top: 8px;
-            display: none;
-        }
-        .btn-pagar {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .btn-pagar:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(78, 52, 46, 0.3);
-        }
-        .btn-pagar:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        .spinner {
-            display: none;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--color-primary);
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-            margin-right: 10px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .info-seguridad {
-            background: #e8f5e9;
-            border-left: 4px solid #4caf50;
             padding: 15px;
             border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
-            color: #2e7d32;
+            background: white;
         }
-        .info-seguridad i {
-            margin-right: 10px;
+        .StripeElement--focus { border-color: var(--color-primary); }
+        .error-message { color: #dc3545; font-size: 0.9rem; margin-top: 8px; display: none; }
+
+        .separator {
+            display: flex; align-items: center; text-align: center; margin: 25px 0; color: #6c757d;
         }
+        .separator::before, .separator::after { content: ''; flex: 1; border-bottom: 1px solid #dee2e6; }
+        .separator span { padding: 0 10px; font-size: 0.9rem; font-weight: 500; }
     </style>
 </head>
 <body>
@@ -122,75 +109,90 @@
 <nav th:replace="~{fragments :: navbar}"></nav>
 
 <div class="container my-5">
-    <h1 style="color: var(--color-primary); text-align: center; margin-bottom: 40px;">
-        <i class="fas fa-credit-card me-2"></i> Procesar Pago
-    </h1>
-
     <div class="pago-container">
-        <!-- Resumen del Pedido -->
+
+        <div class="header-pago mb-4">
+            <h2>Elige tu Método de Pago</h2>
+            <p class="text-muted">Completa tu compra de forma segura</p>
+        </div>
+
         <div class="seccion-pago">
-            <h3><i class="fas fa-box me-2"></i> Resumen del Pedido</h3>
+            <h3><i class="fas fa-box me-2"></i>Resumen de Pago</h3>
             <div class="resumen">
                 <div class="resumen-item">
-                    <span>Número de Pedido:</span>
-                    <span th:text="${pedido.numeroPedido}">PED-0000000001</span>
-                </div>
-                <div class="resumen-item">
                     <span>Subtotal:</span>
-                    <span>S/ <span th:text="${#numbers.formatDecimal(pedido.subtotal, 1, 'COMMA', 2, 'POINT')}">0.00</span></span>
-                </div>
-                <div class="resumen-item">
-                    <span>Descuento:</span>
-                    <span th:if="${pedido.descuento == 0 || pedido.descuento == null}">-</span>
-                    <span th:if="${pedido.descuento > 0}">-S/ <span th:text="${#numbers.formatDecimal(pedido.descuento, 1, 'COMMA', 2, 'POINT')}">0.00</span></span>
+                    <span>S/ <span th:text="${#numbers.formatDecimal(carrito.total, 1, 'COMMA', 2, 'POINT')}">0.00</span></span>
                 </div>
                 <div class="resumen-item">
                     <span>Envío:</span>
-                    <span th:if="${pedido.costoEnvio == 0 || pedido.costoEnvio == null}" class="text-success">
-                        <strong>GRATIS</strong>
-                    </span>
-                    <span th:if="${pedido.costoEnvio > 0}">
-                        S/ <span th:text="${#numbers.formatDecimal(pedido.costoEnvio, 1, 'COMMA', 2, 'POINT')}">0.00</span>
-                    </span>
-                </div>
+                    <span>S/ 15.00</span> </div>
                 <div class="resumen-item">
                     <span>Total a Pagar:</span>
-                    <span>S/ <span th:text="${#numbers.formatDecimal(pedido.total, 1, 'COMMA', 2, 'POINT')}">0.00</span></span>
+                    <span>S/ <span id="total-pagar" th:text="${#numbers.formatDecimal(total, 1, 'COMMA', 2, 'POINT')}">0.00</span></span>
                 </div>
             </div>
         </div>
 
-        <!-- Información de Seguridad -->
-        <div class="info-seguridad">
-            <i class="fas fa-shield-alt"></i>
-            <strong>Pago Seguro:</strong> Tu información está protegida y se procesa de forma segura con Stripe.
+        <div class="info-seguridad mb-4 p-3 rounded" style="background: #e8f5e9; border-left: 4px solid #4caf50; color: #2e7d32;">
+            <i class="fas fa-shield-alt me-2"></i><strong>Pago 100% Seguro:</strong> Tu información está protegida.
         </div>
 
-        <!-- Formulario de Pago -->
         <div class="seccion-pago">
-            <h3><i class="fas fa-lock me-2"></i> Información de Pago</h3>
+            <h3><i class="fas fa-wallet me-2"></i>Forma de Pago</h3>
+
+            <a th:href="@{/pago/yape}" class="btn-yape-container">
+                <div class="d-flex align-items-center">
+                    <div style="background: white; width: 45px; height: 45px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
+                        <strong style="color: #742284; font-size: 1.5rem;">Y</strong>
+                    </div>
+                    <div class="yape-info text-start">
+                        <h5 class="m-0">Pagar con Yape</h5>
+                        <small>Validación automática</small>
+                    </div>
+                </div>
+                <i class="fas fa-chevron-right fa-lg"></i>
+            </a>
+
+            <div class="separator">
+                <span>O paga con Tarjeta (Crédito/Débito)</span>
+            </div>
 
             <form id="payment-form">
                 <div class="form-group">
-                    <label for="card-element">Datos de la Tarjeta</label>
+                    <label for="card-element">
+                        <i class="fas fa-credit-card me-2"></i>Datos de la Tarjeta
+                    </label>
                     <div id="card-element" class="StripeElement"></div>
                     <div id="card-errors" class="error-message"></div>
                 </div>
 
                 <div class="form-group">
-                    <label for="email">Email de Confirmación</label>
-                    <input type="email" id="email" class="form-control" th:value="${session.usuarioEmail}" readonly>
+                    <label for="email">
+                        <i class="fas fa-envelope me-2"></i>Email de Confirmación
+                    </label>
+                    <input type="email"
+                           id="email"
+                           class="form-control"
+                           th:value="${session.usuarioEmail}"
+                           placeholder="ejemplo@correo.com"
+                           required>
                 </div>
 
                 <button type="submit" class="btn-pagar" id="submit-button">
-                    <span class="spinner" id="spinner"></span>
-                    <span id="button-text">Pagar S/ <span th:text="${#numbers.formatDecimal(pedido.total, 1, 'COMMA', 2, 'POINT')}">0.00</span></span>
+                    <span id="button-text">
+                        <i class="fas fa-lock me-2"></i>PAGAR S/ <span th:text="${#numbers.formatDecimal(total, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                    </span>
                 </button>
             </form>
 
-            <!-- Mensaje de Éxito/Error -->
-            <div id="payment-message" style="display: none; margin-top: 20px; padding: 15px; border-radius: 8px;">
+            <div id="payment-message" style="display: none; margin-top: 20px; padding: 18px; border-radius: 10px;">
             </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <a th:href="@{/checkout}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Cancelar y Volver
+            </a>
         </div>
     </div>
 </div>
@@ -198,57 +200,42 @@
 <footer th:replace="~{fragments :: footer}"></footer>
 <div th:replace="~{fragments :: scripts}"></div>
 
-<script>
-    const stripe = Stripe('[[${stripePublicKey}]]');
+<script th:inline="javascript">
+    const stripe = Stripe(/*[[${stripePublicKey}]]*/ 'pk_test_xxx');
     const elements = stripe.elements();
-    const cardElement = elements.create('card');
 
+    // Crear elemento de tarjeta
+    const cardElement = elements.create('card', {
+        style: {
+            base: { fontSize: '16px', color: '#32325d', fontFamily: '"Helvetica Neue", Helvetica, sans-serif', '::placeholder': { color: '#aab7c4' } },
+            invalid: { color: '#dc3545', iconColor: '#dc3545' }
+        }
+    });
     cardElement.mount('#card-element');
 
     const form = document.getElementById('payment-form');
     const submitButton = document.getElementById('submit-button');
-    const spinner = document.getElementById('spinner');
     const cardErrors = document.getElementById('card-errors');
     const paymentMessage = document.getElementById('payment-message');
-    const pedidoId = [[${pedido.id}]];
-
-    // Manejar errores de la tarjeta
-    cardElement.on('change', (event) => {
-        if (event.error) {
-            cardErrors.textContent = event.error.message;
-            cardErrors.style.display = 'block';
-        } else {
-            cardErrors.style.display = 'none';
-        }
-    });
 
     // Manejar envío del formulario
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-
-        submitButton.disabled = true;
-        spinner.style.display = 'inline-block';
-        submitButton.querySelector('#button-text').textContent = 'Procesando...';
+        setLoading(true);
 
         try {
-            // Paso 1: Iniciar pago en el servidor
+            // Paso 1: Iniciar pago (SIN ID DE PEDIDO, SE USA SESIÓN)
             const initResponse = await fetch('/pago/api/iniciar-stripe', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: 'pedidoId=' + pedidoId
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+                // Ya no enviamos pedidoId
             });
-
-            if (!initResponse.ok) {
-                throw new Error('Error al contactar el servidor');
-            }
 
             const initData = await initResponse.json();
 
             if (initData.error) {
                 showError(initData.error);
-                submitButton.disabled = false;
-                spinner.style.display = 'none';
-                submitButton.querySelector('#button-text').textContent = 'Pagar S/ ...';
+                setLoading(false);
                 return;
             }
 
@@ -267,11 +254,9 @@
 
             if (error) {
                 showError(error.message);
-                submitButton.disabled = false;
-                spinner.style.display = 'none';
-                submitButton.querySelector('#button-text').textContent = 'Reintentar Pago';
+                setLoading(false);
             } else if (paymentIntent.status === 'succeeded') {
-                // Paso 3: Confirmar en servidor
+                // Paso 3: Confirmar en servidor (Crear Pedido)
                 const confirmResponse = await fetch('/pago/api/confirmar-stripe', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -281,44 +266,48 @@
                 const confirmData = await confirmResponse.json();
 
                 if (confirmData.exito) {
-                    showSuccess('¡Pago completado exitosamente! Redirigiendo...');
+                    showSuccess('¡Pago completado! Generando pedido...');
                     setTimeout(() => {
                         window.location.href = confirmData.redirect;
-                    }, 2000);
+                    }, 1500);
                 } else {
                     showError(confirmData.error || 'Error al confirmar el pago');
-                    submitButton.disabled = false;
-                    spinner.style.display = 'none';
-                    submitButton.querySelector('#button-text').textContent = 'Reintentar';
+                    setLoading(false);
                 }
             }
 
         } catch (err) {
-            console.error('Error completo:', err);
-            showError('Error inesperado: ' + err.message);
-            submitButton.disabled = false;
-            spinner.style.display = 'none';
-            submitButton.querySelector('#button-text').textContent = 'Reintentar Pago';
+            console.error('Error:', err);
+            showError('Error inesperado de conexión');
+            setLoading(false);
         }
     });
+
+    function setLoading(isLoading) {
+        submitButton.disabled = isLoading;
+        if (isLoading) {
+            submitButton.innerHTML = '<span class="spinner"></span> Procesando...';
+        } else {
+            submitButton.innerHTML = '<i class="fas fa-lock me-2"></i>PAGAR S/ ' + document.getElementById('total-pagar').textContent;
+        }
+    }
 
     function showError(message) {
         paymentMessage.style.display = 'block';
         paymentMessage.style.background = '#ffebee';
-        paymentMessage.style.borderLeft = '4px solid #dc3545';
         paymentMessage.style.color = '#c62828';
+        paymentMessage.style.border = '1px solid #f5c6cb';
         paymentMessage.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i>' + message;
     }
 
     function showSuccess(message) {
         paymentMessage.style.display = 'block';
         paymentMessage.style.background = '#e8f5e9';
-        paymentMessage.style.borderLeft = '4px solid #4caf50';
         paymentMessage.style.color = '#2e7d32';
+        paymentMessage.style.border = '1px solid #c3e6cb';
         paymentMessage.innerHTML = '<i class="fas fa-check-circle me-2"></i>' + message;
     }
 </script>
 
 </body>
 </html>
-

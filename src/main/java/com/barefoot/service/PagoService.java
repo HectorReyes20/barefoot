@@ -24,32 +24,29 @@ public class PagoService {
     @Value("${stripe.api.key}")
     private String stripeApiKey;
 
-    public PagoService() {
-        // Stripe se inicializa con la key del application.properties
-    }
-
     /**
      * Crear un PaymentIntent con Stripe para iniciar el pago
+     * IMPORTANTE: NO guarda la transacción con el pedido porque el pedido aún no existe
      */
-    public Transaccion iniciarPagoStripe(Pedido pedido) throws StripeException {
+    public Transaccion iniciarPagoStripe(Pedido pedidoTemporal) throws StripeException {
         // Inicializar Stripe con la API key
         Stripe.apiKey = stripeApiKey;
 
-        // Crear transacción en BD
+        // Crear transacción en memoria (SIN pedido asociado todavía)
         Transaccion transaccion = new Transaccion();
-        transaccion.setPedido(pedido);
-        transaccion.setMonto(pedido.getTotal());
+        // NO asignar pedido aquí -> transaccion.setPedido(pedidoTemporal);
+        transaccion.setMonto(pedidoTemporal.getTotal());
         transaccion.setPasarela(Transaccion.Pasarela.STRIPE);
         transaccion.setEstado(Transaccion.EstadoTransaccion.PENDIENTE);
 
+        // Guardar transacción SIN pedido
         Transaccion transaccionGuardada = transaccionRepository.save(transaccion);
 
         // Crear PaymentIntent en Stripe
         PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
-                .setAmount((long) (pedido.getTotal() * 100)) // Stripe usa centavos
+                .setAmount((long) (pedidoTemporal.getTotal() * 100)) // Stripe usa centavos
                 .setCurrency("pen") // Soles peruanos
-                .setDescription("Pedido #" + pedido.getNumeroPedido())
-                .putMetadata("pedido_id", pedido.getId().toString())
+                .setDescription("Pedido Barefoot Store")
                 .putMetadata("transaccion_id", transaccionGuardada.getId().toString())
                 .build();
 
@@ -86,19 +83,22 @@ public class PagoService {
             transaccion.setEstado(Transaccion.EstadoTransaccion.COMPLETADO);
             transaccion.setFechaConfirmacion(LocalDateTime.now());
 
-            // Actualizar estado del pedido
-            Pedido pedido = transaccion.getPedido();
-            pedido.setEstado(Pedido.EstadoPedido.CONFIRMADO);
-
-            log.info("Pago confirmado para pedido: {}", pedido.getNumeroPedido());
+            // Solo actualizar estado del pedido SI ya tiene pedido asociado
+            if (transaccion.getPedido() != null) {
+                Pedido pedido = transaccion.getPedido();
+                pedido.setEstado(Pedido.EstadoPedido.CONFIRMADO);
+                log.info("Pago confirmado para pedido: {}", pedido.getNumeroPedido());
+            } else {
+                log.info("Pago confirmado. Pedido aún no asociado a transacción ID: {}", transaccion.getId());
+            }
         } else if ("processing".equals(intent.getStatus())) {
             transaccion.setEstado(Transaccion.EstadoTransaccion.PROCESANDO);
-            log.info("Pago en procesamiento para pedido: {}", transaccion.getPedido().getNumeroPedido());
+            log.info("Pago en procesamiento para transacción ID: {}", transaccion.getId());
         } else {
             transaccion.setEstado(Transaccion.EstadoTransaccion.FALLIDO);
             transaccion.setMessageError(intent.getLastPaymentError() != null ?
-                intent.getLastPaymentError().getMessage() : "Error desconocido");
-            log.error("Pago fallido para pedido: {}", transaccion.getPedido().getNumeroPedido());
+                    intent.getLastPaymentError().getMessage() : "Error desconocido");
+            log.error("Pago fallido para transacción ID: {}", transaccion.getId());
         }
 
         return transaccionRepository.save(transaccion);
@@ -134,13 +134,12 @@ public class PagoService {
 
         // Crear reembolso en Stripe usando el PaymentIntent
         com.stripe.model.Refund.create(
-            com.stripe.param.RefundCreateParams.builder()
-                .setPaymentIntent(transaccion.getReferenciaExterna())
-                .build()
+                com.stripe.param.RefundCreateParams.builder()
+                        .setPaymentIntent(transaccion.getReferenciaExterna())
+                        .build()
         );
 
         transaccion.setEstado(Transaccion.EstadoTransaccion.REEMBOLSADO);
         return transaccionRepository.save(transaccion);
     }
 }
-
