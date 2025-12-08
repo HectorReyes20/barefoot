@@ -10,219 +10,155 @@
 
 <nav th:replace="~{fragments :: navbar}"></nav>
 
-<section class="hero-section">
-    <div class="container">
-        <h1>
+<header class="catalog-header">
+    <div class="container text-center">
+        <span class="text-uppercase text-accent ls-2 fw-bold small mb-2 d-block">Colección 2025</span>
+        <h1 class="display-4 font-serif fw-bold text-primary-dark mb-0">
             <span th:if="${categoriaActual != null}" th:text="${categoriaActual}">Categoría</span>
-            <span th:if="${esDestacados}">Productos Destacados</span>
-            <span th:if="${categoriaActual == null && !esDestacados}">Nuestro Catálogo</span>
+            <span th:if="${esDestacados}">Favoritos</span>
+            <span th:if="${categoriaActual == null && !esDestacados}">Nuestra Colección</span>
         </h1>
-
-        <p th:if="${query != null}" th:text="'Resultados para: ' + ${query}">Búsqueda</p>
-        <p th:if="${categoriaActual == null && !esDestacados && query == null}">
-            Descubre nuestra colección de calzado barefoot
-        </p>
-
-        <!-- BARRA DE BÚSQUEDA (Mantenida) -->
-        <div class="search-bar">
-            <form th:action="@{/productos/buscar}" method="get" class="d-flex">
-                <input type="text" name="query" class="form-control"
-                       placeholder="Buscar productos..." th:value="${query}">
-                <button type="submit" class="btn">
-                    <i class="fas fa-search"></i>
-                </button>
-            </form>
-        </div>
+        <div class="separator mx-auto mt-3"></div>
+        <p class="text-muted mt-3 mb-0" th:if="${query != null}" th:text="'Resultados para: ' + ${query}"></p>
     </div>
-</section>
+</header>
 
 <div class="container mb-5">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-                <a th:href="@{/productos}">
-                    <i class="fas fa-home me-1"></i> Inicio
-                </a>
-            </li>
 
-            <li class="breadcrumb-item active" th:if="${categoriaActual != null}">
-                <i class="fas fa-tag me-1"></i>
-                <span th:text="${categoriaActual}">Categoría</span>
-            </li>
+    <div class="catalog-toolbar d-flex flex-wrap justify-content-between align-items-center mb-5">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb bg-transparent p-0 m-0">
+                <li class="breadcrumb-item"><a th:href="@{/inicio}">Inicio</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Catálogo</li>
+            </ol>
+        </nav>
 
-            <li class="breadcrumb-item active" th:if="${esDestacados}">
-                <i class="fas fa-star me-1"></i> Destacados
-            </li>
+        <div class="d-flex gap-3 align-items-center">
+            <form th:action="@{/productos/buscar}" method="get" class="search-form-compact">
+                <div class="input-group">
+                    <input type="text" name="query" class="form-control" placeholder="Buscar..." th:value="${query}">
+                    <button class="btn btn-outline-primary-custom" type="submit"><i class="fas fa-search"></i></button>
+                </div>
+            </form>
 
-            <li class="breadcrumb-item active" th:if="${query != null}">
-                <i class="fas fa-search me-1"></i> Búsqueda
-            </li>
-        </ol>
-    </nav>
+            <select class="form-select form-select-custom w-auto" onchange="ordenarProductos(this.value)">
+                <option value="">Ordenar por</option>
+                <option value="precio-asc">Precio: Menor a Mayor</option>
+                <option value="precio-desc">Precio: Mayor a Menor</option>
+                <option value="nombre">Nombre A-Z</option>
+            </select>
+        </div>
+    </div>
 
-    <div class="row">
-        <div class="col-lg-3 mb-4">
-            <div class="filters-section">
-                <h5 class="filter-title">
-                    <i class="fas fa-filter me-2"></i> Categorías
-                </h5>
+    <div class="row g-5">
+        <div class="col-lg-3">
+            <div class="filters-sidebar">
+                <h5 class="font-serif fw-bold mb-4 text-primary-dark">Categorías</h5>
+                <ul class="list-unstyled filter-list">
+                    <li>
+                        <a th:href="@{/productos}"
+                           th:classappend="${categoriaActual == null ? 'active' : ''}">
+                            Ver Todo
+                        </a>
+                    </li>
+                    <li><a th:href="@{/productos/categoria/Casual}" th:classappend="${categoriaActual == 'Casual' ? 'active' : ''}">Casual</a></li>
+                    <li><a th:href="@{/productos/categoria/Deportivo}" th:classappend="${categoriaActual == 'Deportivo' ? 'active' : ''}">Deportivo</a></li>
+                    <li><a th:href="@{/productos/categoria/Formal}" th:classappend="${categoriaActual == 'Formal' ? 'active' : ''}">Formal</a></li>
+                    <li><a th:href="@{/productos/categoria/Running}" th:classappend="${categoriaActual == 'Running' ? 'active' : ''}">Running</a></li>
+                    <li><a th:href="@{/productos/categoria/Senderismo}" th:classappend="${categoriaActual == 'Senderismo' ? 'active' : ''}">Senderismo</a></li>
+                </ul>
 
-                <a th:href="@{/productos}" class="filter-option"
-                   th:classappend="${categoriaActual == null ? 'active' : ''}">
-                    <i class="fas fa-th me-2"></i> Todas las categorías
-                </a>
+                <hr class="my-4 border-light-brown">
 
-                <a th:href="@{/productos/categoria/Casual}" class="filter-option"
-                   th:classappend="${categoriaActual == 'Casual' ? 'active' : ''}">
-                    <i class="fas fa-walking me-2"></i> Casual
-                </a>
+                <h5 class="font-serif fw-bold mb-4 text-primary-dark">Colecciones</h5>
+                <ul class="list-unstyled filter-list">
+                    <li>
+                        <a th:href="@{/productos/destacados}"
+                           th:classappend="${esDestacados ? 'active' : ''}"
+                           class="d-flex align-items-center">
+                            <i class="fas fa-star text-accent me-2 small"></i> Destacados
+                        </a>
+                    </li>
+                </ul>
 
-                <a th:href="@{/productos/categoria/Deportivo}" class="filter-option"
-                   th:classappend="${categoriaActual == 'Deportivo' ? 'active' : ''}">
-                    <i class="fas fa-running me-2"></i> Deportivo
-                </a>
-
-                <a th:href="@{/productos/categoria/Formal}" class="filter-option"
-                   th:classappend="${categoriaActual == 'Formal' ? 'active' : ''}">
-                    <i class="fas fa-briefcase me-2"></i> Formal
-                </a>
-
-                <a th:href="@{/productos/categoria/Running}" class="filter-option"
-                   th:classappend="${categoriaActual == 'Running' ? 'active' : ''}">
-                    <i class="fas fa-fire me-2"></i> Running
-                </a>
-
-                <a th:href="@{/productos/categoria/Senderismo}" class="filter-option"
-                   th:classappend="${categoriaActual == 'Senderismo' ? 'active' : ''}">
-                    <i class="fas fa-mountain me-2"></i> Senderismo
-                </a>
-
-                <hr class="my-4">
-
-                <h5 class="filter-title">
-                    <i class="fas fa-star me-2"></i> Especiales
-                </h5>
-
-                <a th:href="@{/productos/destacados}" class="filter-option"
-                   th:classappend="${esDestacados ? 'active' : ''}">
-                    <i class="fas fa-star me-2"></i> Productos destacados
-                </a>
+                <div class="sidebar-promo mt-5 p-4 text-center text-white rounded-3">
+                    <h5 class="font-serif">Personaliza tu estilo</h5>
+                    <p class="small opacity-75">Crea un diseño único desde cero.</p>
+                    <a th:href="@{/personalizar}" class="btn btn-sm btn-light btn-promo fw-bold mt-2">Empezar</a>
+                </div>
             </div>
         </div>
 
         <div class="col-lg-9">
-            <div class="results-header">
-                <div>
-                    <strong th:text="${#lists.size(productos)}">0</strong> productos encontrados
+            <div th:if="${#lists.isEmpty(productos)}" class="text-center py-5">
+                <div class="empty-state">
+                    <i class="fas fa-search fa-3x text-accent mb-3"></i>
+                    <h3 class="font-serif text-primary-dark">No encontramos resultados</h3>
+                    <p class="text-muted">Intenta ajustar tu búsqueda o filtros.</p>
+                    <a th:href="@{/productos}" class="btn btn-primary-elegant mt-3">Limpiar Filtros</a>
                 </div>
-                <select class="sort-select" onchange="ordenarProductos(this.value)">
-                    <option value="">Ordenar por</option>
-                    <option value="precio-asc">Precio: Menor a Mayor</option>
-                    <option value="precio-desc">Precio: Mayor a Menor</option>
-                    <option value="nombre">Nombre A-Z</option>
-                </select>
-            </div>
-
-            <div th:if="${#lists.isEmpty(productos)}" class="no-products">
-                <i class="fas fa-box-open"></i>
-                <h3>No se encontraron productos</h3>
-                <p>Intenta con otros filtros o búsqueda</p>
-                <a th:href="@{/productos}" class="btn btn-ver-detalle mt-3" style="max-width: 300px; margin: 0 auto;">
-                    Ver todos los productos
-                </a>
             </div>
 
             <div class="row g-4">
                 <div class="col-md-6 col-lg-4" th:each="producto : ${productos}">
-                    <div class="card product-card">
-                        <div class="product-image-container">
-                            <img th:if="${producto.imagenUrl != null}"
-                                 th:src="${producto.imagenUrl}"
-                                 th:alt="${producto.nombre}">
-                            <div th:if="${producto.imagenUrl == null}"
-                                 class="d-flex align-items-center justify-content-center h-100 bg-light">
-                                <i class="fas fa-image fa-3x text-muted"></i>
+                    <div class="product-card-elegant h-100">
+                        <div class="card-image-wrapper">
+                            <a th:href="@{/productos/{id}(id=${producto.id})}">
+                                <img th:if="${producto.imagenUrl != null}" th:src="${producto.imagenUrl}" th:alt="${producto.nombre}">
+                                <div th:if="${producto.imagenUrl == null}" class="placeholder-img">
+                                    <i class="fas fa-image"></i>
+                                </div>
+                            </a>
+
+                            <div class="badges-overlay top-left">
+                                <span th:if="${producto.tieneDescuento()}" class="badge bg-danger rounded-0">Sale</span>
+                                <span th:if="${producto.destacado}" class="badge bg-accent text-primary rounded-0 ms-1">Top</span>
                             </div>
 
-                            <span th:if="${producto.tieneDescuento()}" class="badge-descuento">
-                                -<span th:text="${producto.porcentajeDescuento}">0</span>%
-                            </span>
-
-                            <span th:if="${producto.destacado}" class="badge-destacado">
-                                <i class="fas fa-star me-1"></i> Destacado
-                            </span>
+                            <div class="action-overlay">
+                                <a th:href="@{/productos/{id}(id=${producto.id})}" class="btn-action" title="Ver Detalle">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </div>
                         </div>
 
-                        <div class="card-body">
-                            <h5 class="card-title" th:text="${producto.nombre}">Nombre del Producto</h5>
-                            <p class="card-text" th:text="${producto.descripcion}">Descripción del producto</p>
+                        <div class="card-body text-center p-3">
+                            <span class="text-uppercase small text-muted ls-1" th:text="${producto.categoria}">Categoría</span>
+                            <h5 class="product-title font-serif my-2">
+                                <a th:href="@{/productos/{id}(id=${producto.id})}" th:text="${producto.nombre}">Nombre</a>
+                            </h5>
 
-                            <div class="product-stock"
-                                 th:classappend="${producto.stock < 10 ? 'low' : ''}">
-                                <i class="fas fa-boxes me-1"></i>
-                                <span th:if="${producto.stock > 10}">Stock disponible</span>
-                                <span th:if="${producto.stock <= 10 && producto.stock > 0}">
-                                    ¡Solo quedan <span th:text="${producto.stock}">0</span>!
-                                </span>
-                                <span th:if="${producto.stock == 0}" class="text-danger">
-                                    <i class="fas fa-times-circle me-1"></i> Agotado
-                                </span>
+                            <div class="price-wrapper">
+                                <span class="current-price text-primary fw-bold" th:text="'S/ ' + ${producto.precioFinal}">S/ 0.00</span>
+                                <span th:if="${producto.tieneDescuento()}" class="old-price text-muted text-decoration-line-through ms-2 small" th:text="'S/ ' + ${producto.precio}"></span>
                             </div>
-
-                            <div class="d-flex align-items-center mb-3">
-                                <span class="product-price" th:text="'S/ ' + ${producto.precioFinal}">S/ 0.00</span>
-                                <span th:if="${producto.tieneDescuento()}"
-                                      class="product-price-original"
-                                      th:text="'S/ ' + ${producto.precio}">S/ 0.00</span>
-                            </div>
-
-                            <a th:href="@{/productos/{id}(id=${producto.id})}"
-                               class="btn btn-ver-detalle">
-                                <i class="fas fa-eye me-2"></i> Ver Detalle
-                            </a>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- PAGINACIÓN -->
-            <nav th:if="${totalPages != null && totalPages > 1}" class="mt-5">
-                <ul class="pagination justify-content-center">
-                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                        <a class="page-link" th:href="@{/productos(page=0, size=${pageSize}, categoria=${categoriaActual}, orden=${ordenActual})}">
-                            <i class="fas fa-angle-double-left"></i>
-                        </a>
-                    </li>
-
+            <nav th:if="${totalPages != null && totalPages > 1}" class="mt-5 border-top pt-4 border-light-brown">
+                <ul class="pagination justify-content-center gap-2">
                     <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
                         <a class="page-link" th:href="@{/productos(page=${currentPage - 1}, size=${pageSize}, categoria=${categoriaActual}, orden=${ordenActual})}">
-                            <i class="fas fa-angle-left"></i>
+                            <i class="fas fa-chevron-left"></i>
                         </a>
                     </li>
 
-                    <li class="page-item"
-                        th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                    <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
                         th:if="${i >= (currentPage - 2) && i <= (currentPage + 2)}"
                         th:classappend="${i == currentPage} ? 'active'">
-                        <a class="page-link"
-                           th:href="@{/productos(page=${i}, size=${pageSize}, categoria=${categoriaActual}, orden=${ordenActual})}"
+                        <a class="page-link" th:href="@{/productos(page=${i}, size=${pageSize}, categoria=${categoriaActual}, orden=${ordenActual})}"
                            th:text="${i + 1}">1</a>
                     </li>
 
                     <li class="page-item" th:classappend="${currentPage >= totalPages - 1} ? 'disabled'">
                         <a class="page-link" th:href="@{/productos(page=${currentPage + 1}, size=${pageSize}, categoria=${categoriaActual}, orden=${ordenActual})}">
-                            <i class="fas fa-angle-right"></i>
-                        </a>
-                    </li>
-
-                    <li class="page-item" th:classappend="${currentPage >= totalPages - 1} ? 'disabled'">
-                        <a class="page-link" th:href="@{/productos(page=${totalPages - 1}, size=${pageSize}, categoria=${categoriaActual}, orden=${ordenActual})}">
-                            <i class="fas fa-angle-double-right"></i>
+                            <i class="fas fa-chevron-right"></i>
                         </a>
                     </li>
                 </ul>
             </nav>
-
         </div>
     </div>
 </div>
@@ -240,11 +176,12 @@
         }
     }
 
+    // Setear valor del select al cargar
     document.addEventListener("DOMContentLoaded", function() {
         const urlParams = new URLSearchParams(window.location.search);
         const ordenActual = urlParams.get('orden');
         if (ordenActual) {
-            document.querySelector('.sort-select').value = ordenActual;
+            document.querySelector('.form-select-custom').value = ordenActual;
         }
     });
 </script>

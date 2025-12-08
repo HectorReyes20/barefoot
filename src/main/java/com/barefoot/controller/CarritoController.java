@@ -52,7 +52,7 @@ public class CarritoController {
             session.setAttribute("pendiente_cant", cantidad);
             session.setAttribute("pendiente_pers", personalizacion);
 
-            redirectAttributes.addFlashAttribute("mensaje", "Inicia sesión para guardar tu diseño en el carrito.");
+            redirectAttributes.addFlashAttribute("mensaje", "Inicia sesión para agregar el producto en el carrito.");
             redirectAttributes.addFlashAttribute("tipoMensaje", "info");
             return "redirect:/login"; // Redirige al login
         }

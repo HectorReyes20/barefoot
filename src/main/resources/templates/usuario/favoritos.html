@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:insert="~{fragments :: head('Favoritos - Barefoot Store')}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/usuario.css}">
+</head>
+<body>
+<nav th:replace="~{fragments :: navbar}"></nav>
+
+<div style="height: 100px;"></div>
+
+<div class="container mb-5" style="min-height: 60vh;">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="font-serif fw-bold text-primary-dark m-0">Mis Favoritos</h2>
+        <a th:href="@{/productos}" class="btn btn-outline-primary btn-sm">Ver Catálogo</a>
+    </div>
+
+    <div th:if="${favoritos.isEmpty()}" class="text-center py-5 border rounded bg-white">
+        <i class="far fa-heart fa-3x text-muted mb-3 opacity-50"></i>
+        <h4 class="font-serif">Tu lista de deseos está vacía</h4>
+        <p class="text-muted">Guarda los modelos que te encantan aquí.</p>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4" th:unless="${favoritos.isEmpty()}">
+        <div class="col" th:each="fav : ${favoritos}">
+            <div class="card fav-card h-100 bg-white border">
+                <div class="position-relative overflow-hidden" style="height: 250px; background: #F8F5F2;">
+                    <a th:href="@{/productos/detalle/{id}(id=${fav.producto.id})}">
+                        <img th:if="${fav.producto.imagenUrl != null}"
+                             th:src="${fav.producto.imagenUrl}" class="w-100 h-100 object-fit-cover">
+                        <div th:if="${fav.producto.imagenUrl == null}"
+                             class="d-flex align-items-center justify-content-center h-100 text-muted">
+                            <i class="fas fa-image fa-2x"></i>
+                        </div>
+                    </a>
+
+                    <a th:href="@{/favoritos/toggle/{id}(id=${fav.producto.id})}"
+                       class="position-absolute top-0 end-0 m-2 btn btn-light btn-sm rounded-circle shadow-sm text-danger"
+                       title="Quitar">
+                        <i class="fas fa-times"></i>
+                    </a>
+                </div>
+
+                <div class="card-body text-center p-3">
+                    <h6 class="card-title text-truncate mb-1">
+                        <a th:href="@{/productos/detalle/{id}(id=${fav.producto.id})}"
+                           class="text-decoration-none text-primary fw-bold"
+                           th:text="${fav.producto.nombre}">Nombre</a>
+                    </h6>
+                    <p class="text-muted small mb-2" th:text="${fav.producto.categoria}">Cat</p>
+                    <div class="fw-bold text-primary">S/ <span th:text="${fav.producto.precio}">0.00</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{fragments :: footer}"></footer>
+<div th:replace="~{fragments :: scripts}"></div>
+</body>
+</html>

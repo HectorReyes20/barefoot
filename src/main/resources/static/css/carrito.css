@@ -1,0 +1,125 @@
+:root {
+    --primary-color: #4E342E;
+    --primary-dark: #2C1E1A;
+    --accent-color: #CCA474;
+    --bg-color: #FBF9F6;
+    --card-bg: #FFFFFF;
+    --border-color: rgba(78, 52, 46, 0.15);
+}
+
+body { background-color: var(--bg-color); color: #444; }
+.font-serif { font-family: 'Playfair Display', serif; }
+.text-primary-dark { color: var(--primary-dark); }
+.border-light-brown { border-color: var(--border-color) !important; }
+
+/* CARRITO ITEMS */
+.cart-item {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    transition: box-shadow 0.3s;
+}
+
+.cart-item:hover {
+    box-shadow: 0 5px 20px rgba(0,0,0,0.03);
+}
+
+.img-wrapper {
+    width: 80px; height: 80px;
+    border-radius: 6px;
+    overflow: hidden;
+    background-color: #F8F5F2;
+}
+
+.img-wrapper img {
+    width: 100%; height: 100%; object-fit: cover;
+}
+
+.item-title a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.item-title a:hover { color: var(--accent-color); }
+
+.customization-badge {
+    background-color: #F8F5F2;
+    padding: 5px 10px;
+    border-radius: 4px;
+    display: inline-block;
+    border: 1px dashed var(--border-color);
+}
+
+/* CONTROLES */
+.quantity-control {
+    display: flex;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    width: fit-content;
+}
+
+.quantity-control button {
+    background: white;
+    border: none;
+    color: var(--primary-color);
+    padding: 5px 12px;
+    cursor: pointer;
+}
+
+.quantity-control button:hover { background-color: #F8F5F2; }
+
+.quantity-control input {
+    width: 40px;
+    text-align: center;
+    border: none;
+    border-left: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
+    font-weight: 600;
+    color: #444;
+}
+
+.btn-remove {
+    background: none; border: none; color: #999; transition: color 0.2s;
+}
+.btn-remove:hover { color: #dc3545; }
+
+/* RESUMEN */
+.order-summary {
+    background-color: #F3ECE7; /* Fondo crema tostado para el resumen */
+    padding: 30px;
+    border-radius: 12px;
+    border: 1px solid rgba(78, 52, 46, 0.1);
+    position: sticky; top: 120px;
+}
+
+.summary-row {
+    display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 1rem;
+}
+
+.summary-total {
+    display: flex; justify-content: space-between;
+    font-size: 1.3rem; font-weight: 700; color: var(--primary-color);
+}
+
+/* BOTONES */
+.btn-primary-elegant {
+    background-color: var(--primary-color);
+    color: white;
+    border: 1px solid var(--primary-color);
+    padding: 12px 25px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    transition: all 0.3s;
+    border-radius: 4px;
+    text-decoration: none;
+    display: inline-block;
+}
+.btn-primary-elegant:hover {
+    background-color: var(--primary-dark);
+    color: white;
+}
+
+.btn-link-custom { color: var(--primary-color); text-decoration: none; font-weight: 600; }
+.btn-link-custom:hover { color: var(--accent-color); }

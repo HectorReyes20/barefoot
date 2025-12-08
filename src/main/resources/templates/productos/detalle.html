@@ -10,177 +10,120 @@
 
 <nav th:replace="~{fragments :: navbar}"></nav>
 
-<div class="container">
+<div style="height: 100px;"></div>
 
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-                <a th:href="@{/productos}">
-                    <i class="fas fa-home me-1"></i> Productos
-                </a>
-            </li>
-            <li class="breadcrumb-item">
-                <a th:href="@{/productos/categoria/{cat}(cat=${producto.categoria})}"
-                   th:text="${producto.categoria}">
-                    <i class="fas fa-tag me-1"></i> Categoría
-                </a>
-            </li>
-            <li class="breadcrumb-item active" th:text="${producto.nombre}">
-                <i class="fas fa-shoe-prints me-1"></i> Producto
-            </li>
+<div class="container mb-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb bg-transparent p-0">
+            <li class="breadcrumb-item"><a th:href="@{/inicio}">Inicio</a></li>
+            <li class="breadcrumb-item"><a th:href="@{/productos}">Colección</a></li>
+            <li class="breadcrumb-item active" aria-current="page" th:text="${producto.nombre}">Producto</li>
         </ol>
     </nav>
 
-    <div class="product-detail-container">
-        <div class="row">
-            <div class="col-lg-6">
-                <img th:if="${producto.imagenUrl != null}"
-                     th:src="${producto.imagenUrl}"
-                     th:alt="${producto.nombre}"
-                     class="product-image-main">
-                <div th:if="${producto.imagenUrl == null}" class="product-image-placeholder">
-                    <i class="fas fa-image"></i>
+    <div class="product-detail-card">
+        <div class="row g-0">
+            <div class="col-lg-6 bg-light-texture border-end-lg">
+                <div class="product-gallery h-100 d-flex align-items-center justify-content-center p-5 position-relative">
+
+                    <div class="position-absolute top-0 start-0 m-4">
+                        <span th:if="${producto.tieneDescuento()}" class="badge bg-danger rounded-0 px-3 py-2">OFERTA</span>
+                    </div>
+
+                    <img th:if="${producto.imagenUrl != null}"
+                         th:src="${producto.imagenUrl}"
+                         th:alt="${producto.nombre}"
+                         class="img-fluid main-image shadow-sm rounded-3">
+
+                    <div th:if="${producto.imagenUrl == null}" class="placeholder-box">
+                        <i class="fas fa-image fa-3x text-muted"></i>
+                    </div>
                 </div>
             </div>
 
             <div class="col-lg-6">
-                <h1 class="product-title" th:text="${producto.nombre}">Nombre del Producto</h1>
+                <div class="p-5">
+                    <span class="text-uppercase text-accent ls-2 small fw-bold" th:text="${producto.categoria}">Categoría</span>
+                    <h1 class="font-serif fw-bold text-primary-dark mt-2 mb-3" th:text="${producto.nombre}">Nombre</h1>
 
-                <span class="product-category" th:text="${producto.categoria}">Categoría</span>
-
-                <span th:if="${producto.destacado}" class="badge bg-warning text-dark ms-2">
-                    <i class="fas fa-star me-1"></i> Destacado
-                </span>
-
-                <div class="product-price-section">
-                    <div class="d-flex align-items-center">
-                        <span class="product-price-main" th:text="'S/ ' + ${producto.precioFinal}">S/ 0.00</span>
-                        <span th:if="${producto.tieneDescuento()}"
-                              class="product-price-original"
-                              th:text="'S/ ' + ${producto.precio}">S/ 0.00</span>
-                        <span th:if="${producto.tieneDescuento()}"
-                              class="discount-badge">
-                            -<span th:text="${producto.porcentajeDescuento}">0</span>% OFF
-                        </span>
-                    </div>
-                </div>
-
-                <div th:if="${producto.stock > 10}" class="stock-indicator stock-disponible">
-                    <i class="fas fa-check-circle me-2"></i>
-                    ¡Stock disponible! Listo para envío inmediato
-                </div>
-
-                <div th:if="${producto.stock <= 10 && producto.stock > 0}"
-                     class="stock-indicator stock-bajo">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    ¡Solo quedan <strong th:text="${producto.stock}">0</strong> unidades!
-                </div>
-
-                <div th:if="${producto.stock == 0}" class="stock-indicator stock-agotado">
-                    <i class="fas fa-times-circle me-2"></i>
-                    Producto agotado temporalmente
-                </div>
-
-                <div class="product-description">
-                    <p th:text="${producto.descripcion}">Descripción del producto...</p>
-                </div>
-
-                <div class="quantity-selector" th:if="${producto.stock > 0}">
-                    <label><strong>Cantidad:</strong></label>
-                    <button onclick="decreaseQuantity()">-</button>
-                    <input type="number" id="quantity" value="1" min="1" th:max="${producto.stock}" readonly>
-                    <button onclick="increaseQuantity()">+</button>
-                </div>
-
-                <div class="action-buttons">
-                    <button class="btn btn-add-cart"
-                            th:disabled="${producto.stock == 0}"
-                            onclick="addToCart()">
-                        <i class="fas fa-shopping-cart me-2"></i>
-                        <span th:if="${producto.stock > 0}">Agregar al Carrito</span>
-                        <span th:if="${producto.stock == 0}">Agotado</span>
-                    </button>
-                    <button class="btn btn-favorite" onclick="toggleFavorite(event)">
-                        <i class="far fa-heart"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <div class="product-features mt-5">
-            <h3 class="mb-4">Características del Producto</h3>
-            <div class="row">
-
-                <div class="col-md-6 mb-3" th:if="${producto.talla != null}">
-                    <div class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-ruler"></i>
+                    <div class="price-area mb-4 border-bottom pb-4 border-light-brown">
+                        <div class="d-flex align-items-baseline gap-3">
+                            <span class="display-6 fw-bold text-primary" th:text="'S/ ' + ${producto.precioFinal}">S/ 0.00</span>
+                            <span th:if="${producto.tieneDescuento()}" class="text-muted text-decoration-line-through fs-5" th:text="'S/ ' + ${producto.precio}"></span>
                         </div>
-                        <div class="feature-content">
-                            <h5>Talla</h5>
-                            <p th:text="${producto.talla}">-</p>
+                        <div class="stock-status mt-2">
+                            <span th:if="${producto.stock > 10}" class="text-success small"><i class="fas fa-circle fa-xs me-1"></i> Disponible</span>
+                            <span th:if="${producto.stock <= 10 && producto.stock > 0}" class="text-warning small"><i class="fas fa-exclamation-circle me-1"></i> Pocas unidades</span>
+                            <span th:if="${producto.stock == 0}" class="text-danger small"><i class="fas fa-times-circle me-1"></i> Agotado</span>
                         </div>
                     </div>
-                </div>
 
-                <div class="col-md-6 mb-3" th:if="${producto.color != null}">
-                    <div class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-palette"></i>
+                    <p class="text-muted leading-relaxed mb-4" th:text="${producto.descripcion}">
+                        Descripción...
+                    </p>
+
+                    <div class="features-grid row g-3 mb-4">
+                        <div class="col-6" th:if="${producto.material != null}">
+                            <div class="d-flex align-items-center">
+                                <div class="icon-square me-3"><i class="fas fa-layer-group"></i></div>
+                                <div>
+                                    <span class="d-block small text-uppercase fw-bold text-muted">Material</span>
+                                    <span th:text="${producto.material}">Cuero</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="feature-content">
-                            <h5>Color</h5>
-                            <p th:text="${producto.color}">-</p>
+                        <div class="col-6" th:if="${producto.talla != null}">
+                            <div class="d-flex align-items-center">
+                                <div class="icon-square me-3"><i class="fas fa-ruler"></i></div>
+                                <div>
+                                    <span class="d-block small text-uppercase fw-bold text-muted">Talla</span>
+                                    <span th:text="${producto.talla}">40</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="col-md-6 mb-3" th:if="${producto.material != null}">
-                    <div class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-layer-group"></i>
-                        </div>
-                        <div class="feature-content">
-                            <h5>Material</h5>
-                            <p th:text="${producto.material}">-</p>
+                    <div class="purchase-actions mt-5" th:if="${producto.stock > 0}">
+                        <div class="d-flex gap-3 align-items-stretch">
+                            <div class="quantity-input d-flex border rounded border-light-brown">
+                                <button onclick="decreaseQuantity()" class="btn btn-link text-dark px-3 text-decoration-none">-</button>
+                                <input type="number" id="quantity" value="1" min="1" th:max="${producto.stock}" class="form-control border-0 text-center fw-bold" style="width: 50px;">
+                                <button onclick="increaseQuantity()" class="btn btn-link text-dark px-3 text-decoration-none">+</button>
+                            </div>
+
+                            <button class="btn btn-primary-elegant flex-grow-1" onclick="addToCart()">
+                                Añadir al Carrito
+                            </button>
+
+                            <a th:href="@{/favoritos/toggle/{id}(id=${producto.id})}"
+                               class="btn btn-outline-elegant px-3 d-flex align-items-center"
+                               th:title="${favoritosIds != null && #lists.contains(favoritosIds, producto.id)} ? 'Quitar' : 'Guardar'">
+                                <i class="fa-heart" th:classappend="${favoritosIds != null && #lists.contains(favoritosIds, producto.id)} ? 'fas text-danger' : 'far'"></i>
+                            </a>
                         </div>
                     </div>
-                </div>
 
-                <div class="col-md-6 mb-3">
-                    <div class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-shoe-prints"></i>
-                        </div>
-                        <div class="feature-content">
-                            <h5>Tipo Barefoot</h5>
-                            <p>Suela flexible, cero drop, puntera ancha</p>
-                        </div>
+                    <div th:if="${producto.stock == 0}" class="alert alert-light border-danger text-danger mt-4">
+                        Este producto no está disponible por el momento.
                     </div>
-                </div>
 
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="related-products" th:if="${!#lists.isEmpty(productosRelacionados)}">
-        <h2 class="section-title">Productos Relacionados</h2>
+    <div class="mt-5 pt-5 border-top border-light-brown" th:if="${!#lists.isEmpty(productosRelacionados)}">
+        <h3 class="font-serif fw-bold mb-4 text-center">También te podría gustar</h3>
         <div class="row g-4">
-            <div class="col-md-3" th:each="relacionado, relacionadoStat : ${productosRelacionados}"
-                 th:if="${relacionadoStat.index < 4}">
-                <div class="related-product-card">
-                    <a th:href="@{/productos/{id}(id=${relacionado.id})}" style="text-decoration: none; color: inherit;">
-                        <img th:if="${relacionado.imagenUrl != null}"
-                             th:src="${relacionado.imagenUrl}"
-                             th:alt="${relacionado.nombre}">
-                        <div th:if="${relacionado.imagenUrl == null}"
-                             style="height: 200px; background: #f0f0f0; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-image fa-2x text-muted"></i>
+            <div class="col-md-3" th:each="relacionado, stat : ${productosRelacionados}" th:if="${stat.index < 4}">
+                <div class="product-card-mini">
+                    <a th:href="@{/productos/{id}(id=${relacionado.id})}">
+                        <div class="img-wrapper rounded-3 overflow-hidden mb-3 border border-light-brown">
+                            <img th:if="${relacionado.imagenUrl != null}" th:src="${relacionado.imagenUrl}" class="img-fluid w-100">
+                            <div th:if="${relacionado.imagenUrl == null}" class="bg-light p-5 text-center"><i class="fas fa-image"></i></div>
                         </div>
-                        <h5 th:text="${relacionado.nombre}">Producto</h5>
-                        <p class="text-muted" style="font-size: 0.9rem;" th:text="${relacionado.categoria}">Categoría</p>
-                        <strong style="font-size: 1.3rem; color: var(--primary-color);"
-                                th:text="'S/ ' + ${relacionado.precioFinal}">S/ 0.00</strong>
+                        <h6 class="text-dark fw-bold mb-1" th:text="${relacionado.nombre}">Producto</h6>
+                        <span class="text-primary" th:text="'S/ ' + ${relacionado.precioFinal}">S/ 0.00</span>
                     </a>
                 </div>
             </div>
@@ -190,12 +133,10 @@
 </div>
 
 <footer th:replace="~{fragments :: footer}"></footer>
-
 <div th:replace="~{fragments :: scripts}"></div>
 
 <script th:inline="javascript">
     /*<![CDATA[*/
-
     const maxStock = /*[[${producto.stock}]]*/ 1;
     const productoId = /*[[${producto.id}]]*/ 0;
 
@@ -211,48 +152,23 @@
         if (currentValue > 1) input.value = currentValue - 1;
     }
 
-    // 🚀 Correcto: Enviar producto al carrito
     function addToCart() {
         const quantity = document.getElementById('quantity').value;
-
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = '/carrito/agregar';
 
-        const productoInput = document.createElement('input');
-        productoInput.type = 'hidden';
-        productoInput.name = 'productoId';
-        productoInput.value = productoId;
+        const pInput = document.createElement('input');
+        pInput.type = 'hidden'; pInput.name = 'productoId'; pInput.value = productoId;
 
-        const cantidadInput = document.createElement('input');
-        cantidadInput.type = 'hidden';
-        cantidadInput.name = 'cantidad';
-        cantidadInput.value = quantity;
+        const qInput = document.createElement('input');
+        qInput.type = 'hidden'; qInput.name = 'cantidad'; qInput.value = quantity;
 
-        form.appendChild(productoInput);
-        form.appendChild(cantidadInput);
-
+        form.appendChild(pInput);
+        form.appendChild(qInput);
         document.body.appendChild(form);
         form.submit();
     }
-
-    function toggleFavorite(event) {
-        const btn = event.currentTarget.closest('button');
-        const icon = btn.querySelector('i');
-
-        if (icon.classList.contains('far')) {
-            icon.classList.remove('far');
-            icon.classList.add('fas');
-            btn.style.background = 'var(--primary-color)';
-            btn.style.color = 'white';
-        } else {
-            icon.classList.remove('fas');
-            icon.classList.add('far');
-            btn.style.background = 'white';
-            btn.style.color = 'var(--primary-color)';
-        }
-    }
-
     /*]]>*/
 </script>
 

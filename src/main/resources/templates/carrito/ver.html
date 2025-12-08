@@ -1,224 +1,141 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <th:block th:insert="~{fragments :: head('Carrito de Compras - Barefoot Store')}"></th:block>
-    <style>
-        .carrito-container {
-            background: var(--color-surface);
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-        }
-        .item-carrito {
-            display: flex;
-            align-items: center;
-            padding: 20px;
-            border-bottom: 1px solid #e0e0e0;
-            transition: background 0.3s;
-        }
-        .item-carrito:hover {
-            background: #f8f9fa;
-        }
-        .item-imagen {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 10px;
-            margin-right: 20px;
-        }
-        .item-info {
-            flex-grow: 1;
-        }
-        .item-precio {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--color-primary);
-        }
-        .cantidad-control {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .cantidad-control button {
-            width: 35px;
-            height: 35px;
-            border: 2px solid var(--color-primary);
-            background: white;
-            color: var(--color-primary);
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .cantidad-control button:hover {
-            background: var(--color-primary);
-            color: white;
-        }
-        .cantidad-control input {
-            width: 60px;
-            text-align: center;
-            border: 2px solid #e0e0e0;
-            border-radius: 5px;
-            padding: 5px;
-        }
-        .resumen-carrito {
-            background: var(--color-background);
-            padding: 30px;
-            border-radius: 15px;
-            position: sticky;
-            top: 100px;
-        }
-        .btn-checkout {
-            background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 10px;
-            font-weight: 600;
-            width: 100%;
-            transition: all 0.3s;
-        }
-        .btn-checkout:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(78, 52, 46, 0.3);
-        }
-        .carrito-vacio {
-            text-align: center;
-            padding: 80px 20px;
-        }
-        .carrito-vacio i {
-            font-size: 5rem;
-            color: #ccc;
-            margin-bottom: 20px;
-        }
-    </style>
+    <th:block th:insert="~{fragments :: head('Mi Bolsa - Barefoot Store')}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/carrito.css}">
 </head>
 <body>
 
 <nav th:replace="~{fragments :: navbar}"></nav>
 
-<div class="container my-5">
-    <h1 class="mb-4">
-        <i class="fas fa-shopping-cart me-2"></i> Mi Carrito
-    </h1>
+<div style="height: 100px;"></div>
 
-    <!-- Mensajes -->
-    <div th:if="${mensaje}" th:class="'alert alert-' + ${tipoMensaje}" role="alert">
-        <i class="fas fa-check-circle me-2"></i>
+<div class="container mb-5" style="min-height: 60vh;">
+
+    <div class="text-center mb-5">
+        <h1 class="display-5 font-serif fw-bold text-primary-dark">Tu Bolsa de Compras</h1>
+        <p class="text-muted" th:if="${!#lists.isEmpty(carrito)}">Estás a un paso de caminar libre.</p>
+    </div>
+
+    <div th:if="${mensaje}" th:class="'alert alert-custom alert-' + ${tipoMensaje} + ' mb-4'" role="alert">
+        <i class="fas fa-info-circle me-2"></i>
         <span th:text="${mensaje}"></span>
     </div>
 
-    <!-- Carrito Vacío -->
-    <div th:if="${#lists.isEmpty(carrito)}" class="carrito-container">
-        <div class="carrito-vacio">
-            <i class="fas fa-shopping-cart"></i>
-            <h3>Tu carrito está vacío</h3>
-            <p class="text-muted">¡Explora nuestros productos y encuentra tu calzado perfecto!</p>
-            <a th:href="@{/productos}" class="btn btn-checkout mt-3" style="max-width: 300px; margin: 0 auto;">
-                <i class="fas fa-shopping-bag me-2"></i> Ver Productos
-            </a>
+    <div th:if="${#lists.isEmpty(carrito)}" class="empty-cart-container text-center py-5">
+        <div class="mb-4 text-muted opacity-25">
+            <i class="fas fa-shopping-bag fa-4x"></i>
         </div>
+        <h3 class="font-serif mb-3">Tu bolsa está vacía</h3>
+        <p class="text-muted mb-4">Parece que aún no has descubierto tu par perfecto.</p>
+        <a th:href="@{/productos}" class="btn btn-primary-elegant">
+            Explorar Colección
+        </a>
     </div>
 
-    <!-- Carrito con Productos -->
-    <div th:if="${!#lists.isEmpty(carrito)}" class="row">
+    <div th:if="${!#lists.isEmpty(carrito)}" class="row g-5">
         <div class="col-lg-8">
-            <div class="carrito-container">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h4>Productos (<span th:text="${cantidadItems}">0</span>)</h4>
-                    <form th:action="@{/carrito/vaciar}" method="post" style="display: inline;"
-                          onsubmit="return confirm('¿Estás seguro de vaciar el carrito?');">
-                        <button type="submit" class="btn btn-outline-danger btn-sm">
-                            <i class="fas fa-trash me-1"></i> Vaciar Carrito
+            <div class="cart-items-wrapper">
+                <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom border-light-brown">
+                    <span class="text-uppercase small fw-bold text-muted">Producto</span>
+                    <form th:action="@{/carrito/vaciar}" method="post" onsubmit="return confirm('¿Estás seguro?');">
+                        <button type="submit" class="btn btn-link text-danger text-decoration-none small">
+                            <i class="far fa-trash-alt me-1"></i> Vaciar Bolsa
                         </button>
                     </form>
                 </div>
 
-                <div th:each="item : ${carrito}" class="item-carrito">
-                    <img th:if="${item.imagenUrl != null}"
-                         th:src="${item.imagenUrl}"
-                         class="item-imagen"
-                         th:alt="${item.nombre}">
-                    <div th:if="${item.imagenUrl == null}"
-                         class="item-imagen bg-secondary d-flex align-items-center justify-content-center">
-                        <i class="fas fa-image text-white fa-2x"></i>
-                    </div>
+                <div th:each="item : ${carrito}" class="cart-item">
+                    <div class="row align-items-center">
+                        <div class="col-3 col-md-2">
+                            <div class="img-wrapper">
+                                <img th:if="${item.imagenUrl != null}" th:src="${item.imagenUrl}" th:alt="${item.nombre}">
+                                <div th:if="${item.imagenUrl == null}" class="placeholder-img"><i class="fas fa-image"></i></div>
+                            </div>
+                        </div>
 
-                    <div class="item-info">
-                        <h5 th:text="${item.nombre}">Producto</h5>
-                        <p class="text-muted mb-2">
-                            Precio unitario: S/ <span th:text="${#numbers.formatDecimal(item.precio, 1, 'COMMA', 2, 'POINT')}">0.00</span>
-                        </p>
-                        <p th:if="${item.personalizacion != null}" class="text-info small mb-2">
-                            <i class="fas fa-palette me-1"></i>
-                            <strong>Personalización:</strong> <span th:text="${item.personalizacion}"></span>
-                        </p>
+                        <div class="col-9 col-md-5">
+                            <h5 class="item-title font-serif mb-1">
+                                <a th:href="@{/productos/detalle/{id}(id=${item.productoId})}" th:text="${item.nombre}">Nombre</a>
+                            </h5>
+                            <div class="price-mobile d-md-none fw-bold text-primary mb-2">
+                                S/ <span th:text="${#numbers.formatDecimal(item.precio, 1, 'COMMA', 2, 'POINT')}"></span>
+                            </div>
 
-                        <form th:action="@{/carrito/actualizar/{id}(id=${item.productoId})}" method="post" class="cantidad-control">
-                            <button type="button" onclick="decrementarCantidad(this)">-</button>
-                            <input type="number" name="cantidad" th:value="${item.cantidad}"
-                                   min="1" readonly onchange="this.form.submit()">
-                            <button type="button" onclick="incrementarCantidad(this)">+</button>
-                        </form>
-                    </div>
+                            <div th:if="${item.personalizacion != null}" class="customization-badge mt-2">
+                                <i class="fas fa-magic me-1 text-accent"></i>
+                                <small class="text-muted fst-italic" th:text="${item.personalizacion}"></small>
+                            </div>
+                        </div>
 
-                    <div class="text-end">
-                        <p class="item-precio mb-3">
-                            S/ <span th:text="${#numbers.formatDecimal(item.subtotal, 1, 'COMMA', 2, 'POINT')}">0.00</span>
-                        </p>
-                        <form th:action="@{/carrito/eliminar/{id}(id=${item.productoId})}" method="post"
-                              onsubmit="return confirm('¿Eliminar este producto?');">
-                            <button type="submit" class="btn btn-outline-danger btn-sm">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </form>
+                        <div class="col-6 col-md-3 mt-3 mt-md-0">
+                            <form th:action="@{/carrito/actualizar/{id}(id=${item.productoId})}" method="post" class="quantity-control">
+                                <button type="button" onclick="decrementar(this)">-</button>
+                                <input type="number" name="cantidad" th:value="${item.cantidad}" min="1" readonly onchange="this.form.submit()">
+                                <button type="button" onclick="incrementar(this)">+</button>
+                            </form>
+                        </div>
+
+                        <div class="col-6 col-md-2 mt-3 mt-md-0 text-end">
+                            <div class="item-subtotal font-serif fw-bold">
+                                S/ <span th:text="${#numbers.formatDecimal(item.subtotal, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                            </div>
+                            <form th:action="@{/carrito/eliminar/{id}(id=${item.productoId})}" method="post" class="mt-2">
+                                <button type="submit" class="btn-remove" title="Eliminar">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
+            </div>
+
+            <div class="mt-4">
+                <a th:href="@{/productos}" class="btn-link-custom">
+                    <i class="fas fa-arrow-left me-2"></i> Seguir Comprando
+                </a>
             </div>
         </div>
 
         <div class="col-lg-4">
-            <div class="resumen-carrito">
-                <h4 class="mb-4">Resumen del Pedido</h4>
+            <div class="order-summary">
+                <h4 class="font-serif mb-4">Resumen</h4>
 
-                <div class="d-flex justify-content-between mb-2">
-                    <span>Subtotal:</span>
-                    <strong>S/ <span th:text="${#numbers.formatDecimal(total, 1, 'COMMA', 2, 'POINT')}">0.00</span></strong>
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span>S/ <span th:text="${#numbers.formatDecimal(total, 1, 'COMMA', 2, 'POINT')}">0.00</span></span>
                 </div>
 
-                <div class="d-flex justify-content-between mb-2">
-                    <span>Envío:</span>
-                    <span th:if="${total >= 400}" class="text-success">
-                        <strong>GRATIS</strong>
-                    </span>
-                    <span th:if="${total < 400}">
-                        S/ 15.00
-                    </span>
+                <div class="summary-row">
+                    <span>Envío</span>
+                    <span th:if="${total >= 400}" class="text-success fw-bold">GRATIS</span>
+                    <span th:if="${total < 400}">S/ 15.00</span>
                 </div>
 
-                <hr>
-
-                <div class="d-flex justify-content-between mb-4">
-                    <h5>Total:</h5>
-                    <h4 class="text-primary">
-                        S/ <span th:text="${#numbers.formatDecimal(total + (total >= 400 ? 0 : 15), 1, 'COMMA', 2, 'POINT')}">0.00</span>
-                    </h4>
+                <div th:if="${total < 400}" class="shipping-progress mt-3">
+                    <div class="progress" style="height: 4px;">
+                        <div class="progress-bar bg-accent" role="progressbar"
+                             th:style="'width: ' + ${(total/400)*100} + '%'"></div>
+                    </div>
+                    <small class="text-muted mt-2 d-block">
+                        Faltan S/ <span th:text="${#numbers.formatDecimal(400 - total, 1, 'COMMA', 2, 'POINT')}"></span> para envío gratis
+                    </small>
                 </div>
 
-                <div th:if="${total < 400}" class="alert alert-info small mb-3">
-                    <i class="fas fa-truck me-1"></i>
-                    Te faltan S/ <span th:text="${#numbers.formatDecimal(400 - total, 1, 'COMMA', 2, 'POINT')}">0.00</span>
-                    para envío gratis
+                <hr class="my-4 border-light-brown">
+
+                <div class="summary-total">
+                    <span>Total</span>
+                    <span>S/ <span th:text="${#numbers.formatDecimal(total + (total >= 400 ? 0 : 15), 1, 'COMMA', 2, 'POINT')}">0.00</span></span>
                 </div>
 
-                <a th:href="@{/carrito/checkout}" class="btn btn-checkout">
-                    <i class="fas fa-credit-card me-2"></i> Proceder al Pago
+                <a th:href="@{/carrito/checkout}" class="btn btn-primary-elegant w-100 mt-4 py-3">
+                    Proceder al Pago
                 </a>
 
-                <a th:href="@{/productos}" class="btn btn-outline-secondary w-100 mt-2">
-                    <i class="fas fa-arrow-left me-2"></i> Seguir Comprando
-                </a>
+                <div class="text-center mt-3">
+                    <small class="text-muted"><i class="fas fa-lock me-1"></i> Checkout Seguro</small>
+                </div>
             </div>
         </div>
     </div>
@@ -228,31 +145,18 @@
 <div th:replace="~{fragments :: scripts}"></div>
 
 <script>
-    function incrementarCantidad(btn) {
-        const form = btn.closest('form');
-        const input = form.querySelector('input[name="cantidad"]');
+    function incrementar(btn) {
+        const input = btn.parentElement.querySelector('input');
         input.value = parseInt(input.value) + 1;
-        form.submit();
+        input.form.submit();
     }
-
-    function decrementarCantidad(btn) {
-        const form = btn.closest('form');
-        const input = form.querySelector('input[name="cantidad"]');
+    function decrementar(btn) {
+        const input = btn.parentElement.querySelector('input');
         if (parseInt(input.value) > 1) {
             input.value = parseInt(input.value) - 1;
-            form.submit();
+            input.form.submit();
         }
     }
-
-    // Auto-ocultar mensajes
-    setTimeout(function() {
-        const alerts = document.querySelectorAll('.alert');
-        alerts.forEach(alert => {
-            alert.style.transition = 'opacity 0.5s';
-            alert.style.opacity = '0';
-            setTimeout(() => alert.remove(), 500);
-        });
-    }, 5000);
 </script>
 
 </body>
