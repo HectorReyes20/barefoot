@@ -1,48 +1,52 @@
 <!DOCTYPE html>
 <div class="sidebar" th:fragment="sidebar(paginaActiva)" xmlns:th="http://www.w3.org/1999/xhtml">
   <div class="sidebar-header">
-    <h3><i class="fas fa-shoe-prints me-2"></i> Barefoot Admin</h3>
-    <p>Panel de Administración</p>
+    <h3><i class="fas fa-shoe-prints me-2 text-warning"></i> Barefoot</h3>
+    <p>Panel de Administrador</p>
   </div>
   <ul class="sidebar-menu">
     <li>
       <a th:href="@{/admin/dashboard}"
          th:class="${paginaActiva == 'dashboard'} ? 'active' : ''">
-        <i class="fas fa-tachometer-alt"></i> Dashboard
+        <i class="fas fa-chart-pie"></i> <span>Dashboard</span>
       </a>
     </li>
     <li>
       <a th:href="@{/admin/productos}"
          th:class="${paginaActiva == 'productos'} ? 'active' : ''">
-        <i class="fas fa-box"></i> Productos
+        <i class="fas fa-box-open"></i> <span>Productos</span>
       </a>
     </li>
     <li>
       <a th:href="@{/admin/pedidos}"
          th:class="${paginaActiva == 'pedidos'} ? 'active' : ''">
-        <i class="fas fa-shopping-cart"></i> Pedidos
+        <i class="fas fa-shopping-bag"></i> <span>Pedidos</span>
       </a>
     </li>
     <li>
       <a th:href="@{/admin/clientes}"
          th:class="${paginaActiva == 'clientes'} ? 'active' : ''">
-        <i class="fas fa-users"></i> Clientes
+        <i class="fas fa-user-friends"></i> <span>Clientes</span>
       </a>
     </li>
+    <li class="mt-4 mb-2 ps-3 text-muted small fw-bold text-uppercase" style="font-size: 0.7rem;">Gestión</li>
     <li>
       <a th:href="@{/admin/reportes}"
          th:class="${paginaActiva == 'reportes'} ? 'active' : ''">
-        <i class="fas fa-chart-line"></i> Reportes
+        <i class="fas fa-file-alt"></i> <span>Reportes</span>
       </a>
     </li>
     <li>
       <a th:href="@{/admin/inventario}"
          th:class="${paginaActiva == 'inventario'} ? 'active' : ''">
-        <i class="fas fa-warehouse"></i> Inventario
+        <i class="fas fa-warehouse"></i> <span>Inventario</span>
       </a>
     </li>
 
-
-    <li><a th:href="@{/logout}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
+    <li class="mt-auto pt-4">
+      <a th:href="@{/logout}" class="text-danger">
+        <i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>
+      </a>
+    </li>
   </ul>
 </div>

@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <head th:replace="~{admin/layout/head :: head(titulo='Gestión de Productos - Barefoot Admin')}"></head>
-
+    <th:block th:insert="~{admin/layout/head :: head(titulo='Productos - Barefoot Admin')}"></th:block>
     <link th:href="@{/css/producto-lista.css}" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 </head>
 <body>
 
@@ -11,125 +12,161 @@
 
 <div class="main-content">
 
-    <div class="top-bar">
-        <h2><i class="fas fa-box me-2"></i> Gestión de Productos</h2>
-        <a th:href="@{/admin/productos/nuevo}" class="btn btn-nuevo">
-            <i class="fas fa-plus me-2"></i> Nuevo Producto
+    <div th:replace="~{admin/layout/navbar :: navbar(tituloPagina='Gestión de Productos')}"></div>
+
+    <div class="stats-grid">
+        <div class="stat-card-mini">
+            <div class="stat-icon" style="background: #E0F2FE; color: #0284C7;">
+                <i class="fas fa-box"></i>
+            </div>
+            <div>
+                <h4 class="m-0 fw-bold" th:text="${#lists.size(productos)}">0</h4>
+                <small class="text-muted">Total Productos</small>
+            </div>
+        </div>
+
+        <div class="stat-card-mini">
+            <div class="stat-icon" style="background: #DCFCE7; color: #16A34A;">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div>
+                <h4 class="m-0 fw-bold" th:text="${productosActivos}">0</h4>
+                <small class="text-muted">Activos</small>
+            </div>
+        </div>
+
+        <div class="stat-card-mini">
+            <div class="stat-icon" style="background: #F3E8FF; color: #9333EA;">
+                <i class="fas fa-star"></i>
+            </div>
+            <div>
+                <h4 class="m-0 fw-bold" th:text="${productosDestacados}">0</h4>
+                <small class="text-muted">Destacados</small>
+            </div>
+        </div>
+
+        <div class="stat-card-mini">
+            <div class="stat-icon" style="background: #FFEDD5; color: #EA580C;">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div>
+                <h4 class="m-0 fw-bold" th:text="${productosStockBajo}">0</h4>
+                <small class="text-muted">Stock Bajo</small>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${mensaje}" th:class="'alert alert-' + ${tipoMensaje} + ' shadow-sm border-0 rounded-3 mb-4'" role="alert">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-info-circle me-2"></i>
+            <span th:text="${mensaje}"></span>
+        </div>
+    </div>
+
+    <div class="toolbar">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Buscar producto, SKU o categoría..." onkeyup="filtrarTabla()">
+        </div>
+        <a th:href="@{/admin/productos/nuevo}" class="btn-primary-soft">
+            <i class="fas fa-plus"></i> Nuevo Producto
         </a>
     </div>
 
-    <div th:if="${mensaje}" th:class="'alert alert-' + ${tipoMensaje}" role="alert">
-        <i class="fas fa-check-circle me-2"></i>
-        <span th:text="${mensaje}"></span>
-    </div>
-
-    <div class="stats-mini">
-        <div class="stat-mini" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-            <h4 th:text="${#lists.size(productos)}">0</h4>
-            <p>Total Productos</p>
-        </div>
-        <div class="stat-mini" style="background: linear-gradient(135deg, #2c5f2d 0%, #97bc62 100%);">
-            <h4 th:text="${productosActivos}">0</h4>
-            <p>Activos</p>
-        </div>
-        <div class="stat-mini" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-            <h4 th:text="${productosDestacados}">0</h4>
-            <p>Destacados</p>
-        </div>
-        <div class="stat-mini" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-            <h4 th:text="${productosStockBajo}">0</h4>
-            <p>Stock Bajo</p>
-        </div>
-    </div>
-
-    <div class="content-card">
+    <div class="table-card">
         <div class="table-responsive">
-            <table class="table table-hover">
+            <table class="table table-hover" id="productosTable">
                 <thead>
                 <tr>
-                    <th>Imagen</th>
-                    <th>Nombre</th>
+                    <th style="width: 80px;">Img</th>
+                    <th>Producto</th>
                     <th>Categoría</th>
                     <th>Precio</th>
                     <th>Stock</th>
                     <th>Estado</th>
-                    <th>Destacado</th>
-                    <th>Acciones</th>
+                    <th class="text-center">Destacado</th>
+                    <th class="text-end">Acciones</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:if="${#lists.isEmpty(productos)}">
-                    <td colspan="8" class="text-center text-muted py-5">
-                        <i class="fas fa-box-open fa-3x mb-3"></i>
-                        <p class="mb-0">No hay productos registrados</p>
-                        <a th:href="@{/admin/productos/nuevo}" class="btn btn-primary mt-3">
-                            <i class="fas fa-plus me-2"></i> Crear primer producto
-                        </a>
+                    <td colspan="8" class="text-center py-5">
+                        <div class="d-flex flex-column align-items-center justify-content-center">
+                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                <i class="fas fa-box-open fa-2x text-muted"></i>
+                            </div>
+                            <h5 class="fw-bold text-muted">No hay productos registrados</h5>
+                            <p class="text-muted small">Empieza agregando tu primer producto al inventario.</p>
+                            <a th:href="@{/admin/productos/nuevo}" class="btn btn-sm btn-primary mt-2">Crear Producto</a>
+                        </div>
                     </td>
                 </tr>
+
                 <tr th:each="producto : ${productos}">
                     <td>
                         <img th:if="${producto.imagenUrl != null}"
                              th:src="${producto.imagenUrl}"
-                             class="table-imagen"
-                             alt="Producto">
-                        <div th:if="${producto.imagenUrl == null}"
-                             class="table-imagen bg-secondary d-flex align-items-center justify-content-center">
-                            <i class="fas fa-image text-white"></i>
+                             class="product-img"
+                             alt="Img">
+                        <div th:if="${producto.imagenUrl == null}" class="product-placeholder">
+                            <i class="fas fa-image"></i>
                         </div>
                     </td>
+
                     <td>
-                        <strong th:text="${producto.nombre}">Nombre</strong>
-                        <br>
-                        <small class="text-muted" th:text="${producto.descripcion}">Descripción</small>
+                        <div class="d-flex flex-column">
+                            <span class="fw-bold text-dark" th:text="${producto.nombre}">Nombre</span>
+                            <small class="text-muted text-truncate" style="max-width: 250px;" th:text="${producto.descripcion}">Desc</small>
+                        </div>
                     </td>
+
                     <td>
-                        <span class="badge badge-categoria bg-info" th:text="${producto.categoria}">Categoría</span>
+                        <span class="category-tag" th:text="${producto.categoria}">Cat</span>
                     </td>
+
                     <td>
-                        <strong th:text="'S/ ' + ${#numbers.formatDecimal(producto.precio, 1, 'COMMA', 2, 'POINT')}">S/ 0.00</strong>
-                        <br>
-                        <small th:if="${producto.tieneDescuento()}"
-                               class="text-success">
-                            <i class="fas fa-tag me-1"></i>
-                            <span th:text="'S/ ' + ${#numbers.formatDecimal(producto.precioDescuento, 1, 'COMMA', 2, 'POINT')}"></span>
-                            (<span th:text="${producto.porcentajeDescuento} + '%'"></span> OFF)
-                        </small>
+                        <div th:if="${!producto.tieneDescuento()}">
+                            <span class="fw-bold" th:text="'S/ ' + ${#numbers.formatDecimal(producto.precio, 1, 'COMMA', 2, 'POINT')}"></span>
+                        </div>
+                        <div th:if="${producto.tieneDescuento()}">
+                            <span class="fw-bold text-success" th:text="'S/ ' + ${#numbers.formatDecimal(producto.precioDescuento, 1, 'COMMA', 2, 'POINT')}"></span>
+                            <br>
+                            <small class="text-decoration-line-through text-muted" style="font-size: 0.75rem;"
+                                   th:text="'S/ ' + ${#numbers.formatDecimal(producto.precio, 1, 'COMMA', 2, 'POINT')}"></small>
+                        </div>
                     </td>
+
                     <td>
-                                <span th:class="${producto.stock < 10} ? 'text-danger fw-bold' : ''"
-                                      th:text="${producto.stock}">0</span>
-                        <br>
-                        <small th:if="${producto.stock < 10}" class="text-danger">
-                            <i class="fas fa-exclamation-triangle"></i> Stock bajo
-                        </small>
+                        <span th:class="${producto.stock < 10} ? 'text-danger fw-bold' : ''" th:text="${producto.stock}">0</span>
                     </td>
+
                     <td>
-                        <i th:class="${producto.activo} ? 'fas fa-check-circle producto-activo' : 'fas fa-times-circle producto-inactivo'"></i>
-                        <span th:text="${producto.activo} ? 'Activo' : 'Inactivo'">Estado</span>
+                        <span class="badge-pill"
+                              th:classappend="${producto.activo} ? 'status-active' : 'status-inactive'"
+                              th:text="${producto.activo} ? 'Activo' : 'Inactivo'">
+                        </span>
                     </td>
-                    <td>
+
+                    <td class="text-center">
                         <button th:data-producto-id="${producto.id}"
                                 onclick="toggleDestacado(this)"
-                                class="btn btn-sm btn-link p-0">
+                                class="btn p-0 border-0 bg-transparent"
+                                data-bs-toggle="tooltip" title="Destacar/Quitar">
                             <i th:class="${producto.destacado} ? 'fas fa-star text-warning' : 'far fa-star text-muted'"
-                               style="font-size: 1.2rem;"></i>
+                               style="font-size: 1.1rem; cursor: pointer;"></i>
                         </button>
                     </td>
-                    <td>
-                        <a th:href="@{/admin/productos/detalle/{id}(id=${producto.id})}"
-                           class="btn btn-sm btn-info btn-accion" title="Ver detalle">
-                            <i class="fas fa-eye"></i>
-                        </a>
+
+                    <td class="text-end">
                         <a th:href="@{/admin/productos/editar/{id}(id=${producto.id})}"
-                           class="btn btn-sm btn-primary btn-accion" title="Editar">
-                            <i class="fas fa-edit"></i>
+                           class="action-btn edit" title="Editar">
+                            <i class="fas fa-pen"></i>
                         </a>
                         <button th:data-producto-id="${producto.id}"
                                 th:data-producto-nombre="${producto.nombre}"
                                 onclick="confirmarEliminar(this)"
-                                class="btn btn-sm btn-danger btn-accion" title="Eliminar">
-                            <i class="fas fa-trash"></i>
+                                class="action-btn delete" title="Eliminar">
+                            <i class="fas fa-trash-alt"></i>
                         </button>
                     </td>
                 </tr>
@@ -141,34 +178,60 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // FUNCIÓN ACTUALIZADA: Recibe el botón (elemento) como parámetro
+    // Tooltips de Bootstrap
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+
     function confirmarEliminar(boton) {
-        // Leemos los datos desde el dataset del botón
         const id = boton.dataset.productoId;
         const nombre = boton.dataset.productoNombre;
-
-        // Usamos los datos en la confirmación
-        if (confirm('¿Estás seguro de eliminar el producto "' + nombre + '"?')) {
+        if (confirm('¿Estás seguro de eliminar "' + nombre + '"? Esta acción no se puede deshacer.')) {
             window.location.href = '/admin/productos/eliminar/' + id;
         }
     }
 
-    // FUNCIÓN ACTUALIZADA: Recibe el botón (elemento) como parámetro
     function toggleDestacado(boton) {
-        // Leemos el ID desde el dataset del botón
         const id = boton.dataset.productoId;
         window.location.href = '/admin/productos/destacar/' + id;
     }
 
-    // Auto-ocultar mensajes después de 5 segundos
+    // Buscador Simple en JS
+    function filtrarTabla() {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("searchInput");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("productosTable");
+        tr = table.getElementsByTagName("tr");
+
+        for (i = 1; i < tr.length; i++) {
+            // Busca en Nombre (col 1) y Categoría (col 2)
+            let tdNombre = tr[i].getElementsByTagName("td")[1];
+            let tdCat = tr[i].getElementsByTagName("td")[2];
+
+            if (tdNombre || tdCat) {
+                let txtNombre = tdNombre.textContent || tdNombre.innerText;
+                let txtCat = tdCat.textContent || tdCat.innerText;
+
+                if (txtNombre.toUpperCase().indexOf(filter) > -1 || txtCat.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+
+    // Auto-ocultar alertas
     setTimeout(function() {
         const alerts = document.querySelectorAll('.alert');
         alerts.forEach(alert => {
-            alert.style.transition = 'opacity 0.5s';
+            alert.style.transition = 'opacity 0.5s ease';
             alert.style.opacity = '0';
             setTimeout(() => alert.remove(), 500);
         });
-    }, 5000);
+    }, 4000);
 </script>
 </body>
 </html>

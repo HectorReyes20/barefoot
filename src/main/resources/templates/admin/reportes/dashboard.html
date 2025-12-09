@@ -1,14 +1,169 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <head th:replace="~{admin/layout/head :: head(titulo='Reportes y Estadísticas - Barefoot Admin')}"></head>
+  <th:block th:insert="~{admin/layout/head :: head(titulo='Reportes - Barefoot Admin')}"></th:block>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <link th:href="@{/css/reportes.css}" rel="stylesheet">
+  <style>
+    :root {
+        --primary-bg: #F8FAFC;
+        --card-bg: #FFFFFF;
+        --text-main: #1E293B;
+        --text-muted: #64748B;
+        --border-radius: 16px;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    }
+
+    body {
+        background-color: var(--primary-bg);
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        color: var(--text-main);
+    }
+
+    .main-content {
+        margin-left: 260px;
+        padding: 2rem 2.5rem;
+    }
+
+    /* --- HEADER & TOOLBAR --- */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .btn-export {
+        background-color: white;
+        border: 1px solid #E2E8F0;
+        color: var(--text-main);
+        padding: 0.6rem 1.2rem;
+        border-radius: 10px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.2s;
+    }
+    .btn-export:hover { background-color: #F1F5F9; }
+
+    /* --- KPI CARDS (Top Row) --- */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .kpi-card {
+        background: var(--card-bg);
+        padding: 1.5rem;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid #E2E8F0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .kpi-label { color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; margin-bottom: 0.5rem; }
+    .kpi-value { font-size: 1.75rem; font-weight: 700; color: var(--text-main); }
+    .kpi-icon {
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        width: 45px;
+        height: 45px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        opacity: 0.8;
+    }
+
+    /* Colores KPI */
+    .kpi-purple .kpi-icon { background: #F3E8FF; color: #9333EA; }
+    .kpi-green .kpi-icon { background: #DCFCE7; color: #16A34A; }
+    .kpi-orange .kpi-icon { background: #FFEDD5; color: #EA580C; }
+    .kpi-blue .kpi-icon { background: #E0F2FE; color: #0284C7; }
+
+    /* --- CHART CARDS --- */
+    .chart-card {
+        background: var(--card-bg);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        border: 1px solid #E2E8F0;
+        box-shadow: var(--shadow-sm);
+        height: 100%;
+        margin-bottom: 1.5rem;
+    }
+
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    .chart-title { font-size: 1rem; font-weight: 700; color: var(--text-main); margin: 0; }
+
+    .chart-container {
+        position: relative;
+        width: 100%;
+    }
+
+    /* --- COMPARATIVA (Trend) --- */
+    .trend-badge {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+    .trend-up { background: #DCFCE7; color: #166534; }
+    .trend-down { background: #FEE2E2; color: #991B1B; }
+
+    /* --- LEADERBOARD (Top Products) --- */
+    .leaderboard-item {
+        display: flex;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px dashed #E2E8F0;
+    }
+    .leaderboard-item:last-child { border-bottom: none; }
+
+    .rank-num {
+        width: 24px;
+        height: 24px;
+        background: #F1F5F9;
+        color: #64748B;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 700;
+        margin-right: 12px;
+    }
+    .rank-1 { background: #FEF3C7; color: #D97706; } /* Oro */
+
+    .product-mini-img {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        object-fit: cover;
+        margin-right: 12px;
+        border: 1px solid #E2E8F0;
+    }
+
+    @media (max-width: 992px) {
+        .main-content { margin-left: 0; }
+    }
+  </style>
 </head>
 <body>
 
@@ -16,530 +171,265 @@
 
 <div class="main-content">
 
-  <div class="top-bar">
-    <h2><i class="fas fa-chart-line me-2"></i> Reportes y Estadísticas</h2>
-    <div class="d-flex align-items-center gap-3">
-      <div class="btn-group">
-        <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown">
-          <i class="fas fa-download me-2"></i> Exportar
-        </button>
-        <ul class="dropdown-menu">
-          <li>
-            <a class="dropdown-item" th:href="@{/admin/reportes/export/ventas-mes-csv(year=${yearSeleccionado})}">
-              <i class="fas fa-file-csv me-2"></i> Ventas Mensuales (CSV)
-            </a>
-          </li>
-          <li>
-            <a class="dropdown-item" th:href="@{/admin/reportes/export/productos-vendidos-csv}">
-              <i class="fas fa-file-csv me-2"></i> Productos Más Vendidos (CSV)
-            </a>
-          </li>
-          <li>
-            <a class="dropdown-item" th:href="@{/admin/reportes/export/ventas-categoria-csv}">
-              <i class="fas fa-file-csv me-2"></i> Ventas por Categoría (CSV)
-            </a>
-          </li>
-          <li>
-            <a class="dropdown-item" th:href="@{/admin/reportes/export/pedidos-csv}">
-              <i class="fas fa-file-csv me-2"></i> Todos los Pedidos (CSV)
-            </a>
-          </li>
-          <li><hr class="dropdown-divider"></li>
-          <li>
-            <a class="dropdown-item" th:href="@{/admin/reportes/export/resumen-csv}">
-              <i class="fas fa-file-csv me-2"></i> Resumen General (CSV)
-            </a>
-          </li>
-        </ul>
-      </div>
+  <div th:replace="~{admin/layout/navbar :: navbar(tituloPagina='Reportes Analíticos')}"></div>
 
-      <div class="user-info">
-        <span><strong>Admin:</strong> <span th:text="${nombreUsuario}">Usuario</span></span>
-        <div class="user-avatar">
-          <i class="fas fa-user-shield"></i>
+  <div class="page-header">
+    <div>
+      <h4 class="fw-bold m-0 text-dark">Resumen Ejecutivo</h4>
+      <p class="text-muted small m-0">Estadísticas en tiempo real de tu tienda.</p>
+    </div>
+
+    <div class="dropdown">
+      <button class="btn-export dropdown-toggle" type="button" data-bs-toggle="dropdown">
+        <i class="fas fa-file-export text-muted"></i> Exportar Datos
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0" style="border-radius: 12px; padding: 0.5rem;">
+        <li><h6 class="dropdown-header small text-uppercase">Formatos Disponibles</h6></li>
+        <li><a class="dropdown-item rounded-2" th:href="@{/admin/reportes/export/ventas-mes-csv}"><i class="fas fa-calendar me-2 text-primary"></i> Ventas Mensuales</a></li>
+        <li><a class="dropdown-item rounded-2" th:href="@{/admin/reportes/export/productos-vendidos-csv}"><i class="fas fa-box me-2 text-success"></i> Top Productos</a></li>
+        <li><a class="dropdown-item rounded-2" th:href="@{/admin/reportes/export/resumen-csv}"><i class="fas fa-chart-pie me-2 text-warning"></i> Resumen General</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="kpi-card kpi-purple">
+      <div class="kpi-icon"><i class="fas fa-shopping-bag"></i></div>
+      <div class="kpi-label">Total Pedidos</div>
+      <div class="kpi-value" th:text="${resumenGeneral.totalPedidos}">0</div>
+    </div>
+    <div class="kpi-card kpi-green">
+      <div class="kpi-icon"><i class="fas fa-dollar-sign"></i></div>
+      <div class="kpi-label">Ingresos Totales</div>
+      <div class="kpi-value" th:text="'S/ ' + ${#numbers.formatDecimal(resumenGeneral.ventasTotales, 1, 'COMMA', 2, 'POINT')}">S/ 0</div>
+    </div>
+    <div class="kpi-card kpi-orange">
+      <div class="kpi-icon"><i class="fas fa-receipt"></i></div>
+      <div class="kpi-label">Ticket Promedio</div>
+      <div class="kpi-value" th:text="'S/ ' + ${#numbers.formatDecimal(resumenGeneral.ticketPromedio, 1, 'COMMA', 2, 'POINT')}">S/ 0</div>
+    </div>
+    <div class="kpi-card kpi-blue">
+      <div class="kpi-icon"><i class="fas fa-cubes"></i></div>
+      <div class="kpi-label">Items Vendidos</div>
+      <div class="kpi-value" th:text="${resumenGeneral.totalProductosVendidos}">0</div>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="chart-card d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <div>
+          <h5 class="m-0 fw-bold">Comparativa Mensual</h5>
+          <small class="text-muted">Rendimiento respecto al mes anterior</small>
+        </div>
+
+        <div class="d-flex gap-4 text-center">
+          <div>
+            <small class="d-block text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Mes Anterior</small>
+            <span class="fw-bold fs-5 text-muted" th:text="'S/ ' + ${#numbers.formatDecimal(comparativaVentas.mesAnterior, 1, 'COMMA', 0, 'POINT')}">0</span>
+          </div>
+          <div style="border-left: 1px solid #E2E8F0; padding-left: 1.5rem;">
+            <small class="d-block text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Mes Actual</small>
+            <span class="fw-bold fs-4 text-dark" th:text="'S/ ' + ${#numbers.formatDecimal(comparativaVentas.mesActual, 1, 'COMMA', 0, 'POINT')}">0</span>
+          </div>
+          <div class="d-flex align-items-center">
+                        <span class="trend-badge"
+                              th:classappend="${comparativaVentas.tendencia == 'positiva' ? 'trend-up' : 'trend-down'}">
+                            <i th:class="|fas ${comparativaVentas.tendencia == 'positiva' ? 'fa-arrow-up' : 'fa-arrow-down'} me-1|"></i>
+                            <span th:text="${#numbers.formatDecimal(comparativaVentas.porcentajeCambio, 1, 1)} + '%'">0%</span>
+                        </span>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
   <div class="row">
-    <div class="col-md-3">
-      <div class="metric-card purple">
-        <h3 th:text="${resumenGeneral.totalPedidos}">0</h3>
-        <p>Total Pedidos</p>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="metric-card green">
-        <h3 th:text="'S/ ' + ${#numbers.formatDecimal(resumenGeneral.ventasTotales, 1, 'COMMA', 2, 'POINT')}">
-          S/ 0
-        </h3>
-        <p>Ventas Totales</p>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="metric-card orange">
-        <h3 th:text="'S/ ' + ${#numbers.formatDecimal(resumenGeneral.ticketPromedio, 1, 'COMMA', 2, 'POINT')}">
-          S/ 0
-        </h3>
-        <p>Ticket Promedio</p>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="metric-card blue">
-        <h3 th:text="${resumenGeneral.totalProductosVendidos}">0</h3>
-        <p>Productos Vendidos</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="chart-card">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h4 class="chart-title mb-0">
-        <i class="fas fa-chart-bar me-2"></i> Comparativa de Ventas
-      </h4>
-      <span th:class="${comparativaVentas.tendencia == 'positiva' ? 'trend-indicator positive' : 'trend-indicator negative'}">
-                <i th:class="|${comparativaVentas.tendencia == 'positiva' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'} me-1|"></i>
-                <span th:text="${#numbers.formatDecimal(comparativaVentas.porcentajeCambio, 1, 2)} + '%'">0%</span>
-            </span>
-    </div>
-    <div class="row">
-      <div class="col-md-6">
-        <div class="p-3 bg-light rounded">
-          <h5>Mes Actual</h5>
-          <h2 th:text="'S/ ' + ${#numbers.formatDecimal(comparativaVentas.mesActual, 1, 'COMMA', 2, 'POINT')}">
-            S/ 0
-          </h2>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="p-3 bg-light rounded">
-          <h5>Mes Anterior</h5>
-          <h2 th:text="'S/ ' + ${#numbers.formatDecimal(comparativaVentas.mesAnterior, 1, 'COMMA', 2, 'POINT')}">
-            S/ 0
-          </h2>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="chart-card">
-    <h4 class="chart-title">
-      <i class="fas fa-calendar-alt me-2"></i> Ventas por Mes (<span th:text="${yearSeleccionado}">2024</span>)
-    </h4>
-    <div class="chart-container">
-      <canvas id="ventasMensualChart"></canvas>
-    </div>
-  </div>
-
-  <div class="chart-card">
-    <h4 class="chart-title">
-      <i class="fas fa-chart-line me-2"></i> Evolución Anual de Ventas
-    </h4>
-    <div class="chart-container">
-      <canvas id="ventasAnualChart"></canvas>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col-lg-6">
+    <div class="col-lg-8">
       <div class="chart-card">
-        <h4 class="chart-title">
-          <i class="fas fa-tags me-2"></i> Ventas por Categoría
-        </h4>
-        <div class="chart-container" style="height: 350px;">
+        <div class="chart-header">
+          <h5 class="chart-title">Comportamiento de Ventas (<span th:text="${yearSeleccionado}">2024</span>)</h5>
+        </div>
+        <div class="chart-container" style="height: 300px;">
+          <canvas id="ventasMensualChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="chart-card">
+        <div class="chart-header">
+          <h5 class="chart-title">Por Categoría</h5>
+        </div>
+        <div class="chart-container" style="height: 300px;">
           <canvas id="ventasCategoriaChart"></canvas>
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="col-lg-6">
+  <div class="row mt-4">
+    <div class="col-md-6 col-lg-4">
       <div class="chart-card">
-        <h4 class="chart-title">
-          <i class="fas fa-clipboard-list me-2"></i> Pedidos por Estado
-        </h4>
-        <div class="chart-container" style="height: 350px;">
+        <div class="chart-header"><h5 class="chart-title">Estado de Pedidos</h5></div>
+        <div class="chart-container" style="height: 250px;">
           <canvas id="pedidosEstadoChart"></canvas>
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="chart-card">
-    <h4 class="chart-title">
-      <i class="fas fa-calendar-day me-2"></i> Ventas Diarias del Mes Actual
-    </h4>
-    <div class="chart-container">
-      <canvas id="ventasDiariasChart"></canvas>
-    </div>
-  </div>
-
-  <div class="chart-card">
-    <h4 class="chart-title">
-      <i class="fas fa-credit-card me-2"></i> Ventas por Método de Pago
-    </h4>
-    <div class="chart-container" style="height: 300px;">
-      <canvas id="metodoPagoChart"></canvas>
-    </div>
-  </div>
-
-  <div class="chart-card">
-    <h4 class="chart-title">
-      <i class="fas fa-trophy me-2"></i> Top 10 Productos Más Vendidos
-    </h4>
-    <div class="row">
-      <div class="col-lg-8">
-        <div class="chart-container">
-          <canvas id="productosVendidosChart"></canvas>
+    <div class="col-md-6 col-lg-4">
+      <div class="chart-card">
+        <div class="chart-header"><h5 class="chart-title">Métodos de Pago</h5></div>
+        <div class="chart-container" style="height: 250px;">
+          <canvas id="metodoPagoChart"></canvas>
         </div>
       </div>
-      <div class="col-lg-4">
-        <div th:each="producto, iterStat : ${productosMasVendidos}" class="product-rank">
-          <div class="product-rank-number" th:text="${iterStat.index + 1}">1</div>
-          <img th:if="${producto.imagenUrl != null}"
-               th:src="${producto.imagenUrl}"
-               class="product-rank-image"
-               alt="Producto">
-          <div th:if="${producto.imagenUrl == null}"
-               class="product-rank-image bg-secondary d-flex align-items-center justify-content-center">
-            <i class="fas fa-image text-white"></i>
-          </div>
-          <div class="flex-grow-1">
-            <h6 class="mb-1" th:text="${producto.nombre}">Producto</h6>
-            <small class="text-muted" th:text="${producto.categoria}">Categoría</small>
-            <p class="mb-0">
-              <strong th:text="${producto.cantidadVendida} + ' unidades'">0 unidades</strong>
-              <br>
-              <small class="text-success"
-                     th:text="'S/ ' + ${#numbers.formatDecimal(producto.ingresos, 1, 'COMMA', 2, 'POINT')}">
-                S/ 0
-              </small>
-            </p>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="chart-card">
+        <div class="chart-header"><h5 class="chart-title">Top 5 Productos</h5></div>
+
+        <div style="max-height: 250px; overflow-y: auto; padding-right: 5px;">
+          <div th:each="producto, stat : ${productosMasVendidos}"
+               th:if="${stat.index < 5}"
+               class="leaderboard-item">
+
+            <div class="rank-num" th:classappend="${stat.index == 0} ? 'rank-1'" th:text="${stat.index + 1}">1</div>
+
+            <img th:if="${producto.imagenUrl != null}" th:src="${producto.imagenUrl}" class="product-mini-img">
+            <div th:if="${producto.imagenUrl == null}" class="product-mini-img bg-light d-flex align-items-center justify-content-center"><i class="fas fa-box text-muted"></i></div>
+
+            <div class="flex-grow-1" style="line-height: 1.2;">
+              <div class="fw-bold text-dark text-truncate" style="max-width: 120px;" th:text="${producto.nombre}">Prod</div>
+              <small class="text-muted" th:text="${producto.cantidadVendida} + ' vendidos'">0</small>
+            </div>
+
+            <div class="text-end fw-bold text-success" style="font-size: 0.85rem;">
+              S/ <span th:text="${#numbers.formatDecimal(producto.ingresos, 1, 'COMMA', 0, 'POINT')}">0</span>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script th:inline="javascript">
   /*<![CDATA[*/
 
-  // ... (Todo tu JavaScript para los gráficos va aquí, no cambia nada) ...
+  // --- 1. CONFIGURACIÓN VISUAL ---
+  Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+  Chart.defaults.color = '#64748B';
+  Chart.defaults.scale.grid.color = '#F1F5F9';
 
-    // Configuración de colores
-    const colors = {
-        primary: '#2c5f2d',
-        secondary: '#97bc62',
-        accent: '#d4a574',
-        blue: '#4facfe',
-        purple: '#764ba2',
-        orange: '#f5576c',
-        green: '#28a745',
-        red: '#dc3545'
-    };
+  const colors = {
+      primary: '#2c5f2d',   // Verde Barefoot
+      lightGreen: '#97bc62',
+      accent: '#d4a574',    // Dorado/Arena
+      blue: '#3B82F6',
+      purple: '#8B5CF6',
+      red: '#EF4444',
+      gray: '#CBD5E1'
+  };
 
-    // Datos desde Thymeleaf
-    const ventasPorMes = /*[[${ventasPorMes}]]*/ {};
-    const ventasPorYear = /*[[${ventasPorYear}]]*/ {};
-    const ventasPorCategoria = /*[[${ventasPorCategoria}]]*/ {};
-    const pedidosPorEstado = /*[[${pedidosPorEstado}]]*/ {};
-    const productosMasVendidos = /*[[${productosMasVendidos}]]*/ [];
-    const ventasPorMetodoPago = /*[[${ventasPorMetodoPago}]]*/ {};
-    const ventasDiarias = /*[[${ventasDiarias}]]*/ {};
+  // --- 2. DATOS DEL BACKEND ---
+  const ventasPorMes = /*[[${ventasPorMes}]]*/ {};
+  const ventasPorCategoria = /*[[${ventasPorCategoria}]]*/ {};
+  const pedidosPorEstado = /*[[${pedidosPorEstado}]]*/ {};
+  const ventasPorMetodoPago = /*[[${ventasPorMetodoPago}]]*/ {};
 
-    // Gráfico de Ventas Mensuales
-    const ctxMensual = document.getElementById('ventasMensualChart');
-    new Chart(ctxMensual, {
-        type: 'bar',
-        data: {
-            labels: Object.keys(ventasPorMes),
-            datasets: [{
-                label: 'Ventas (S/)',
-                data: Object.values(ventasPorMes),
-                backgroundColor: colors.primary,
-                borderColor: colors.secondary,
-                borderWidth: 2,
-                borderRadius: 8
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return 'S/ ' + context.parsed.y.toFixed(2);
-                        }
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return 'S/ ' + value;
-                        }
-                    }
-                }
-            }
-        }
-    });
+  // --- 3. RENDERIZADO DE GRÁFICOS ---
 
-    // Gráfico de Ventas Anuales (Línea)
-    const ctxAnual = document.getElementById('ventasAnualChart');
-    new Chart(ctxAnual, {
-        type: 'line',
-        data: {
-            labels: Object.keys(ventasPorYear),
-            datasets: [{
-                label: 'Ventas Anuales (S/)',
-                data: Object.values(ventasPorYear),
-                backgroundColor: 'rgba(44, 95, 45, 0.1)',
-                borderColor: colors.primary,
-                borderWidth: 3,
-                fill: true,
-                tension: 0.4,
-                pointBackgroundColor: colors.accent,
-                pointBorderColor: colors.primary,
-                pointBorderWidth: 2,
-                pointRadius: 6,
-                pointHoverRadius: 8
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return 'S/ ' + context.parsed.y.toFixed(2);
-                        }
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return 'S/ ' + value;
-                        }
-                    }
-                }
-            }
-        }
-    });
+  // A. Ventas Mensuales (Barra)
+  new Chart(document.getElementById('ventasMensualChart'), {
+      type: 'bar',
+      data: {
+          labels: Object.keys(ventasPorMes),
+          datasets: [{
+              label: 'Ventas',
+              data: Object.values(ventasPorMes),
+              backgroundColor: colors.primary,
+              borderRadius: 4,
+              barPercentage: 0.6
+          }]
+      },
+      options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+              y: { beginAtZero: true, grid: { borderDash: [2, 2] } },
+              x: { grid: { display: false } }
+          }
+      }
+  });
 
-    // Gráfico de Ventas por Categoría (Doughnut)
-    const ctxCategoria = document.getElementById('ventasCategoriaChart');
-    new Chart(ctxCategoria, {
-        type: 'doughnut',
-        data: {
-            labels: Object.keys(ventasPorCategoria),
-            datasets: [{
-                data: Object.values(ventasPorCategoria),
-                backgroundColor: [
-                    colors.primary,
-                    colors.secondary,
-                    colors.accent,
-                    colors.blue,
-                    colors.purple,
-                    colors.orange
-                ],
-                borderWidth: 2,
-                borderColor: '#fff'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom'
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return context.label + ': S/ ' + context.parsed.toFixed(2);
-                        }
-                    }
-                }
-            }
-        }
-    });
+  // B. Categorías (Doughnut)
+  new Chart(document.getElementById('ventasCategoriaChart'), {
+      type: 'doughnut',
+      data: {
+          labels: Object.keys(ventasPorCategoria),
+          datasets: [{
+              data: Object.values(ventasPorCategoria),
+              backgroundColor: [colors.primary, colors.lightGreen, colors.accent, colors.blue, colors.purple],
+              borderWidth: 0
+          }]
+      },
+      options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '70%',
+          plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: { size: 11 } } } }
+      }
+  });
 
-    // Gráfico de Pedidos por Estado (Pie)
-    const ctxEstado = document.getElementById('pedidosEstadoChart');
-    new Chart(ctxEstado, {
-        type: 'pie',
-        data: {
-            labels: Object.keys(pedidosPorEstado),
-            datasets: [{
-                data: Object.values(pedidosPorEstado),
-                backgroundColor: [
-                    '#ffc107',
-                    '#17a2b8',
-                    '#007bff',
-                    '#6c757d',
-                    '#20c997',
-                    '#28a745',
-                    '#dc3545'
-                ],
-                borderWidth: 2,
-                borderColor: '#fff'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom'
-                }
-            }
-        }
-    });
+  // C. Estado Pedidos (Pie)
+  new Chart(document.getElementById('pedidosEstadoChart'), {
+      type: 'pie',
+      data: {
+          labels: Object.keys(pedidosPorEstado),
+          datasets: [{
+              data: Object.values(pedidosPorEstado),
+              backgroundColor: [colors.accent, colors.blue, colors.primary, colors.red, colors.gray],
+              borderWidth: 2,
+              borderColor: '#fff'
+          }]
+      },
+      options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom', labels: { usePointStyle: true } } }
+      }
+  });
 
-    // Gráfico de Productos Más Vendidos (Horizontal Bar)
-    const ctxProductos = document.getElementById('productosVendidosChart');
-    new Chart(ctxProductos, {
-        type: 'bar',
-        data: {
-            labels: productosMasVendidos.map(p => p.nombre),
-            datasets: [{
-                label: 'Unidades Vendidas',
-                data: productosMasVendidos.map(p => p.cantidadVendida),
-                backgroundColor: colors.accent,
-                borderColor: colors.primary,
-                borderWidth: 2,
-                borderRadius: 8
-            }]
-        },
-        options: {
-            indexAxis: 'y',
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                x: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-
-    // Gráfico de Ventas Diarias
-    const ctxDiarias = document.getElementById('ventasDiariasChart');
-    new Chart(ctxDiarias, {
-        type: 'line',
-        data: {
-            labels: Object.keys(ventasDiarias),
-            datasets: [{
-                label: 'Ventas Diarias (S/)',
-                data: Object.values(ventasDiarias),
-                backgroundColor: 'rgba(79, 172, 254, 0.1)',
-                borderColor: colors.blue,
-                borderWidth: 2,
-                fill: true,
-                tension: 0.3,
-                pointBackgroundColor: colors.blue,
-                pointBorderWidth: 0,
-                pointRadius: 3
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return 'S/ ' + context.parsed.y.toFixed(2);
-                        }
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return 'S/ ' + value;
-                        }
-                    }
-                }
-            }
-        }
-    });
-
-    // Gráfico de Método de Pago
-    const ctxMetodoPago = document.getElementById('metodoPagoChart');
-    if (ventasPorMetodoPago.ventas) {
-        new Chart(ctxMetodoPago, {
-            type: 'bar',
-            data: {
-                labels: Object.keys(ventasPorMetodoPago.ventas),
-                datasets: [{
-                    label: 'Ventas (S/)',
-                    data: Object.values(ventasPorMetodoPago.ventas),
-                    backgroundColor: [
-                        colors.primary,
-                        colors.secondary,
-                        colors.accent,
-                        colors.blue,
-                        colors.purple,
-                        colors.orange
-                    ],
-                    borderWidth: 0,
-                    borderRadius: 8
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return 'S/ ' + context.parsed.y.toFixed(2);
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return 'S/ ' + value;
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    }
+  // D. Métodos de Pago (Barra Horizontal)
+  if (ventasPorMetodoPago.ventas) {
+      new Chart(document.getElementById('metodoPagoChart'), {
+          type: 'bar',
+          data: {
+              labels: Object.keys(ventasPorMetodoPago.ventas),
+              datasets: [{
+                  label: 'Total',
+                  data: Object.values(ventasPorMetodoPago.ventas),
+                  backgroundColor: [colors.purple, colors.accent],
+                  borderRadius: 4,
+                  barThickness: 20
+              }]
+          },
+          options: {
+              indexAxis: 'y',
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: { x: { grid: { display: false } } }
+          }
+      });
+  }
 
   /*]]>*/
 </script>

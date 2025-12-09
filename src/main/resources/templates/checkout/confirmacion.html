@@ -1,66 +1,198 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <th:block th:insert="~{fragments :: head('Pedido Confirmado - Barefoot Store')}"></th:block>
+    <th:block th:insert="~{fragments :: head('Pedido Confirmado - Barefoot')}"></th:block>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
     <style>
-        .confirmacion-container {
-            max-width: 800px;
-            margin: 50px auto;
-            text-align: center;
+        :root {
+            --bg-color: #F9FAFB;
+            --card-bg: #FFFFFF;
+            --text-main: #1F2937;
+            --text-muted: #6B7280;
+            --primary-dark: #111827;
+            --accent-green: #10B981;
+            --border-color: #E5E7EB;
+            --radius-lg: 24px;
+            --radius-md: 12px;
+            --shadow-soft: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
         }
-        .success-icon {
-            width: 120px;
-            height: 120px;
-            background: linear-gradient(135deg, #28a745, #20c997);
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-main);
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* --- Header de Celebración --- */
+        .celebration-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-top: 2rem;
+        }
+
+        .success-checkmark {
+            width: 80px;
+            height: 80px;
+            background: var(--accent-green);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 30px;
-            animation: scaleIn 0.5s ease-out;
+            margin: 0 auto 20px;
+            box-shadow: 0 0 0 10px rgba(16, 185, 129, 0.1);
+            animation: popIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
-        .success-icon i {
-            font-size: 4rem;
+
+        .success-checkmark i {
             color: white;
+            font-size: 2.5rem;
         }
-        @keyframes scaleIn {
-            from {
-                transform: scale(0);
-            }
-            to {
-                transform: scale(1);
-            }
+
+        @keyframes popIn {
+            0% { transform: scale(0); }
+            80% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
-        .info-pedido {
-            background: var(--color-surface);
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            margin-top: 30px;
-            text-align: left;
+
+        /* --- Grid Layout --- */
+        .confirmation-grid {
+            display: grid;
+            grid-template-columns: 1fr 380px; /* Izquierda fluido, Derecha fijo */
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
         }
+
+        /* --- Tarjetas --- */
+        .card-clean {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid rgba(0,0,0,0.03);
+            height: 100%;
+        }
+
+        /* --- Timeline (Izquierda) --- */
         .timeline {
             position: relative;
-            padding: 20px 0;
+            padding-left: 20px;
+            margin-top: 2rem;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 5px;
+            bottom: 5px;
+            width: 2px;
+            background: #E5E7EB;
         }
         .timeline-item {
             position: relative;
-            padding-left: 40px;
-            margin-bottom: 30px;
+            padding-left: 35px;
+            margin-bottom: 2rem;
         }
-        .timeline-item::before {
-            content: '';
+        .timeline-dot {
             position: absolute;
-            left: 10px;
-            top: 5px;
-            width: 20px;
-            height: 20px;
+            left: 0;
+            top: 2px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
-            background: var(--color-primary);
+            background: #fff;
+            border: 2px solid #D1D5DB;
+            z-index: 2;
         }
-        .timeline-item.active::before {
-            background: var(--color-accent);
-            box-shadow: 0 0 0 4px rgba(243, 156, 18, 0.2);
+        .timeline-item.active .timeline-dot {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+            box-shadow: 0 0 0 4px rgba(17, 24, 39, 0.15);
+        }
+        .timeline-item.completed .timeline-dot {
+            background: var(--accent-green);
+            border-color: var(--accent-green);
+        }
+
+        /* --- Recibo (Derecha) --- */
+        .receipt-header {
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .product-mini {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .product-thumb {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            background-color: #f3f4f6;
+            object-fit: cover;
+        }
+
+        /* --- Info Box (Azul) --- */
+        .info-box {
+            background-color: #EFF6FF;
+            border: 1px solid #DBEAFE;
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            color: #1E40AF;
+        }
+
+        /* --- Botones --- */
+        .btn-primary-dark {
+            background-color: var(--primary-dark);
+            color: white;
+            padding: 15px 30px;
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s;
+        }
+        .btn-primary-dark:hover {
+            background-color: black;
+            transform: translateY(-2px);
+            color: white;
+        }
+        .btn-outline {
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 15px 30px;
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            transition: all 0.2s;
+        }
+        .btn-outline:hover {
+            border-color: var(--text-main);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .confirmation-grid {
+                grid-template-columns: 1fr;
+            }
+            .card-clean {
+                height: auto;
+            }
+            /* Invertir orden en móvil: primero mensaje, luego recibo? No, orden normal está bien */
         }
     </style>
 </head>
@@ -68,108 +200,126 @@
 
 <nav th:replace="~{fragments :: navbar}"></nav>
 
-<div class="container">
-    <div class="confirmacion-container">
-        <div class="success-icon">
+<div class="container my-5">
+
+    <div class="celebration-header">
+        <div class="success-checkmark">
             <i class="fas fa-check"></i>
         </div>
+        <h1 class="display-5 fw-bold mb-2">¡Gracias por tu compra!</h1>
+        <p class="text-muted fs-5">Tu pedido ha sido confirmado con éxito.</p>
+        <div class="mt-3">
+            <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">
+                Pedido #<span th:text="${pedido.numeroPedido}">PED-000</span>
+            </span>
+        </div>
+    </div>
 
-        <h1 class="mb-3">¡Pedido Realizado con Éxito!</h1>
-        <p class="lead text-muted">Gracias por tu compra en Barefoot Store</p>
+    <div class="confirmation-grid">
 
-        <div class="info-pedido">
-            <div class="row text-center mb-4">
-                <div class="col-md-4">
-                    <h5 class="text-muted mb-2">Número de Pedido</h5>
-                    <h3 class="text-primary" th:text="${pedido.numeroPedido}">PED-000</h3>
+        <div class="left-col">
+            <div class="card-clean">
+                <h3 class="h4 mb-4">Estado del Pedido</h3>
+
+                <div class="info-box mb-4">
+                    <div class="d-flex">
+                        <i class="fas fa-envelope-open-text mt-1 me-3 fs-5"></i>
+                        <div>
+                            <h6 class="fw-bold mb-1">Confirmación enviada</h6>
+                            <p class="mb-0 small opacity-75">
+                                Hemos enviado los detalles a <strong th:text="${pedido.usuario.email}">email</strong>.
+                                Te notificaremos cuando tu paquete salga de nuestro almacén.
+                            </p>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <h5 class="text-muted mb-2">Estado</h5>
-                    <span class="badge"
-                          th:classappend="'bg-' + ${pedido.estado.colorBadge}"
-                          style="font-size: 1.1rem; padding: 10px 20px;"
-                          th:text="${pedido.estado.nombre}">Estado</span>
+
+                <div class="timeline">
+                    <div class="timeline-item active">
+                        <div class="timeline-dot"></div>
+                        <h6 class="fw-bold mb-1">Pedido Recibido</h6>
+                        <p class="text-muted small mb-0" th:text="${#temporals.format(pedido.fechaPedido, 'dd MMM yyyy, HH:mm')}">Fecha</p>
+                        <p class="small text-success mt-1">
+                            <i class="fas fa-check-circle me-1"></i> Pago autorizado correctamente
+                        </p>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <h6 class="fw-bold mb-1 text-muted">En Preparación</h6>
+                        <p class="text-muted small">Estamos empacando tus Barefoot.</p>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <h6 class="fw-bold mb-1 text-muted">En Camino</h6>
+                        <p class="text-muted small">Entrega estimada: 2-3 días hábiles.</p>
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <h5 class="text-muted mb-2">Total</h5>
-                    <h3 class="text-success">
-                        S/ <span th:text="${#numbers.formatDecimal(pedido.total, 1, 'COMMA', 2, 'POINT')}">0.00</span>
-                    </h3>
+
+                <div class="mt-5 pt-4 border-top d-flex flex-wrap gap-3">
+                    <a th:href="@{/productos}" class="btn-primary-dark">
+                        Seguir Comprando <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <a th:href="@{/mis-pedidos}" class="btn-outline">
+                        Ver Mis Pedidos
+                    </a>
                 </div>
-            </div>
-
-            <hr>
-
-            <h4 class="mb-3"><i class="fas fa-box me-2"></i> Detalles del Pedido</h4>
-
-            <div th:each="detalle : ${pedido.detalles}" class="d-flex align-items-center mb-3 pb-3 border-bottom">
-                <img th:if="${detalle.producto.imagenUrl != null}"
-                     th:src="${detalle.producto.imagenUrl}"
-                     style="width: 80px; height: 80px; object-fit: cover; border-radius: 10px;"
-                     th:alt="${detalle.producto.nombre}">
-                <div class="flex-grow-1 ms-3">
-                    <h5 class="mb-1" th:text="${detalle.producto.nombre}">Producto</h5>
-                    <p class="text-muted mb-0">
-                        Cantidad: <strong th:text="${detalle.cantidad}">1</strong> ×
-                        S/ <span th:text="${#numbers.formatDecimal(detalle.precioUnitario, 1, 'COMMA', 2, 'POINT')}">0.00</span>
-                    </p>
-                    <p th:if="${detalle.personalizacion != null}" class="text-info small mb-0">
-                        <i class="fas fa-palette me-1"></i>
-                        <strong>Personalización:</strong> <span th:text="${detalle.personalizacion}"></span>
-                    </p>
-                </div>
-                <h5 class="mb-0">
-                    S/ <span th:text="${#numbers.formatDecimal(detalle.subtotal, 1, 'COMMA', 2, 'POINT')}">0.00</span>
-                </h5>
-            </div>
-
-            <hr>
-
-            <h4 class="mb-3"><i class="fas fa-truck me-2"></i> Información de Envío</h4>
-            <p><strong>Dirección:</strong> <span th:text="${pedido.direccionEnvio}">Dirección</span></p>
-            <p><strong>Método de Pago:</strong>
-                <span th:text="${pedido.metodoPago.nombre}">Método</span>
-            </p>
-
-            <div class="alert alert-info mt-4">
-                <i class="fas fa-info-circle me-2"></i>
-                <strong>¿Qué sigue?</strong>
-                <p class="mb-0 mt-2">
-                    Hemos enviado un correo de confirmación a <strong th:text="${pedido.usuario.email}">email</strong>
-                    con todos los detalles de tu pedido. Te notificaremos sobre el estado de tu envío.
-                </p>
-            </div>
-
-            <h4 class="mb-3 mt-4"><i class="fas fa-route me-2"></i> Seguimiento del Pedido</h4>
-            <div class="timeline">
-                <div class="timeline-item active">
-                    <h6>Pedido Recibido</h6>
-                    <small class="text-muted"
-                           th:text="${#temporals.format(pedido.fechaPedido, 'dd/MM/yyyy HH:mm')}">Fecha</small>
-                </div>
-                <div class="timeline-item">
-                    <h6>En Preparación</h6>
-                    <small class="text-muted">Procesando tu pedido</small>
-                </div>
-                <div class="timeline-item">
-                    <h6>Enviado</h6>
-                    <small class="text-muted">En camino a tu dirección</small>
-                </div>
-                <div class="timeline-item">
-                    <h6>Entregado</h6>
-                    <small class="text-muted">¡Disfruta tu compra!</small>
-                </div>
-            </div>
-
-            <div class="text-center mt-4">
-                <a th:href="@{/productos}" class="btn btn-primary me-2">
-                    <i class="fas fa-shopping-bag me-2"></i> Seguir Comprando
-                </a>
-                <a th:href="@{/inicio}" class="btn btn-outline-secondary">
-                    <i class="fas fa-home me-2"></i> Volver al Inicio
-                </a>
             </div>
         </div>
+
+        <div class="right-col">
+            <div class="card-clean bg-white">
+                <div class="receipt-header">
+                    <h3 class="h5 mb-1">Resumen</h3>
+                    <p class="text-muted small mb-0">
+                        Total pagado: <strong class="text-dark">S/ <span th:text="${#numbers.formatDecimal(pedido.total, 1, 'COMMA', 2, 'POINT')}"></span></strong>
+                    </p>
+                </div>
+
+                <div class="products-list mb-4">
+                    <div th:each="detalle : ${pedido.detalles}" class="product-mini">
+                        <div class="position-relative">
+                            <img th:if="${detalle.producto.imagenUrl != null}"
+                                 th:src="${detalle.producto.imagenUrl}" class="product-thumb">
+                            <div th:if="${detalle.producto.imagenUrl == null}"
+                                 class="product-thumb d-flex align-items-center justify-content-center text-muted border">
+                                <i class="fas fa-shoe-prints"></i>
+                            </div>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-secondary"
+                                  style="font-size: 0.6rem;" th:text="${detalle.cantidad}">1</span>
+                        </div>
+                        <div class="flex-grow-1 lh-sm">
+                            <span class="d-block fw-bold small text-dark" th:text="${detalle.producto.nombre}">Nombre</span>
+                            <span class="d-block text-muted" style="font-size: 0.8rem;"
+                                  th:if="${detalle.personalizacion}" th:text="${detalle.personalizacion}">Opción</span>
+                        </div>
+                        <div class="fw-bold small">
+                            S/ <span th:text="${#numbers.formatDecimal(detalle.subtotal, 1, 'COMMA', 2, 'POINT')}"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-top pt-3">
+                    <div class="mb-3">
+                        <h6 class="small text-muted text-uppercase fw-bold ls-1 mb-2">Enviar a</h6>
+                        <p class="small mb-0 text-dark">
+                            <i class="fas fa-map-marker-alt me-1 text-muted"></i>
+                            <span th:text="${pedido.direccionEnvio}">Dirección</span>
+                        </p>
+                    </div>
+
+                    <div class="mb-0">
+                        <h6 class="small text-muted text-uppercase fw-bold ls-1 mb-2">Método de Pago</h6>
+                        <p class="small mb-0 text-dark">
+                            <i class="fas fa-credit-card me-1 text-muted"></i>
+                            <span th:text="${pedido.metodoPago.nombre}">Tarjeta</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 

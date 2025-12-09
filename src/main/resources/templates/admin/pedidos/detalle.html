@@ -1,86 +1,171 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <head th:replace="~{admin/layout/head :: head(titulo='Detalle Pedido - Barefoot Admin')}"></head>
+    <th:block th:insert="~{admin/layout/head :: head(titulo='Pedido #' + ${pedido.numeroPedido} + ' - Barefoot Admin')}"></th:block>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        .info-section {
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            margin-bottom: 25px;
+        :root {
+            --primary-bg: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-main: #1E293B;
+            --text-muted: #64748B;
+            --border-radius: 16px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
         }
-        .info-section h5 {
-            color: var(--primary-color);
-            font-weight: bold;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #f0f0f0;
+
+        body {
+            background-color: var(--primary-bg);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-main);
         }
-        .info-row {
+
+        .main-content {
+            margin-left: 260px;
+            padding: 2rem 2.5rem;
+        }
+
+        /* --- LAYOUT GRID --- */
+        .order-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        /* --- TARJETAS --- */
+        .content-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #E2E8F0;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- HEADER PEDIDO --- */
+        .order-header {
             display: flex;
             justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid #f0f0f0;
+            align-items: center;
+            margin-bottom: 2rem;
         }
-        .info-row:last-child {
-            border-bottom: none;
-        }
-        .info-label {
-            font-weight: 600;
-            color: #666;
-        }
-        .info-value {
-            color: #333;
-        }
+        .order-id { font-size: 1.75rem; font-weight: 800; color: #0F172A; }
+        .order-meta { color: var(--text-muted); font-size: 0.9rem; }
+
+        /* --- PRODUCT LIST --- */
         .product-item {
             display: flex;
             align-items: center;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            margin-bottom: 10px;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px dashed #E2E8F0;
         }
-        .product-image {
-            width: 80px;
-            height: 80px;
+        .product-item:last-child { border-bottom: none; }
+
+        .product-thumb {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
             object-fit: cover;
-            border-radius: 8px;
-            margin-right: 15px;
+            border: 1px solid #E2E8F0;
         }
+        .product-placeholder {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            background: #F1F5F9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94A3B8;
+        }
+
+        /* --- INFO ROWS --- */
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
+        .info-label { color: var(--text-muted); }
+        .info-value { font-weight: 600; color: var(--text-main); text-align: right; }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px solid #E2E8F0;
+            font-size: 1.2rem;
+            font-weight: 800;
+        }
+
+        /* --- TIMELINE MODERNO --- */
         .timeline {
             position: relative;
-            padding-left: 30px;
+            padding-left: 2rem;
+            margin-top: 1rem;
         }
-        .timeline-item {
-            position: relative;
-            padding-bottom: 20px;
-        }
-        .timeline-item::before {
+        .timeline::before {
             content: '';
             position: absolute;
-            left: -24px;
-            top: 0;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #ccc;
-        }
-        .timeline-item.active::before {
-            background: var(--primary-color);
-        }
-        .timeline-item::after {
-            content: '';
-            position: absolute;
-            left: -18px;
-            top: 12px;
+            left: 7px;
+            top: 5px;
+            bottom: 5px;
             width: 2px;
-            height: calc(100% - 12px);
-            background: #e0e0e0;
+            background: #E2E8F0;
         }
-        .timeline-item:last-child::after {
-            display: none;
+        .timeline-event {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        .timeline-dot {
+            position: absolute;
+            left: -2rem;
+            top: 4px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid #CBD5E1;
+            z-index: 2;
+        }
+        .timeline-event.active .timeline-dot {
+            border-color: #3B82F6;
+            background: #3B82F6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+        }
+
+        /* --- BADGES --- */
+        .status-badge {
+            padding: 0.4em 1em;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .bg-info { background: #E0F2FE; color: #0284C7; }
+        .bg-warning { background: #FEF3C7; color: #D97706; }
+        .bg-success { background: #DCFCE7; color: #166534; }
+        .bg-danger { background: #FEE2E2; color: #DC2626; }
+
+        @media (max-width: 992px) {
+            .order-grid { grid-template-columns: 1fr; }
+            .main-content { margin-left: 0; }
         }
     </style>
 </head>
@@ -90,248 +175,231 @@
 
 <div class="main-content">
 
-    <div class="top-bar">
-        <h2>
-            <i class="fas fa-receipt me-2"></i>
-            Pedido <span th:text="${pedido.numeroPedido}">PED-000</span>
-        </h2>
-        <a th:href="@{/admin/pedidos}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left me-2"></i> Volver
-        </a>
+    <div th:replace="~{admin/layout/navbar :: navbar(tituloPagina='Detalle de Pedido')}"></div>
+
+    <div class="order-header">
+        <div>
+            <div class="d-flex align-items-center gap-3 mb-1">
+                <h1 class="order-id m-0" th:text="${pedido.numeroPedido}">PED-000</h1>
+                <span th:class="'status-badge bg-' + ${pedido.estado.colorBadge}">
+                    <i class="fas fa-circle" style="font-size: 0.5rem;"></i>
+                    <span th:text="${pedido.estado.nombre}">Estado</span>
+                </span>
+            </div>
+            <div class="order-meta">
+                <i class="far fa-calendar-alt me-1"></i>
+                <span th:text="${#temporals.format(pedido.fechaPedido, 'dd MMM yyyy, HH:mm')}">Fecha</span>
+                &bull;
+                <i class="far fa-credit-card me-1 ms-2"></i>
+                <span th:text="${pedido.metodoPago != null ? pedido.metodoPago.nombre : 'Pago Online'}">Método</span>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a href="#" class="btn btn-light border bg-white" title="Imprimir Recibo">
+                <i class="fas fa-print"></i>
+            </a>
+            <a th:href="@{/admin/pedidos}" class="btn btn-light border bg-white">
+                <i class="fas fa-arrow-left me-2"></i> Volver
+            </a>
+        </div>
     </div>
 
-    <div th:if="${mensaje}" th:class="'alert alert-' + ${tipoMensaje}" role="alert">
-        <i class="fas fa-check-circle me-2"></i>
-        <span th:text="${mensaje}"></span>
-    </div>
+    <div class="order-grid">
 
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="info-section">
-                <h5><i class="fas fa-info-circle me-2"></i> Información General</h5>
-                <div class="info-row">
-                    <span class="info-label">Número de Pedido:</span>
-                    <span class="info-value" th:text="${pedido.numeroPedido}">PED-000</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Fecha de Pedido:</span>
-                    <span class="info-value"
-                          th:text="${#temporals.format(pedido.fechaPedido, 'dd/MM/yyyy HH:mm')}">
-                        Fecha
-                    </span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Estado:</span>
-                    <span th:class="'badge bg-' + ${pedido.estado.colorBadge}"
-                          th:text="${pedido.estado.nombre}">
-                        Estado
-                    </span>
-                </div>
-                <div class="info-row" th:if="${pedido.fechaEntrega != null}">
-                    <span class="info-label">Fecha de Entrega:</span>
-                    <span class="info-value"
-                          th:text="${#temporals.format(pedido.fechaEntrega, 'dd/MM/yyyy HH:mm')}">
-                        Fecha
-                    </span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Método de Pago:</span>
-                    <span class="info-value"
-                          th:text="${pedido.metodoPago != null ? pedido.metodoPago.nombre : 'No especificado'}">
-                        Método
-                    </span>
-                </div>
-            </div>
+        <div class="left-col">
 
-            <div class="info-section">
-                <h5><i class="fas fa-user me-2"></i> Información del Cliente</h5>
-                <div class="info-row">
-                    <span class="info-label">Nombre:</span>
-                    <span class="info-value"
-                          th:text="${pedido.usuario.nombre + ' ' + pedido.usuario.apellido}">
-                        Cliente
-                    </span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Email:</span>
-                    <span class="info-value" th:text="${pedido.usuario.email}">email</span>
-                </div>
-                <div class="info-row" th:if="${pedido.usuario.telefono != null}">
-                    <span class="info-label">Teléfono:</span>
-                    <span class="info-value" th:text="${pedido.usuario.telefono}">Teléfono</span>
-                </div>
-                <div class="info-row" th:if="${pedido.direccionEnvio != null}">
-                    <span class="info-label">Dirección de Envío:</span>
-                    <span class="info-value" th:text="${pedido.direccionEnvio}">Dirección</span>
-                </div>
-            </div>
+            <div class="content-card">
+                <h5 class="card-title"><i class="fas fa-shopping-bag text-primary"></i> Productos</h5>
 
-            <div class="info-section">
-                <h5><i class="fas fa-box me-2"></i> Productos del Pedido</h5>
                 <div th:each="detalle : ${pedido.detalles}" class="product-item">
                     <img th:if="${detalle.producto.imagenUrl != null}"
-                         th:src="${detalle.producto.imagenUrl}"
-                         class="product-image"
-                         alt="Producto">
-                    <div th:if="${detalle.producto.imagenUrl == null}"
-                         class="product-image bg-secondary d-flex align-items-center justify-content-center">
-                        <i class="fas fa-image text-white"></i>
+                         th:src="${detalle.producto.imagenUrl}" class="product-thumb">
+                    <div th:if="${detalle.producto.imagenUrl == null}" class="product-placeholder">
+                        <i class="fas fa-image"></i>
                     </div>
+
                     <div class="flex-grow-1">
-                        <h6 class="mb-1" th:text="${detalle.producto.nombre}">Producto</h6>
-                        <p class="mb-1 text-muted" th:text="${detalle.producto.categoria}">Categoría</p>
-                        <p class="mb-0" th:if="${detalle.personalizacion != null}">
-                            <small class="text-info">
-                                <i class="fas fa-palette me-1"></i>
-                                <span th:text="${detalle.personalizacion}">Personalización</span>
+                        <div class="fw-bold text-dark" th:text="${detalle.producto.nombre}">Nombre Producto</div>
+                        <div class="small text-muted" th:text="${detalle.producto.categoria}">Categoría</div>
+                        <div th:if="${detalle.personalizacion}" class="small text-info mt-1">
+                            <i class="fas fa-magic me-1"></i> <span th:text="${detalle.personalizacion}">Opción</span>
+                        </div>
+                    </div>
+
+                    <div class="text-end" style="min-width: 100px;">
+                        <div class="text-muted small"><span th:text="${detalle.cantidad}">1</span> x S/ <span th:text="${#numbers.formatDecimal(detalle.precioUnitario, 1, 'COMMA', 2, 'POINT')}"></span></div>
+                        <div class="fw-bold text-dark">S/ <span th:text="${#numbers.formatDecimal(detalle.subtotal, 1, 'COMMA', 2, 'POINT')}"></span></div>
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-3 border-top">
+                    <div class="info-row">
+                        <span class="info-label">Subtotal</span>
+                        <span class="info-value">S/ <span th:text="${#numbers.formatDecimal(pedido.subtotal, 1, 'COMMA', 2, 'POINT')}"></span></span>
+                    </div>
+                    <div class="info-row" th:if="${pedido.descuento > 0}">
+                        <span class="info-label text-success">Descuento</span>
+                        <span class="info-value text-success">- S/ <span th:text="${#numbers.formatDecimal(pedido.descuento, 1, 'COMMA', 2, 'POINT')}"></span></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Envío</span>
+                        <span class="info-value">S/ <span th:text="${#numbers.formatDecimal(pedido.costoEnvio, 1, 'COMMA', 2, 'POINT')}"></span></span>
+                    </div>
+                    <div class="total-row">
+                        <span>Total Pagado</span>
+                        <span class="text-primary">S/ <span th:text="${#numbers.formatDecimal(pedido.total, 1, 'COMMA', 2, 'POINT')}"></span></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="content-card h-100">
+                        <h5 class="card-title"><i class="fas fa-user text-muted"></i> Cliente</h5>
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center fw-bold text-secondary"
+                                 style="width: 48px; height: 48px; font-size: 1.2rem;"
+                                 th:text="${#strings.substring(pedido.usuario.nombre, 0, 1)}">A</div>
+                            <div>
+                                <div class="fw-bold" th:text="${pedido.usuario.nombre + ' ' + pedido.usuario.apellido}">Nombre</div>
+                                <div class="small text-muted">Cliente Registrado</div>
+                            </div>
+                        </div>
+                        <div class="small mb-2"><i class="fas fa-envelope me-2 text-muted"></i> <span th:text="${pedido.usuario.email}">email</span></div>
+                        <div class="small"><i class="fas fa-phone me-2 text-muted"></i> <span th:text="${pedido.usuario.telefono ?: 'No registrado'}">tel</span></div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="content-card h-100">
+                        <h5 class="card-title"><i class="fas fa-map-marker-alt text-muted"></i> Entrega</h5>
+                        <div class="mb-3">
+                            <label class="small text-muted text-uppercase fw-bold ls-1">Dirección</label>
+                            <p class="mb-0 fw-medium" th:text="${pedido.direccionEnvio}">Av. Siempre Viva 123</p>
+                        </div>
+                        <div th:if="${pedido.notas}">
+                            <label class="small text-muted text-uppercase fw-bold ls-1">Notas</label>
+                            <p class="mb-0 small bg-light p-2 rounded text-muted" th:text="${pedido.notas}"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="right-col">
+
+            <div class="content-card border-primary" style="background: #F0F9FF;">
+                <h5 class="card-title text-primary">Gestionar Estado</h5>
+
+                <div th:if="${pedido.estado.name() != 'ENTREGADO' and pedido.estado.name() != 'CANCELADO'}">
+
+                    <form th:action="@{/admin/pedidos/{id}/actualizar-estado(id=${pedido.id})}" method="post">
+                        <label class="form-label small fw-bold">Avanzar estado a:</label>
+                        <div class="d-flex gap-2">
+                            <select name="nuevoEstado" class="form-select form-select-sm bg-white" required>
+                                <option th:each="estado : ${estados}"
+                                        th:value="${estado}"
+                                        th:text="${estado.nombre}"
+                                        th:selected="${estado == pedido.estado}"
+                                        th:if="${estado.name() != 'CANCELADO' and estado.ordinal() >= pedido.estado.ordinal()}">
+                                    Estado
+                                </option>
+                            </select>
+                            <button type="submit" class="btn btn-sm btn-primary">Actualizar</button>
+                        </div>
+                    </form>
+
+                    <div class="mt-3 pt-3 border-top border-primary border-opacity-25"
+                         th:if="${pedido.estado.name() == 'CONFIRMADO'}">
+
+                        <form th:action="@{/admin/pedidos/{id}/cancelar(id=${pedido.id})}" method="post"
+                              onsubmit="return confirm('¿Seguro que deseas cancelar? El stock regresará al inventario.');">
+                            <button type="submit" class="btn btn-sm btn-outline-danger w-100">
+                                <i class="fas fa-ban me-1"></i> Cancelar Pedido
+                            </button>
+                        </form>
+                        <div class="text-center mt-2">
+                            <small class="text-muted" style="font-size: 0.75rem;">
+                                * Stock repuesto automáticamente.
                             </small>
-                        </p>
-                    </div>
-                    <div class="text-end">
-                        <p class="mb-1">
-                            <strong>Cantidad:</strong> <span th:text="${detalle.cantidad}">0</span>
-                        </p>
-                        <p class="mb-1">
-                            <strong>Precio Unit.:</strong>
-                            S/ <span th:text="${#numbers.formatDecimal(detalle.precioUnitario, 1, 'COMMA', 2, 'POINT')}">0.00</span>
-                        </p>
-                        <p class="mb-0">
-                            <strong>Subtotal:</strong>
-                            S/ <span th:text="${#numbers.formatDecimal(detalle.subtotal, 1, 'COMMA', 2, 'POINT')}">0.00</span>
-                        </p>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="info-section" th:if="${pedido.notas != null && !pedido.notas.isEmpty()}">
-                <h5><i class="fas fa-sticky-note me-2"></i> Notas del Pedido</h5>
-                <p class="mb-0" th:text="${pedido.notas}">Notas</p>
-            </div>
-        </div>
+                <div th:unless="${pedido.estado.name() != 'ENTREGADO' and pedido.estado.name() != 'CANCELADO'}"
+                     class="text-center py-3">
 
-        <div class="col-lg-4">
-            <div class="info-section">
-                <h5><i class="fas fa-calculator me-2"></i> Resumen</h5>
-                <div class="info-row">
-                    <span class="info-label">Subtotal:</span>
-                    <span class="info-value"
-                          th:text="'S/ ' + ${#numbers.formatDecimal(pedido.subtotal, 1, 'COMMA', 2, 'POINT')}">
-                        S/ 0.00
-                    </span>
-                </div>
-                <div class="info-row" th:if="${pedido.descuento > 0}">
-                    <span class="info-label text-success">Descuento:</span>
-                    <span class="info-value text-success"
-                          th:text="'- S/ ' + ${#numbers.formatDecimal(pedido.descuento, 1, 'COMMA', 2, 'POINT')}">
-                        S/ 0.00
-                    </span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Envío:</span>
-                    <span class="info-value"
-                          th:text="'S/ ' + ${#numbers.formatDecimal(pedido.costoEnvio, 1, 'COMMA', 2, 'POINT')}">
-                        S/ 0.00
-                    </span>
-                </div>
-                <div class="info-row" style="border-top: 2px solid var(--primary-color); padding-top: 15px;">
-                    <span class="info-label"><strong>TOTAL:</strong></span>
-                    <span class="info-value">
-                        <strong style="font-size: 1.5rem; color: var(--primary-color);"
-                                th:text="'S/ ' + ${#numbers.formatDecimal(pedido.total, 1, 'COMMA', 2, 'POINT')}">
-                            S/ 0.00
-                        </strong>
-                    </span>
-                </div>
-            </div>
-
-            <div class="info-section">
-                <h5><i class="fas fa-edit me-2"></i> Actualizar Estado</h5>
-                <form th:action="@{/admin/pedidos/{id}/actualizar-estado(id=${pedido.id})}"
-                      method="post">
-                    <div class="mb-3">
-                        <label class="form-label">Nuevo Estado:</label>
-                        <select name="nuevoEstado" class="form-select" required>
-                            <option value="">Seleccionar...</option>
-                            <option th:each="estado : ${estados}"
-                                    th:value="${estado}"
-                                    th:text="${estado.nombre}"
-                                    th:selected="${estado == pedido.estado}">
-                                Estado
-                            </option>
-                        </select>
+                    <div th:if="${pedido.estado.name() == 'ENTREGADO'}" class="text-success">
+                        <i class="fas fa-check-circle fa-2x mb-2"></i>
+                        <h6 class="fw-bold m-0">Pedido Completado</h6>
+                        <small>El ciclo de entrega ha finalizado.</small>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-save me-2"></i> Actualizar Estado
-                    </button>
-                </form>
-            </div>
 
-            <div class="info-section"
-                 th:if="${pedido.estado.name() == 'PENDIENTE' || pedido.estado.name() == 'CONFIRMADO'}">
-                <h5 class="text-danger"><i class="fas fa-times-circle me-2"></i> Cancelar Pedido</h5>
-                <form th:action="@{/admin/pedidos/{id}/cancelar(id=${pedido.id})}"
-                      method="post"
-                      onsubmit="return confirm('¿Estás seguro de cancelar este pedido? El stock será devuelto.');">
-                    <div class="mb-3">
-                        <label class="form-label">Motivo (opcional):</label>
-                        <textarea name="motivo" class="form-control" rows="3"
-                                  placeholder="Explica el motivo de la cancelación..."></textarea>
+                    <div th:if="${pedido.estado.name() == 'CANCELADO'}" class="text-danger">
+                        <i class="fas fa-times-circle fa-2x mb-2"></i>
+                        <h6 class="fw-bold m-0">Pedido Cancelado</h6>
+                        <small>No se pueden realizar más acciones.</small>
                     </div>
-                    <button type="submit" class="btn btn-danger w-100">
-                        <i class="fas fa-ban me-2"></i> Cancelar Pedido
-                    </button>
-                </form>
+                </div>
+
             </div>
 
-            <div class="info-section">
-                <h5><i class="fas fa-history me-2"></i> Historial</h5>
+            <div class="content-card">
+                <h5 class="card-title">Historial</h5>
                 <div class="timeline">
-                    <div class="timeline-item active">
-                        <strong>Pedido Creado</strong>
-                        <p class="text-muted small mb-0"
-                           th:text="${#temporals.format(pedido.fechaPedido, 'dd/MM/yyyy HH:mm')}">
-                            Fecha
-                        </p>
+                    <div class="timeline-event active">
+                        <div class="timeline-dot"></div>
+                        <div class="fw-bold text-dark">Pedido Realizado</div>
+                        <div class="small text-muted" th:text="${#temporals.format(pedido.fechaPedido, 'dd MMM HH:mm')}">Fecha</div>
                     </div>
-                    <div class="timeline-item"
-                         th:classappend="${pedido.estado.name() != 'PENDIENTE' ? 'active' : ''}">
-                        <strong>Estado Actual</strong>
-                        <p class="mb-0">
-                            <span th:class="'badge bg-' + ${pedido.estado.colorBadge}"
-                                  th:text="${pedido.estado.nombre}">
-                                Estado
-                            </span>
-                        </p>
-                        <p class="text-muted small mb-0"
-                           th:text="${#temporals.format(pedido.fechaActualizacion, 'dd/MM/yyyy HH:mm')}">
-                            Fecha
-                        </p>
+
+                    <div class="timeline-event active">
+                        <div class="timeline-dot"></div>
+                        <div class="fw-bold text-dark" th:text="'Estado: ' + ${pedido.estado.nombre}">Estado</div>
+                        <div class="small text-muted">Actualizado recientemente</div>
                     </div>
-                    <div class="timeline-item"
-                         th:if="${pedido.fechaEntrega != null}"
-                         th:classappend="${pedido.fechaEntrega != null ? 'active' : ''}">
-                        <strong>Entregado</strong>
-                        <p class="text-muted small mb-0"
-                           th:text="${#temporals.format(pedido.fechaEntrega, 'dd/MM/yyyy HH:mm')}">
-                            Fecha
-                        </p>
+
+                    <div class="timeline-event" th:classappend="${pedido.fechaEntrega != null ? 'active' : ''}">
+                        <div class="timeline-dot"></div>
+                        <div class="fw-bold" th:classappend="${pedido.fechaEntrega == null ? 'text-muted' : 'text-dark'}">Entregado</div>
+                        <div class="small text-muted" th:if="${pedido.fechaEntrega}" th:text="${#temporals.format(pedido.fechaEntrega, 'dd MMM HH:mm')}"></div>
                     </div>
                 </div>
             </div>
+
         </div>
+
+            <div class="content-card">
+                <h5 class="card-title">Historial</h5>
+                <div class="timeline">
+                    <div class="timeline-event active">
+                        <div class="timeline-dot"></div>
+                        <div class="fw-bold text-dark">Pedido Realizado</div>
+                        <div class="small text-muted" th:text="${#temporals.format(pedido.fechaPedido, 'dd MMM HH:mm')}">Fecha</div>
+                    </div>
+
+                    <div class="timeline-event active">
+                        <div class="timeline-dot"></div>
+                        <div class="fw-bold text-dark" th:text="'Estado: ' + ${pedido.estado.nombre}">Estado</div>
+                        <div class="small text-muted">Actualizado recientemente</div>
+                    </div>
+
+                    <div class="timeline-event" th:classappend="${pedido.fechaEntrega != null ? 'active' : ''}">
+                        <div class="timeline-dot"></div>
+                        <div class="fw-bold" th:classappend="${pedido.fechaEntrega == null ? 'text-muted' : 'text-dark'}">Entregado</div>
+                        <div class="small text-muted" th:if="${pedido.fechaEntrega}" th:text="${#temporals.format(pedido.fechaEntrega, 'dd MMM HH:mm')}"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
     </div>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    setTimeout(function() {
-        const alerts = document.querySelectorAll('.alert');
-        alerts.forEach(alert => {
-            alert.style.transition = 'opacity 0.5s';
-            alert.style.opacity = '0';
-            setTimeout(() => alert.remove(), 500);
-        });
-    }, 5000);
-</script>
 </body>
 </html>
