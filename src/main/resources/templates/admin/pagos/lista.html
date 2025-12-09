@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <head th:replace="~{admin/layout/head :: head(titulo='Gestión de Pagos - Barefoot Admin')}"></head>
+    <style>
+        .transaccion-card {
+            border-left: 4px solid;
+            transition: all 0.3s;
+        }
+        .transaccion-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .transaccion-card.pendiente {
+            border-left-color: #ffc107;
+            background: #fff9e6;
+        }
+        .transaccion-card.completada {
+            border-left-color: #28a745;
+            background: #e8f5e9;
+        }
+        .transaccion-card.fallida {
+            border-left-color: #dc3545;
+            background: #ffebee;
+        }
+        .metodo-pago-icon {
+            font-size: 2rem;
+            margin-right: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{admin/layout/sidebar :: sidebar(paginaActiva='pagos')}"></div>
+
+<div class="main-content">
+
+    <div th:replace="~{admin/layout/navbar :: navbar(tituloPagina='Gestión de Pagos', iconoPagina='fas fa-wallet')}"></div>
+
+    <!-- Mensajes -->
+    <div th:if="${mensaje}" th:class="'alert alert-' + ${tipoMensaje}" role="alert">
+        <i class="fas fa-check-circle me-2"></i>
+        <span th:text="${mensaje}"></span>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="stats-container">
+        <div class="stat-card">
+            <div class="stat-info">
+                <h3 th:text="${totalPendientes}">0</h3>
+                <p>Pagos Pendientes</p>
+            </div>
+            <div class="stat-icon orange">
+                <i class="fas fa-clock"></i>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-info">
+                <h3 th:text="${totalCompletadas}">0</h3>
+                <p>Pagos Completados</p>
+            </div>
+            <div class="stat-icon green">
+                <i class="fas fa-check-circle"></i>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-info">
+                <h3 th:text="'S/ ' + ${#numbers.formatDecimal(montoPendiente, 1, 'COMMA', 2, 'POINT')}">S/ 0</h3>
+                <p>Monto Pendiente</p>
+            </div>
+            <div class="stat-icon purple">
+                <i class="fas fa-dollar-sign"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Buscador -->
+    <div class="content-card mb-4">
+        <form th:action="@{/admin/pagos/buscar}" method="get" class="d-flex gap-2">
+            <input type="text" name="query" class="form-control"
+                   placeholder="Buscar por número de operación o pedido..."
+                   th:value="${busqueda}"
+                   required>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search"></i> Buscar
+            </button>
+            <a th:href="@{/admin/pagos}" class="btn btn-outline-secondary" th:if="${busqueda != null}">
+                <i class="fas fa-times"></i> Limpiar
+            </a>
+        </form>
+    </div>
+
+    <!-- PAGOS PENDIENTES -->
+    <div class="content-card">
+        <h4 class="mb-4">
+            <i class="fas fa-clock me-2 text-warning"></i>
+            Pagos Pendientes de Confirmación
+        </h4>
+
+        <div th:if="${#lists.isEmpty(pendientes)}" class="text-center py-5 text-muted">
+            <i class="fas fa-check-circle fa-3x mb-3 text-success"></i>
+            <p class="mb-0">No hay pagos pendientes de confirmación</p>
+        </div>
+
+        <div th:each="transaccion : ${pendientes}"
+             class="transaccion-card pendiente p-4 mb-3 rounded">
+
+            <div class="row align-items-center">
+                <div class="col-md-1 text-center">
+                    <span class="metodo-pago-icon" th:text="${transaccion.pasarela.icono}">💳</span>
+                </div>
+
+                <div class="col-md-5">
+                    <h5 class="mb-1">
+                        Pedido: <strong th:text="${transaccion.pedido.numeroPedido}">PED-001</strong>
+                    </h5>
+                    <p class="mb-1">
+                        <strong>Cliente:</strong>
+                        <span th:text="${transaccion.pedido.usuario.nombre + ' ' + transaccion.pedido.usuario.apellido}">
+                            Cliente
+                        </span>
+                    </p>
+                    <p class="mb-1">
+                        <strong>Método:</strong>
+                        <span th:text="${transaccion.pasarela.nombre}">Yape</span>
+                    </p>
+                    <p class="mb-0 text-muted small">
+                        <i class="far fa-clock me-1"></i>
+                        <span th:text="${#temporals.format(transaccion.fechaCreacion, 'dd/MM/yyyy HH:mm')}">
+                            Fecha
+                        </span>
+                    </p>
+                </div>
+
+                <div class="col-md-3">
+                    <p class="mb-1">
+                        <strong>Monto:</strong><br>
+                        <span class="h4 text-success mb-0">
+                            S/ <span th:text="${#numbers.formatDecimal(transaccion.monto, 1, 'COMMA', 2, 'POINT')}">
+                                0.00
+                            </span>
+                        </span>
+                    </p>
+                    <p class="mb-0" th:if="${transaccion.referenciaExterna != null}">
+                        <strong>N° Operación:</strong><br>
+                        <code th:text="${transaccion.referenciaExterna}">123456</code>
+                    </p>
+                </div>
+
+                <div class="col-md-3 text-end">
+                    <form th:action="@{/admin/pagos/{id}/confirmar(id=${transaccion.id})}"
+                          method="post"
+                          style="display: inline;"
+                          onsubmit="return confirm('¿Confirmar este pago?');">
+                        <button type="submit" class="btn btn-success btn-sm">
+                            <i class="fas fa-check me-1"></i> Confirmar
+                        </button>
+                    </form>
+
+                    <button type="button" class="btn btn-danger btn-sm"
+                            data-bs-toggle="modal"
+                            th:data-bs-target="'#modalRechazar' + ${transaccion.id}">
+                        <i class="fas fa-times me-1"></i> Rechazar
+                    </button>
+
+                    <a th:href="@{/admin/pagos/{id}(id=${transaccion.id})}"
+                       class="btn btn-info btn-sm">
+                        <i class="fas fa-eye"></i>
+                    </a>
+
+                    <!-- Modal de rechazo -->
+                    <div class="modal fade" th:id="'modalRechazar' + ${transaccion.id}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Rechazar Pago</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <form th:action="@{/admin/pagos/{id}/rechazar(id=${transaccion.id})}" method="post">
+                                    <div class="modal-body">
+                                        <p>¿Estás seguro de rechazar este pago?</p>
+                                        <p class="text-danger">
+                                            <strong>Pedido:</strong>
+                                            <span th:text="${transaccion.pedido.numeroPedido}"></span>
+                                        </p>
+                                        <div class="mb-3">
+                                            <label class="form-label">Motivo del rechazo:</label>
+                                            <textarea name="motivo" class="form-control" rows="3"
+                                                      placeholder="Ej: Número de operación inválido"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                            Cancelar
+                                        </button>
+                                        <button type="submit" class="btn btn-danger">
+                                            <i class="fas fa-ban me-1"></i> Rechazar Pago
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGOS COMPLETADOS (últimos 20) -->
+    <div class="content-card mt-4">
+        <h4 class="mb-4">
+            <i class="fas fa-check-circle me-2 text-success"></i>
+            Pagos Completados Recientes
+        </h4>
+
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th>Pedido</th>
+                    <th>Cliente</th>
+                    <th>Método</th>
+                    <th>Monto</th>
+                    <th>Fecha Confirmación</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(completadas)}">
+                    <td colspan="6" class="text-center text-muted">
+                        No hay pagos completados
+                    </td>
+                </tr>
+                <tr th:each="trans : ${completadas}">
+                    <td>
+                        <strong th:text="${trans.pedido.numeroPedido}">PED-001</strong>
+                    </td>
+                    <td th:text="${trans.pedido.usuario.nombre}">Cliente</td>
+                    <td>
+                        <span th:text="${trans.pasarela.icono}">💳</span>
+                        <span th:text="${trans.pasarela.nombre}">Método</span>
+                    </td>
+                    <td>
+                        S/ <span th:text="${#numbers.formatDecimal(trans.monto, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                    </td>
+                    <td>
+                        <small th:text="${#temporals.format(trans.fechaConfirmacion, 'dd/MM/yyyy HH:mm')}">
+                            Fecha
+                        </small>
+                    </td>
+                    <td>
+                        <a th:href="@{/admin/pagos/{id}(id=${trans.id})}"
+                           class="btn btn-sm btn-info">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Auto-ocultar mensajes
+    setTimeout(function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            alert.style.transition = 'opacity 0.5s';
+            alert.style.opacity = '0';
+            setTimeout(() => alert.remove(), 500);
+        });
+    }, 5000);
+</script>
+
+</body>
+</html>

@@ -43,7 +43,7 @@ public class Pedido {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private EstadoPedido estado = EstadoPedido.PENDIENTE;
+    private EstadoPedido estado = EstadoPedido.CONFIRMADO;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "metodo_pago")
@@ -97,10 +97,8 @@ public class Pedido {
     }
 
     public enum EstadoPedido {
-        PENDIENTE("Pendiente", "warning"),
         CONFIRMADO("Confirmado", "info"),
         PREPARANDO("Preparando", "primary"),
-        ENVIADO("Enviado", "info"),
         EN_CAMINO("En Camino", "info"),
         ENTREGADO("Entregado", "success"),
         CANCELADO("Cancelado", "danger");
@@ -123,21 +121,34 @@ public class Pedido {
     }
 
     public enum MetodoPago {
-        TARJETA_CREDITO("Tarjeta de Crédito"),
-        TARJETA_DEBITO("Tarjeta de Débito"),
-        TRANSFERENCIA("Transferencia Bancaria"),
-        YAPE("Yape"),
-        PLIN("Plin"),
-        CONTRAENTREGA("Contra Entrega");
+        TARJETA_CREDITO("Tarjeta de Crédito", "💳", true),
+        TARJETA_DEBITO("Tarjeta de Débito", "💳", true),
+        YAPE("Yape", "📱", false),
+        PLIN("Plin", "📱", false),
+        TRANSFERENCIA("Transferencia Bancaria", "🏦", false),
+        CONTRAENTREGA("Contra Entrega", "💵", false),
+        PAYPAL("PayPal", "🌐", true);
 
         private final String nombre;
+        private final String icono;
+        private final boolean requierePasarela;
 
-        MetodoPago(String nombre) {
+        MetodoPago(String nombre, String icono, boolean requierePasarela) {
             this.nombre = nombre;
+            this.icono = icono;
+            this.requierePasarela = requierePasarela;
         }
 
         public String getNombre() {
             return nombre;
+        }
+
+        public String getIcono() {
+            return icono;
+        }
+
+        public boolean isRequierePasarela() {
+            return requierePasarela;
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.barefoot.controller;
 
 import com.barefoot.model.Producto;
+import com.barefoot.service.FavoritoService;
 import com.barefoot.service.ProductoService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors; // <--- IMPORTANTE: No olvides este import
 
 @Controller
 @RequestMapping("/productos")
@@ -18,6 +20,27 @@ public class CatalogoController {
 
     @Autowired
     private ProductoService productoService;
+
+    @Autowired
+    private FavoritoService favoritoService;
+
+    // --- MÉTODO AUXILIAR PARA EVITAR REPETIR CÓDIGO ---
+    private void cargarFavoritos(HttpSession session, Model model) {
+        Long usuarioId = (Long) session.getAttribute("usuarioId");
+        List<Long> favoritosIds;
+
+        if (usuarioId != null) {
+            // Si está logueado, obtenemos los IDs de sus productos favoritos
+            favoritosIds = favoritoService.listarFavoritos(usuarioId).stream()
+                    .map(f -> f.getProducto().getId())
+                    .collect(Collectors.toList());
+        } else {
+            // Si no, lista vacía
+            favoritosIds = List.of();
+        }
+        model.addAttribute("favoritosIds", favoritosIds);
+    }
+    // --------------------------------------------------
 
     @GetMapping
     public String mostrarCatalogo(
@@ -37,18 +60,9 @@ public class CatalogoController {
 
         if (orden != null) {
             switch (orden) {
-                case "precio-asc":
-                    sortBy = "precio";
-                    direction = "asc";
-                    break;
-                case "precio-desc":
-                    sortBy = "precio";
-                    direction = "desc";
-                    break;
-                case "nombre":
-                    sortBy = "nombre";
-                    direction = "asc";
-                    break;
+                case "precio-asc": sortBy = "precio"; direction = "asc"; break;
+                case "precio-desc": sortBy = "precio"; direction = "desc"; break;
+                case "nombre": sortBy = "nombre"; direction = "asc"; break;
             }
         }
 
@@ -58,7 +72,6 @@ public class CatalogoController {
 
             List<Producto> productosFiltrados = productoService.buscarConFiltros(
                     categoria, precioMin, precioMax, color);
-
 
             int start = page * size;
             int end = Math.min(start + size, productosFiltrados.size());
@@ -73,7 +86,6 @@ public class CatalogoController {
             model.addAttribute("precioMax", precioMax);
             model.addAttribute("colorActual", color);
         } else {
-
             productosPage = productoService.buscarProductosConPaginacion(null, page, size, sortBy, direction);
             model.addAttribute("productos", productosPage.getContent());
             model.addAttribute("currentPage", page);
@@ -84,10 +96,12 @@ public class CatalogoController {
         model.addAttribute("pageSize", size);
         model.addAttribute("ordenActual", orden);
 
-
         if (!model.containsAttribute("esDestacados")) {
             model.addAttribute("esDestacados", false);
         }
+
+        // AGREGADO: Cargar favoritos para pintar los corazones
+        cargarFavoritos(session, model);
 
         return "productos/catalogo";
     }
@@ -110,6 +124,8 @@ public class CatalogoController {
         model.addAttribute("producto", producto.get());
         model.addAttribute("productosRelacionados", productosRelacionados);
 
+        // AGREGADO: También en el detalle (por si pones el botón ahí o en los relacionados)
+        cargarFavoritos(session, model);
 
         return "productos/detalle";
     }
@@ -131,10 +147,11 @@ public class CatalogoController {
         model.addAttribute("totalItems", productosPage.getTotalElements());
         model.addAttribute("query", query);
 
+        // AGREGADO: Cargar favoritos en búsqueda
+        cargarFavoritos(session, model);
 
         return "productos/catalogo";
     }
-
 
     @GetMapping("/categoria/{nombre}")
     public String filtrarPorCategoria(
@@ -145,23 +162,14 @@ public class CatalogoController {
             HttpSession session,
             Model model) {
 
+        // ... (tu lógica de ordenamiento) ...
         String sortBy = "fechaCreacion";
         String direction = "desc";
-
         if (orden != null) {
             switch (orden) {
-                case "precio-asc":
-                    sortBy = "precio";
-                    direction = "asc";
-                    break;
-                case "precio-desc":
-                    sortBy = "precio";
-                    direction = "desc";
-                    break;
-                case "nombre":
-                    sortBy = "nombre";
-                    direction = "asc";
-                    break;
+                case "precio-asc": sortBy = "precio"; direction = "asc"; break;
+                case "precio-desc": sortBy = "precio"; direction = "desc"; break;
+                case "nombre": sortBy = "nombre"; direction = "asc"; break;
             }
         }
 
@@ -180,6 +188,9 @@ public class CatalogoController {
         model.addAttribute("ordenActual", orden);
         model.addAttribute("esDestacados", false);
 
+        // AGREGADO: Cargar favoritos en filtro por categoría
+        cargarFavoritos(session, model);
+
         return "productos/catalogo";
     }
 
@@ -190,6 +201,8 @@ public class CatalogoController {
         model.addAttribute("productos", productos);
         model.addAttribute("esDestacados", true);
 
+        // AGREGADO: Cargar favoritos en destacados
+        cargarFavoritos(session, model);
 
         return "productos/catalogo";
     }

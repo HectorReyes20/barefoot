@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- Fragmento de Tabla de Usuarios -->
+<div th:fragment="userTable(userList, title)">
+    <h4 class="mt-4" th:text="${title}"></h4>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Email</th>
+                    <th>Rol Actual</th>
+                    <th>Cambiar Rol</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:if="${#lists.isEmpty(userList)}">
+                    <td colspan="4" class="text-center text-muted py-4">No hay usuarios en esta categoría.</td>
+                </tr>
+                <tr th:each="user : ${userList}">
+                    <td th:text="${user.nombre + ' ' + user.apellido}"></td>
+                    <td th:text="${user.email}"></td>
+                    <td>
+                        <span th:class="'badge bg-' + ${user.rol.name() == 'ADMIN' ? 'danger' : (user.rol.name() == 'ENCARGADO' ? 'warning' : 'primary')}"
+                              th:text="${user.rol.name()}"></span>
+                    </td>
+                    <td>
+                        <!-- Evitar que un admin se cambie el rol a sí mismo -->
+                        <div th:if="${session.usuarioId != user.id}">
+                            <form th:action="@{/admin/clientes/{id}/cambiar-rol(id=${user.id})}" method="post" class="d-flex gap-2">
+                                <select name="nuevoRol" class="form-select form-select-sm" style="width: 150px;">
+                                    <option value="USUARIO" th:selected="${user.rol.name() == 'USUARIO'}">Usuario</option>
+                                    <option value="ENCARGADO" th:selected="${user.rol.name() == 'ENCARGADO'}">Encargado</option>
+                                    <option value="ADMIN" th:selected="${user.rol.name() == 'ADMIN'}">Admin</option>
+                                </select>
+                                <button type="submit" class="btn btn-primary btn-sm">Actualizar</button>
+                            </form>
+                        </div>
+                        <div th:if="${session.usuarioId == user.id}">
+                            <span class="text-muted fst-italic">No puedes cambiar tu propio rol.</span>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

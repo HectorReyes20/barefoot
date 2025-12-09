@@ -2,7 +2,9 @@ package com.barefoot.controller;
 
 import com.barefoot.model.Producto;
 import com.barefoot.service.DashboardService;
+import com.barefoot.security.RoleValidator;
 import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Controller
 @RequestMapping("/admin")
 public class DashboardController {
@@ -21,13 +24,17 @@ public class DashboardController {
     @GetMapping("/dashboard")
     public String mostrarDashboard(HttpSession session, Model model) {
         // Verificar autenticación
-        if (session.getAttribute("usuarioId") == null) {
+        if (!RoleValidator.estaAutenticado(session)) {
             return "redirect:/login";
         }
 
+        // Si es ENCARGADO, redirigir a dashboard limitado
+        if (RoleValidator.esEncargado(session)) {
+            return "redirect:/admin/encargado/dashboard";
+        }
+
         // Verificar rol de admin
-        String rol = (String) session.getAttribute("usuarioRol");
-        if (!"ADMIN".equals(rol)) {
+        if (!RoleValidator.esAdmin(session)) {
             return "redirect:/inicio";
         }
 

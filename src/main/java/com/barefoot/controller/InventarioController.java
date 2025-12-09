@@ -3,7 +3,9 @@ package com.barefoot.controller;
 import com.barefoot.model.*;
 import com.barefoot.service.InventarioService;
 import com.barefoot.service.ProductoService;
+import com.barefoot.security.RoleValidator;
 import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -14,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+@Slf4j
 @Controller
 @RequestMapping("/admin/inventario")
 public class InventarioController {
@@ -32,9 +35,12 @@ public class InventarioController {
             HttpSession session,
             Model model) {
 
-        if (!esAdmin(session)) {
+        // Solo ADMIN puede ver el dashboard completo de inventario
+        if (!RoleValidator.esAdmin(session)) {
             return "redirect:/login";
         }
+
+        // ...existing code...
 
         // Estadísticas generales
         Map<String, Object> estadisticas = inventarioService.obtenerEstadisticasInventario();
@@ -71,7 +77,8 @@ public class InventarioController {
             HttpSession session,
             Model model) {
 
-        if (!esAdmin(session)) {
+        // Permitir a ADMIN y ENCARGADO ver el historial
+        if (!RoleValidator.esAdminOEncargado(session)) {
             return "redirect:/login";
         }
 
@@ -89,7 +96,8 @@ public class InventarioController {
     // Formulario para registrar movimiento
     @GetMapping("/movimientos/nuevo")
     public String mostrarFormularioMovimiento(HttpSession session, Model model) {
-        if (!esAdmin(session)) {
+        // Permitir acceso a ADMIN y ENCARGADO (solo para movimientos, no el dashboard completo)
+        if (!RoleValidator.esAdminOEncargado(session)) {
             return "redirect:/login";
         }
 
@@ -112,7 +120,8 @@ public class InventarioController {
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
-        if (!esAdmin(session)) {
+        // Permitir acceso a ADMIN y ENCARGADO
+        if (!RoleValidator.esAdminOEncargado(session)) {
             return "redirect:/login";
         }
 
@@ -147,7 +156,8 @@ public class InventarioController {
             Model model,
             RedirectAttributes redirectAttributes) {
 
-        if (!esAdmin(session)) {
+        // Solo ADMIN puede ver detalles de productos
+        if (!RoleValidator.esAdmin(session)) {
             return "redirect:/login";
         }
 
@@ -167,7 +177,8 @@ public class InventarioController {
     // Gestión de alertas
     @GetMapping("/alertas")
     public String listarAlertas(HttpSession session, Model model) {
-        if (!esAdmin(session)) {
+        // Solo ADMIN puede ver alertas
+        if (!RoleValidator.esAdmin(session)) {
             return "redirect:/login";
         }
 
@@ -188,7 +199,8 @@ public class InventarioController {
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
-        if (!esAdmin(session)) {
+        // Solo ADMIN puede marcar alertas
+        if (!RoleValidator.esAdmin(session)) {
             return "redirect:/login";
         }
 
@@ -212,7 +224,8 @@ public class InventarioController {
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
-        if (!esAdmin(session)) {
+        // Solo ADMIN puede marcar alertas
+        if (!RoleValidator.esAdmin(session)) {
             return "redirect:/login";
         }
 
@@ -237,7 +250,8 @@ public class InventarioController {
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
-        if (!esAdmin(session)) {
+        // Solo ADMIN puede desactivar alertas
+        if (!RoleValidator.esAdmin(session)) {
             return "redirect:/login";
         }
 
@@ -252,10 +266,5 @@ public class InventarioController {
         }
 
         return "redirect:/admin/inventario/alertas";
-    }
-
-    private boolean esAdmin(HttpSession session) {
-        String rol = (String) session.getAttribute("usuarioRol");
-        return "ADMIN".equals(rol);
     }
 }

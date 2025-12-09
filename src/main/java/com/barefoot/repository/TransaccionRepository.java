@@ -1,5 +1,6 @@
 package com.barefoot.repository;
 
+import com.barefoot.model.Pedido;
 import com.barefoot.model.Transaccion;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -15,6 +16,11 @@ public interface TransaccionRepository extends JpaRepository<Transaccion, Long> 
 
     List<Transaccion> findByEstado(Transaccion.EstadoTransaccion estado);
 
-    Optional<Transaccion> findFirstByPedidoIdOrderByFechaCreacionDesc(Long pedidoId);
+    Long countByEstado(Transaccion.EstadoTransaccion estado);
+
+    // Spring Data es más feliz si le pasas el objeto Pedido completo
+    Optional<Transaccion> findFirstByPedidoOrderByFechaCreacionDesc(Pedido pedido);
+
+    List<Transaccion> findByReferenciaExternaContainingIgnoreCase(String query);
 }
 

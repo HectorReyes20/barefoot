@@ -1,4 +1,3 @@
-// Chatbot de Soporte y Asistencia al Cliente - Arilu Store
 const chatbotToggle = document.getElementById('chatbotToggle');
 const chatbotWindow = document.getElementById('chatbotWindow');
 const chatbotClose = document.getElementById('chatbotClose');

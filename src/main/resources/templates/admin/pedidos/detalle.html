@@ -252,7 +252,17 @@
                         <label class="form-label">Nuevo Estado:</label>
                         <select name="nuevoEstado" class="form-select" required>
                             <option value="">Seleccionar...</option>
+                            <!-- Si es ADMIN, mostrar todos los estados -->
                             <option th:each="estado : ${estados}"
+                                    th:if="${usuarioRol == 'ADMIN'}"
+                                    th:value="${estado}"
+                                    th:text="${estado.nombre}"
+                                    th:selected="${estado == pedido.estado}">
+                                Estado
+                            </option>
+                            <!-- Si es ENCARGADO, mostrar solo estados permitidos -->
+                            <option th:each="estado : ${estados}"
+                                    th:if="${usuarioRol == 'ENCARGADO' && (estado.name() == 'PREPARANDO' || estado.name() == 'EN_CAMINO')}"
                                     th:value="${estado}"
                                     th:text="${estado.nombre}"
                                     th:selected="${estado == pedido.estado}">
@@ -266,8 +276,9 @@
                 </form>
             </div>
 
+            <!-- Solo ADMIN puede cancelar pedidos -->
             <div class="info-section"
-                 th:if="${pedido.estado.name() == 'PENDIENTE' || pedido.estado.name() == 'CONFIRMADO'}">
+                 th:if="${usuarioRol == 'ADMIN' && (pedido.estado.name() == 'PENDIENTE' || pedido.estado.name() == 'CONFIRMADO')}">
                 <h5 class="text-danger"><i class="fas fa-times-circle me-2"></i> Cancelar Pedido</h5>
                 <form th:action="@{/admin/pedidos/{id}/cancelar(id=${pedido.id})}"
                       method="post"

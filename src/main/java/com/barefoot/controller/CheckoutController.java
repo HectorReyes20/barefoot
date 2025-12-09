@@ -26,19 +26,23 @@ public class CheckoutController {
     @Autowired
     private ProductoService productoService;
 
-    // Mostrar página de checkout
+
+    // ------------------ MOSTRAR CHECKOUT ------------------
     @GetMapping
     public String mostrarCheckout(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
-        // Verificar que el carrito no esté vacío
+
+        // Verificar autenticación
+        if (session.getAttribute("usuarioId") == null) {
+            redirectAttributes.addFlashAttribute("mensaje", "Debes iniciar sesión para continuar");
+            redirectAttributes.addFlashAttribute("tipoMensaje", "warning");
+            return "redirect:/login";
+        }
+
+        // Carrito vacío
         if (carritoService.estaVacio(session)) {
             redirectAttributes.addFlashAttribute("mensaje", "El carrito está vacío");
             redirectAttributes.addFlashAttribute("tipoMensaje", "warning");
             return "redirect:/productos";
-        }
-
-        // Si no está autenticado, redirigir a autenticación
-        if (session.getAttribute("usuarioId") == null) {
-            return "redirect:/checkout/autenticacion";
         }
 
         List<ItemCarrito> carrito = carritoService.obtenerCarrito(session);
@@ -55,6 +59,8 @@ public class CheckoutController {
         return "checkout/checkout";
     }
 
+
+    // ------------------ PROCESAR PEDIDO (ACTUALIZADO) ------------------
     @PostMapping("/procesar")
     public String procesarPedido(
             @RequestParam String direccionEnvio,
@@ -64,6 +70,7 @@ public class CheckoutController {
             RedirectAttributes redirectAttributes) {
 
         try {
+            // 1. Validaciones básicas
             if (session.getAttribute("usuarioId") == null) {
                 throw new RuntimeException("Debes iniciar sesión");
             }
@@ -77,12 +84,15 @@ public class CheckoutController {
                 throw new RuntimeException("Usuario no encontrado");
             }
 
+            // 2. Crear objeto Pedido base
             Pedido pedido = new Pedido();
             pedido.setUsuario(usuario);
             pedido.setDireccionEnvio(direccionEnvio);
-            pedido.setMetodoPago(Pedido.MetodoPago.valueOf(metodoPago));
+            Pedido.MetodoPago metodo = Pedido.MetodoPago.valueOf(metodoPago);
+            pedido.setMetodoPago(metodo);
             pedido.setNotas(notas);
 
+            // 3. Cálculos de Totales
             List<ItemCarrito> carrito = carritoService.obtenerCarrito(session);
             Double subtotal = carritoService.calcularTotal(session);
             Double costoEnvio = calcularCostoEnvio(subtotal);
@@ -91,9 +101,13 @@ public class CheckoutController {
             pedido.setCostoEnvio(costoEnvio);
             pedido.setDescuento(0.0);
             pedido.setTotal(subtotal + costoEnvio);
+            // La línea pedido.setEstado(Pedido.EstadoPedido.PENDIENTE); ha sido eliminada.
+            // El estado por defecto ahora es CONFIRMADO, establecido en el modelo Pedido.
 
+            // 4. Crear Detalles y Verificar Stock
             List<DetallePedido> detalles = new ArrayList<>();
             for (ItemCarrito item : carrito) {
+
                 Producto producto = productoService.obtenerProductoPorId(item.getProductoId())
                         .orElseThrow(() -> new RuntimeException("Producto no encontrado: " + item.getNombre()));
 
@@ -107,29 +121,31 @@ public class CheckoutController {
             }
 
             pedido.setDetalles(detalles);
-            pedido.setEstado(Pedido.EstadoPedido.PENDIENTE);
 
+            // 5. Guardar Pedido en BD
             Pedido pedidoGuardado = pedidoService.crearPedido(pedido);
+
+            // 6. Vaciar carrito
             carritoService.vaciarCarrito(session);
 
-            // Redirigir a pago según el método seleccionado
-            if ("STRIPE".equals(metodoPago) || "TARJETA_CREDITO".equals(metodoPago)) {
+            // 7. Redirigir según el método de pago
+            if (metodo.isRequierePasarela()) {
                 return "redirect:/pago/procesar/" + pedidoGuardado.getId();
-            } else {
-                // Para otros métodos de pago, completar directamente
-                redirectAttributes.addFlashAttribute("mensaje", "¡Pedido realizado con éxito!");
-                redirectAttributes.addFlashAttribute("tipoMensaje", "success");
-                return "redirect:/checkout/confirmacion/" + pedidoGuardado.getId();
             }
 
+            return "redirect:/pago/manual/" + pedidoGuardado.getId();
+
+
         } catch (Exception e) {
+            // Manejo de errores
             redirectAttributes.addFlashAttribute("mensaje", "Error al procesar el pedido: " + e.getMessage());
             redirectAttributes.addFlashAttribute("tipoMensaje", "danger");
             return "redirect:/checkout";
         }
     }
 
-    // Página de confirmación
+
+    // ------------------ CONFIRMACIÓN ------------------
     @GetMapping("/confirmacion/{id}")
     public String mostrarConfirmacion(
             @PathVariable Long id,
@@ -137,7 +153,6 @@ public class CheckoutController {
             Model model,
             RedirectAttributes redirectAttributes) {
 
-        // Verificar autenticación
         if (session.getAttribute("usuarioId") == null) {
             return "redirect:/login";
         }
@@ -146,8 +161,8 @@ public class CheckoutController {
             Pedido pedido = pedidoService.obtenerPedidoPorId(id)
                     .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
 
-            // Verificar que el pedido pertenezca al usuario
             Usuario usuario = (Usuario) session.getAttribute("usuario");
+
             if (!pedido.getUsuario().getId().equals(usuario.getId())) {
                 throw new RuntimeException("No tienes permiso para ver este pedido");
             }
@@ -163,15 +178,15 @@ public class CheckoutController {
         }
     }
 
-    // Página de autenticación en checkout
+
+    // ------------------ AUTENTICACIÓN EN CHECKOUT ------------------
     @GetMapping("/autenticacion")
     public String mostrarAutenticacion(HttpSession session, Model model) {
-        // Verificar que el carrito no esté vacío
+
         if (carritoService.estaVacio(session)) {
             return "redirect:/productos";
         }
 
-        // Pasar resumen del carrito a la vista
         Double subtotal = carritoService.calcularTotal(session);
         Double costoEnvio = calcularCostoEnvio(subtotal);
         Double total = subtotal + costoEnvio;
@@ -184,13 +199,11 @@ public class CheckoutController {
         return "checkout/autenticacion";
     }
 
-    // Calcular costo de envío
+
+    // ------------------ MÉTODO AUXILIAR: COSTO ENVÍO ------------------
     private Double calcularCostoEnvio(Double subtotal) {
-        // Envío gratis para compras mayores a S/ 400
-        if (subtotal >= 400) {
-            return 0.0;
-        }
-        // Costo fijo de envío
+        if (subtotal >= 400) return 0.0;
         return 15.0;
     }
+
 }

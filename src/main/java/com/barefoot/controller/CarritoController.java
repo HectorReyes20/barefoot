@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -45,39 +46,56 @@ public class CarritoController {
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
+        // 1. VALIDACIÓN: Si no está logueado, guardar datos y mandar a login
+        if (session.getAttribute("usuarioId") == null) {
+            session.setAttribute("pendiente_prod_id", productoId);
+            session.setAttribute("pendiente_cant", cantidad);
+            session.setAttribute("pendiente_pers", personalizacion);
+
+            redirectAttributes.addFlashAttribute("mensaje", "Inicia sesión para agregar el producto en el carrito.");
+            redirectAttributes.addFlashAttribute("tipoMensaje", "info");
+            return "redirect:/login"; // Redirige al login
+        }
+
+        // 2. Flujo normal (Usuario logueado)
         try {
             Optional<Producto> productoOpt = productoService.obtenerProductoPorId(productoId);
+            if (productoOpt.isEmpty()) throw new RuntimeException("Producto no encontrado");
 
-            if (productoOpt.isEmpty()) {
-                throw new RuntimeException("Producto no encontrado");
-            }
+            carritoService.agregarProducto(session, productoOpt.get(), cantidad, personalizacion);
 
-            Producto producto = productoOpt.get();
-
-            // Validar stock
-            if (producto.getStock() < cantidad) {
-                throw new RuntimeException("Stock insuficiente. Disponible: " + producto.getStock());
-            }
-
-            // Validar que el producto esté activo
-            if (!producto.getActivo()) {
-                throw new RuntimeException("Producto no disponible");
-            }
-
-            carritoService.agregarProducto(session, producto, cantidad, personalizacion);
-
-            redirectAttributes.addFlashAttribute("mensaje", "Producto agregado al carrito");
+            redirectAttributes.addFlashAttribute("mensaje", "Producto agregado exitosamente");
             redirectAttributes.addFlashAttribute("tipoMensaje", "success");
-
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("mensaje", "Error: " + e.getMessage());
             redirectAttributes.addFlashAttribute("tipoMensaje", "danger");
         }
+        return "redirect:/carrito";
+    }
 
-        // Redirigir a la página anterior o al carrito
-        String referer = (String) session.getAttribute("referer");
-        if (referer != null && !referer.isEmpty()) {
-            return "redirect:" + referer;
+    // 3. NUEVO ENDPOINT: Procesa lo que estaba pendiente tras el login
+    @GetMapping("/procesar-pendiente")
+    public String procesarPendiente(HttpSession session, RedirectAttributes redirectAttributes) {
+        Long prodId = (Long) session.getAttribute("pendiente_prod_id");
+
+        if (prodId != null) {
+            Integer cant = (Integer) session.getAttribute("pendiente_cant");
+            String pers = (String) session.getAttribute("pendiente_pers");
+
+            try {
+                Optional<Producto> productoOpt = productoService.obtenerProductoPorId(prodId);
+                if (productoOpt.isPresent()) {
+                    carritoService.agregarProducto(session, productoOpt.get(), cant, pers);
+                    redirectAttributes.addFlashAttribute("mensaje", "¡Tu diseño ha sido guardado en el carrito!");
+                    redirectAttributes.addFlashAttribute("tipoMensaje", "success");
+                }
+            } catch (Exception e) {
+                // Log error
+            }
+            // Limpiar sesión
+            session.removeAttribute("pendiente_prod_id");
+            session.removeAttribute("pendiente_cant");
+            session.removeAttribute("pendiente_pers");
         }
         return "redirect:/carrito";
     }
@@ -91,7 +109,6 @@ public class CarritoController {
             RedirectAttributes redirectAttributes) {
 
         try {
-            // Validar stock
             Optional<Producto> productoOpt = productoService.obtenerProductoPorId(productoId);
             if (productoOpt.isPresent()) {
                 Producto producto = productoOpt.get();
@@ -142,6 +159,14 @@ public class CarritoController {
     // Proceder al checkout
     @GetMapping("/checkout")
     public String irACheckout(HttpSession session, RedirectAttributes redirectAttributes) {
+
+        // Verificar que el usuario esté logueado
+        if (session.getAttribute("usuarioId") == null) {
+            redirectAttributes.addFlashAttribute("mensaje", "Debes iniciar sesión para continuar");
+            redirectAttributes.addFlashAttribute("tipoMensaje", "warning");
+            session.setAttribute("redirectAfterLogin", "/carrito/checkout");
+            return "redirect:/login";
+        }
 
         // Verificar que el carrito no esté vacío
         if (carritoService.estaVacio(session)) {
