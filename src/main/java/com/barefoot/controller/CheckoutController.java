@@ -5,7 +5,7 @@ import com.barefoot.model.Pedido;
 import com.barefoot.model.Usuario;
 import com.barefoot.service.CarritoService;
 import com.barefoot.service.PedidoService;
-import com.barefoot.service.UsuarioService; // Necesitamos esto para guardar la dirección
+import com.barefoot.service.UsuarioService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -26,31 +26,34 @@ public class CheckoutController {
     private PedidoService pedidoService;
 
     @Autowired
-    private UsuarioService usuarioService; // Inyectar esto
+    private UsuarioService usuarioService;
 
-    // ------------------ MOSTRAR CHECKOUT ------------------
+    // ------------------ 1. MOSTRAR PANTALLA DE ENVÍO ------------------
     @GetMapping
     public String mostrarCheckout(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
 
-        // 1. Verificar sesión
+        // 🔒 SEGURIDAD: Verificar sesión
         Long usuarioId = (Long) session.getAttribute("usuarioId");
+
         if (usuarioId == null) {
-            redirectAttributes.addFlashAttribute("mensaje", "Debes iniciar sesión para continuar");
+            redirectAttributes.addFlashAttribute("mensaje", "Debes iniciar sesión para finalizar la compra.");
+            redirectAttributes.addFlashAttribute("tipoMensaje", "warning");
+
+            // --- NUEVO: GUARDAR INTENCIÓN PARA VOLVER AUTOMÁTICAMENTE ---
+            session.setAttribute("redirect", "checkout");
+
             return "redirect:/login";
         }
 
         // 2. Verificar carrito vacío
-        // Nota: Asegúrate de usar el método correcto según tu CarritoService híbrido
-        // Si tu servicio usa "estaVacio(session)", usa ese.
-        // Si no, verificamos la lista.
-        List<ItemCarrito> carrito = carritoService.obtenerCarrito(session);
-
-        if (carrito.isEmpty()) {
+        if (carritoService.estaVacio(session)) {
             redirectAttributes.addFlashAttribute("mensaje", "El carrito está vacío");
+            redirectAttributes.addFlashAttribute("tipoMensaje", "info");
             return "redirect:/productos";
         }
 
         // 3. Calcular totales
+        List<ItemCarrito> carrito = carritoService.obtenerCarrito(session);
         Double subtotal = carritoService.calcularTotal(session);
         Double costoEnvio = calcularCostoEnvio(subtotal);
         Double total = subtotal + costoEnvio;
@@ -60,17 +63,15 @@ public class CheckoutController {
         model.addAttribute("costoEnvio", costoEnvio);
         model.addAttribute("total", total);
 
-        // Pasamos el usuario para rellenar el campo de dirección si ya existe
+        // 4. Pre-llenar datos del usuario
         Usuario usuario = usuarioService.findById(usuarioId).orElse(new Usuario());
         model.addAttribute("usuario", usuario);
 
-        // Ya no necesitamos pasar "metodosPago" porque la selección se hace en la siguiente pantalla
         return "checkout/checkout";
     }
 
 
-    // ------------------ PROCESAR DATOS DE ENVÍO ------------------
-    // Este método ya NO crea el pedido. Solo guarda la dirección y redirige al pago.
+    // ------------------ 2. PROCESAR DATOS Y PASAR A PAGO ------------------
     @PostMapping("/procesar")
     public String procesarDatosEnvio(
             @RequestParam String direccionEnvio,
@@ -78,24 +79,24 @@ public class CheckoutController {
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
-        try {
-            Long usuarioId = (Long) session.getAttribute("usuarioId");
-            if (usuarioId == null) return "redirect:/login";
+        // 🔒 SEGURIDAD
+        if (session.getAttribute("usuarioId") == null) {
+            return "redirect:/login";
+        }
 
+        try {
             if (carritoService.estaVacio(session)) {
                 return "redirect:/productos";
             }
 
-            // --- KEY FIX: SAVE ADDRESS IN SESSION ---
-            // This is the "backpack" logic. We save it here so PagoController can read it later.
+            // GUARDAR DATOS EN SESIÓN (MOCHILA) PARA EL SIGUIENTE PASO
             session.setAttribute("direccionEnvio", direccionEnvio);
 
-            // Save notes if present
             if (notas != null && !notas.isEmpty()) {
                 session.setAttribute("notasPedido", notas);
             }
 
-            // --- REDIRECT TO PAYMENT SELECTION ---
+            // Redirigir al controlador de pagos
             return "redirect:/pago/procesar";
 
         } catch (Exception e) {
@@ -106,14 +107,14 @@ public class CheckoutController {
     }
 
 
-    // ------------------ CONFIRMACIÓN (Pantalla final) ------------------
+    // ------------------ 3. CONFIRMACIÓN FINAL ------------------
     @GetMapping("/confirmacion/{id}")
     public String mostrarConfirmacion(
             @PathVariable Long id,
             HttpSession session,
-            Model model,
-            RedirectAttributes redirectAttributes) {
+            Model model) {
 
+        // 🔒 SEGURIDAD
         Long usuarioId = (Long) session.getAttribute("usuarioId");
         if (usuarioId == null) return "redirect:/login";
 
@@ -121,6 +122,7 @@ public class CheckoutController {
             Pedido pedido = pedidoService.obtenerPedidoPorId(id)
                     .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
 
+            // Verificar que el pedido pertenezca al usuario logueado (Seguridad Extra)
             if (!pedido.getUsuario().getId().equals(usuarioId)) {
                 return "redirect:/inicio";
             }
@@ -133,7 +135,6 @@ public class CheckoutController {
         }
     }
 
-    // ------------------ MÉTODO AUXILIAR ------------------
     private Double calcularCostoEnvio(Double subtotal) {
         return (subtotal >= 400) ? 0.0 : 15.0;
     }
