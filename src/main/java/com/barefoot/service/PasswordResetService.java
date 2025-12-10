@@ -2,11 +2,12 @@ package com.barefoot.service;
 
 import com.barefoot.model.Usuario;
 import com.barefoot.repository.UsuarioRepository;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
+// Imports de Resend
+import com.resend.Resend;
+import com.resend.core.exception.ResendException;
+import com.resend.services.emails.model.CreateEmailOptions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,82 +21,78 @@ public class PasswordResetService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    @Autowired
-    private JavaMailSender mailSender; // La herramienta de envío real
+    // Inyectamos la clave desde application.properties
+    @Value("${resend.api.key}")
+    private String resendApiKey;
 
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    // 1. Generar token y ENVIAR correo real
     public void solicitarRecuperacion(String email) {
         Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(email);
 
         if (usuarioOpt.isPresent()) {
             Usuario usuario = usuarioOpt.get();
-
-            // Generar token
             String token = UUID.randomUUID().toString();
             usuario.setResetToken(token);
             usuario.setTokenExpiration(LocalDateTime.now().plusMinutes(15));
             usuarioRepository.save(usuario);
 
-            // Construir el link (ajusta el puerto 8080 si usas otro)
-            String link = "http://localhost:8080/reset-password?token=" + token;
+            // IMPORTANTE: Cambia esto por tu dominio de Railway cuando despliegues
+            // Local: http://localhost:8080...
+            // Prod: https://barefoot-production.up.railway.app...
+            String baseUrl = "https://barefoot-production.up.railway.app";
+            String link = baseUrl + "/reset-password?token=" + token;
 
-            // Enviar el correo
-            try {
-                enviarEmailRecuperacion(email, link, usuario.getNombre());
-            } catch (MessagingException e) {
-                e.printStackTrace(); // En producción usaríamos un Logger
-            }
+            enviarEmailResend(email, link, usuario.getNombre());
         }
     }
 
-    private void enviarEmailRecuperacion(String email, String link, String nombre) throws MessagingException {
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+    private void enviarEmailResend(String emailDestino, String link, String nombre) {
+        // 1. Inicializar Resend
+        Resend resend = new Resend(resendApiKey);
 
-        helper.setFrom("TU_CORREO_REAL@gmail.com"); // ¡PON TU MISMO CORREO AQUÍ!
-        helper.setTo(email);
-        helper.setSubject("Recupera tu contraseña - Barefoot Store");
-
-        // Diseño del correo en HTML
-        String contenidoHtml = """
-            <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; max-width: 600px; margin: auto;">
-                <h2 style="color: #4E342E; text-align: center;">Barefoot Store</h2>
-                <hr>
+        // 2. Crear HTML bonito
+        String htmlContent = """
+            <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px; max-width: 500px; margin: 0 auto;">
+                <h2 style="color: #4E342E; text-align: center; border-bottom: 2px solid #CCA474; padding-bottom: 10px;">Barefoot Store</h2>
                 <p>Hola <strong>%s</strong>,</p>
-                <p>Recibimos una solicitud para restablecer tu contraseña. Si fuiste tú, haz clic en el botón de abajo:</p>
-                
+                <p>Has solicitado restablecer tu contraseña. Haz clic en el siguiente botón para crear una nueva:</p>
                 <div style="text-align: center; margin: 30px 0;">
-                    <a href="%s" style="background-color: #C0A080; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
+                    <a href="%s" style="background-color: #4E342E; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">
                         Restablecer Contraseña
                     </a>
                 </div>
-                
-                <p style="font-size: 12px; color: #777;">Si no solicitaste este cambio, ignora este correo. Tu cuenta sigue segura.</p>
-                <hr>
-                <p style="text-align: center; font-size: 10px; color: #999;">&copy; 2025 Barefoot Store</p>
+                <p style="color: #888; font-size: 12px; text-align: center;">Si no fuiste tú, simplemente ignora este mensaje.</p>
             </div>
             """.formatted(nombre, link);
 
-        helper.setText(contenidoHtml, true); // 'true' habilita HTML
+        // 3. Configurar el correo
+        // OJO: Si usas la cuenta gratuita de Resend sin dominio propio,
+        // el 'from' DEBE ser "onboarding@resend.dev"
+        CreateEmailOptions params = CreateEmailOptions.builder()
+                .from("Barefoot Store <onboarding@resend.dev>")
+                .to(emailDestino)
+                .subject("Recupera tu acceso - Barefoot Store")
+                .html(htmlContent)
+                .build();
 
-        mailSender.send(message);
+        try {
+            resend.emails().send(params);
+            System.out.println("✅ Correo enviado a: " + emailDestino);
+        } catch (ResendException e) {
+            e.printStackTrace();
+            System.err.println("❌ Error enviando correo: " + e.getMessage());
+        }
     }
 
-    // 2. Validar token (Igual que antes)
     public Usuario obtenerUsuarioPorToken(String token) {
         Optional<Usuario> usuarioOpt = usuarioRepository.findByResetToken(token);
-        if (usuarioOpt.isPresent()) {
-            Usuario usuario = usuarioOpt.get();
-            if (usuario.getTokenExpiration().isAfter(LocalDateTime.now())) {
-                return usuario;
-            }
+        if (usuarioOpt.isPresent() && usuarioOpt.get().getTokenExpiration().isAfter(LocalDateTime.now())) {
+            return usuarioOpt.get();
         }
         return null;
     }
 
-    // 3. Cambiar password (Igual que antes)
     public void cambiarPassword(Usuario usuario, String nuevaPassword) {
         usuario.setPassword(passwordEncoder.encode(nuevaPassword));
         usuario.setResetToken(null);
