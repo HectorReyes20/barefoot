@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <th:block th:insert="~{admin/layout/head :: head(titulo='Detalle del Producto')}"></th:block>
+  <style>
+    .main-content {
+        margin-left: 250px;
+        padding: 30px;
+        background-color: #f8f9fa;
+        min-height: 100vh;
+    }
+    .product-image-container {
+        background-color: white;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        text-align: center;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .product-image {
+        max-width: 100%;
+        max-height: 350px;
+        object-fit: contain;
+        border-radius: 10px;
+    }
+    .info-card {
+        background-color: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        height: 100%;
+    }
+    .label-detail {
+        color: #6c757d;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 5px;
+    }
+    .value-detail {
+        font-size: 1.1rem;
+        color: #212529;
+        font-weight: 500;
+        margin-bottom: 20px;
+    }
+    .price-tag {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--color-primary);
+    }
+    @media (max-width: 768px) { .main-content { margin-left: 0; } }
+  </style>
+</head>
+<body>
+
+<div th:replace="~{admin/layout/sidebar :: sidebar(paginaActiva='productos')}"></div>
+
+<div class="main-content">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold m-0 text-dark"><i class="fas fa-box me-2 text-primary"></i>Detalle del Producto</h2>
+      <p class="text-muted m-0">Información general y configuración</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a th:href="@{/admin/productos}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Volver
+      </a>
+      <a th:href="@{/admin/productos/editar/{id}(id=${producto.id})}" class="btn btn-primary">
+        <i class="fas fa-edit me-2"></i>Editar
+      </a>
+    </div>
+  </div>
+
+  <div class="row g-4">
+
+    <div class="col-lg-5">
+      <div class="product-image-container">
+        <div th:if="${producto.imagenUrl != null}">
+          <img th:src="${producto.imagenUrl}" class="product-image" alt="Producto">
+        </div>
+        <div th:if="${producto.imagenUrl == null}" class="text-center text-muted">
+          <i class="fas fa-image fa-5x mb-3 opacity-25"></i>
+          <p>Sin imagen disponible</p>
+        </div>
+      </div>
+
+      <div class="mt-3 text-center">
+                <span th:if="${producto.activo}" class="badge bg-success px-3 py-2 rounded-pill">
+                    <i class="fas fa-check-circle me-1"></i> Activo en Tienda
+                </span>
+        <span th:unless="${producto.activo}" class="badge bg-danger px-3 py-2 rounded-pill">
+                    <i class="fas fa-times-circle me-1"></i> Inactivo
+                </span>
+        <span th:if="${producto.destacado}" class="badge bg-warning text-dark px-3 py-2 rounded-pill ms-2">
+                    <i class="fas fa-star me-1"></i> Destacado
+                </span>
+      </div>
+    </div>
+
+    <div class="col-lg-7">
+      <div class="info-card">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <div>
+            <h2 class="fw-bold mb-1" th:text="${producto.nombre}">Nombre del Producto</h2>
+            <span class="badge bg-light text-dark border" th:text="${producto.categoria}">Categoría</span>
+          </div>
+          <div class="text-end">
+            <div class="label-detail mb-0">Precio Venta</div>
+            <div class="price-tag">S/ <span th:text="${#numbers.formatDecimal(producto.precio, 1, 'COMMA', 2, 'POINT')}">0.00</span></div>
+            <div th:if="${producto.precioDescuento != null}" class="text-decoration-line-through text-muted small">
+              S/ <span th:text="${#numbers.formatDecimal(producto.precioDescuento, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+            </div>
+          </div>
+        </div>
+
+        <hr>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-4">
+              <div class="label-detail">Material</div>
+              <div class="value-detail">
+                <i class="fas fa-layer-group me-2 text-secondary"></i>
+                <span th:text="${producto.material != null ? producto.material : 'No especificado'}">Cuero</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-4">
+              <div class="label-detail">Color</div>
+              <div class="value-detail">
+                <i class="fas fa-palette me-2 text-secondary"></i>
+                <span th:text="${producto.color != null ? producto.color : 'No especificado'}">Negro</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-4">
+              <div class="label-detail">Talla</div>
+              <div class="value-detail">
+                <i class="fas fa-ruler me-2 text-secondary"></i>
+                <span th:text="${producto.talla != null ? producto.talla : 'Estándar'}">42</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-4">
+              <div class="label-detail">Stock Disponible</div>
+              <div class="value-detail">
+                <i class="fas fa-boxes me-2 text-secondary"></i>
+                <strong th:class="${producto.stock < 10 ? 'text-danger' : 'text-success'}"
+                        th:text="${producto.stock}">0</strong> unidades
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <div class="label-detail">Descripción</div>
+          <p class="text-muted" th:text="${producto.descripcion}">Sin descripción.</p>
+        </div>
+
+        <div class="alert alert-light border d-flex align-items-center" role="alert">
+          <i class="fas fa-info-circle me-3 fs-4 text-primary"></i>
+          <div>
+            <small class="text-muted d-block">Última actualización:</small>
+            <strong th:text="${#temporals.format(producto.fechaActualizacion, 'dd/MM/yyyy HH:mm')}">Hoy</strong>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-top">
+          <a th:href="@{/admin/inventario/producto/{id}(id=${producto.id})}" class="btn btn-outline-info w-100">
+            <i class="fas fa-history me-2"></i>Ver Historial de Movimientos (Kardex)
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

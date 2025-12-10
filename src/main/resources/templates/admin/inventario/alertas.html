@@ -1,10 +1,270 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <th:block th:insert="~{admin/layout/head :: head(titulo='Alertas - Barefoot Admin')}"></th:block>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-bg: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-main: #1E293B;
+            --text-muted: #64748B;
+            --border-radius: 16px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            background-color: var(--primary-bg);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-main);
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 2rem 2.5rem;
+        }
+
+        /* --- HEADER & ACTIONS --- */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        /* --- CRITICAL ALERTS GRID --- */
+        .critical-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .card-critical {
+            background: #FEF2F2; /* Rojo muy suave */
+            border: 1px solid #FECACA;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            position: relative;
+            transition: transform 0.2s;
+        }
+        .card-critical:hover { transform: translateY(-3px); box-shadow: var(--shadow-sm); }
+
+        .critical-badge {
+            background: #DC2626;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stock-number-big {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #991B1B;
+            line-height: 1;
+            margin: 1rem 0;
+        }
+
+        /* --- WARNING LIST --- */
+        .warning-section {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #E2E8F0;
+            overflow: hidden;
+        }
+
+        .warning-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid #E2E8F0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .warning-item {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #F1F5F9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: background 0.2s;
+        }
+        .warning-item:last-child { border-bottom: none; }
+        .warning-item:hover { background-color: #F8FAFC; }
+
+        .icon-warning {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: #FFFBEB;
+            color: #D97706;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+        }
+
+        /* --- BOTONES --- */
+        .btn-action-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid transparent;
+            background: white;
+            color: #64748B;
+            transition: all 0.2s;
+        }
+        .btn-action-icon:hover { border-color: #CBD5E1; color: var(--text-main); }
+        .btn-action-icon.check:hover { color: #16A34A; background: #DCFCE7; border-color: #86EFAC; }
+        .btn-action-icon.trash:hover { color: #DC2626; background: #FEE2E2; border-color: #FECACA; }
+
+        @media (max-width: 992px) {
+            .main-content { margin-left: 0; }
+        }
+    </style>
 </head>
 <body>
 
+<div th:replace="~{admin/layout/sidebar :: sidebar(paginaActiva='inventario')}"></div>
+
+<div class="main-content">
+
+    <div th:replace="~{admin/layout/navbar :: navbar(tituloPagina='Centro de Alertas')}"></div>
+
+    <div class="page-header" th:if="${!#lists.isEmpty(alertasCriticas) or !#lists.isEmpty(alertasActivas)}">
+        <div>
+            <h5 class="fw-bold m-0 text-dark">Resumen de Atención</h5>
+            <p class="text-muted small m-0">Gestiona el stock bajo antes de que se agote.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a th:href="@{/admin/inventario}" class="btn btn-light border bg-white text-muted">
+                Volver
+            </a>
+            <form th:action="@{/admin/inventario/alertas/marcar-todas-leidas}" method="post">
+                <button type="submit" class="btn btn-outline-success bg-white">
+                    <i class="fas fa-check-double me-2"></i> Marcar todas leídas
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div th:if="${mensaje}" th:class="'alert alert-' + ${tipoMensaje} + ' shadow-sm border-0 rounded-3 mb-4'" role="alert">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-info-circle me-2"></i>
+            <span th:text="${mensaje}"></span>
+        </div>
+    </div>
+
+    <div th:if="${!#lists.isEmpty(alertasCriticas)}" class="mb-5">
+        <h6 class="text-danger fw-bold text-uppercase ls-1 mb-3">
+            <i class="fas fa-fire me-2"></i> Prioridad Alta
+        </h6>
+
+        <div class="critical-grid">
+            <div class="card-critical" th:each="alerta : ${alertasCriticas}">
+                <div class="d-flex justify-content-between align-items-start">
+                    <span class="critical-badge">Crítico</span>
+                    <small class="text-danger opacity-75 fw-bold" th:text="${#temporals.format(alerta.fechaCreacion, 'HH:mm')}">10:00</small>
+                </div>
+
+                <div class="mt-3">
+                    <h5 class="fw-bold text-dark m-0" th:text="${alerta.producto.nombre}">Producto</h5>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="stock-number-big" th:text="${alerta.stockActual}">0</span>
+                        <span class="text-muted small">unidades<br>restantes</span>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 mt-2">
+                    <a th:href="@{/admin/inventario/movimientos/nuevo(productoId=${alerta.producto.id}, tipo='ENTRADA')}"
+                       class="btn btn-danger w-100 shadow-sm">
+                        <i class="fas fa-plus me-1"></i> Reponer
+                    </a>
+
+                    <form th:action="@{/admin/inventario/alertas/{id}/marcar-leida(id=${alerta.id})}" method="post">
+                        <button type="submit" class="btn btn-light border text-muted" title="Archivar" style="height: 100%;">
+                            <i class="fas fa-check"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${!#lists.isEmpty(alertasActivas)}" class="mb-4">
+        <div class="warning-section">
+            <div class="warning-header bg-white">
+                <h6 class="m-0 fw-bold text-warning-emphasis">
+                    <i class="fas fa-exclamation-triangle me-2"></i> Avisos de Stock Bajo
+                </h6>
+                <span class="badge bg-light text-dark border" th:text="${#lists.size(alertasActivas)} + ' pendientes'">0</span>
+            </div>
+
+            <div class="list-group list-group-flush">
+                <div th:each="alerta : ${alertasActivas}" class="warning-item">
+
+                    <div class="d-flex align-items-center">
+                        <div class="icon-warning">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div>
+                            <h6 class="m-0 fw-bold text-dark" th:text="${alerta.producto.nombre}">Producto</h6>
+                            <small class="text-muted">
+                                Quedan <strong class="text-dark" th:text="${alerta.stockActual}">5</strong> unidades
+                                <span class="mx-1">•</span>
+                                <span th:text="${#temporals.format(alerta.fechaCreacion, 'dd MMM')}">Fecha</span>
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2">
+                        <a th:href="@{/admin/inventario/movimientos/nuevo(productoId=${alerta.producto.id}, tipo='ENTRADA')}"
+                           class="btn btn-sm btn-light border text-primary fw-bold" style="font-size: 0.8rem;">
+                            + Stock
+                        </a>
+
+                        <form th:action="@{/admin/inventario/alertas/{id}/marcar-leida(id=${alerta.id})}" method="post">
+                            <button type="submit" class="btn-action-icon check" title="Marcar como leída">
+                                <i class="fas fa-check"></i>
+                            </button>
+                        </form>
+
+                        <form th:action="@{/admin/inventario/alertas/{id}/desactivar(id=${alerta.id})}" method="post">
+                            <button type="submit" class="btn-action-icon trash" title="Eliminar alerta">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(alertasActivas) && #lists.isEmpty(alertasCriticas)}"
+         class="d-flex flex-column align-items-center justify-content-center py-5">
+        <div class="bg-success bg-opacity-10 p-4 rounded-circle mb-3 text-success">
+            <i class="fas fa-shield-alt fa-4x"></i>
+        </div>
+        <h3 class="fw-bold text-dark">¡Todo bajo control!</h3>
+        <p class="text-muted">Tu inventario está saludable. No hay alertas pendientes.</p>
+        <a th:href="@{/admin/inventario}" class="btn btn-primary mt-2">
+            Volver al Inventario
+        </a>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

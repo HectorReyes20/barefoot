@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-
 <head th:replace="~{admin/layout/head :: head(titulo='Dashboard Admin - Barefoot Store')}"></head>
 
 <body>
@@ -9,13 +8,42 @@
 
 <div class="main-content">
 
-    <div th:replace="~{admin/layout/navbar :: navbar(tituloPagina='Dashboard', iconoPagina='fas fa-tachometer-alt')}"></div>
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h2 class="fw-bold m-0" style="color: var(--text-main);">Dashboard</h2>
+            <p class="text-muted m-0">
+                Hola de nuevo, <strong class="text-dark" th:text="${nombreUsuario}">Admin</strong> 👋
+            </p>
+        </div>
+
+        <div class="d-flex align-items-center gap-3">
+            <button class="btn btn-white border shadow-sm position-relative" style="width: 45px; height: 45px; border-radius: 12px;">
+                <i class="fas fa-bell text-muted"></i>
+                <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle">
+                    <span class="visually-hidden">Alertas</span>
+                </span>
+            </button>
+
+            <div class="d-flex align-items-center gap-3 bg-white border shadow-sm ps-2 pe-4 py-2" style="border-radius: 50px;">
+                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold"
+                     style="width: 38px; height: 38px; font-size: 1rem;"
+                     th:text="${nombreUsuario != null ? #strings.substring(nombreUsuario, 0, 1) : 'A'}">
+                    A
+                </div>
+
+                <div style="line-height: 1.2;">
+                    <span class="d-block fw-bold text-dark" style="font-size: 0.9rem;" th:text="${nombreUsuario}">Admin</span>
+                    <span class="d-block text-muted" style="font-size: 0.75rem;">Administrador</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="stats-container">
         <div class="stat-card">
             <div class="stat-info">
-                <h3 th:text="${estadisticas.pedidosTotales}">245</h3>
                 <p>Pedidos Totales</p>
+                <h3 th:text="${estadisticas.pedidosTotales}">0</h3>
             </div>
             <div class="stat-icon blue">
                 <i class="fas fa-shopping-cart"></i>
@@ -24,18 +52,18 @@
 
         <div class="stat-card">
             <div class="stat-info">
-                <h3 th:text="'S/ ' + ${#numbers.formatDecimal(estadisticas.ventasMes, 1, 'COMMA', 2, 'POINT')}">S/ 45,890</h3>
-                <p>Ventas del Mes</p>
+                <p>Ingresos del Mes</p>
+                <h3 th:text="'S/ ' + ${#numbers.formatDecimal(estadisticas.ventasMes, 1, 'COMMA', 2, 'POINT')}">S/ 0.00</h3>
             </div>
             <div class="stat-icon green">
-                <i class="fas fa-dollar-sign"></i>
+                <i class="fas fa-wallet"></i>
             </div>
         </div>
 
         <div class="stat-card">
             <div class="stat-info">
-                <h3 th:text="${estadisticas.totalUsuarios}">1,234</h3>
-                <p>Clientes Registrados</p>
+                <p>Clientes Nuevos</p>
+                <h3 th:text="${estadisticas.totalUsuarios}">0</h3>
             </div>
             <div class="stat-icon orange">
                 <i class="fas fa-users"></i>
@@ -44,72 +72,80 @@
 
         <div class="stat-card">
             <div class="stat-info">
-                <h3 th:text="${estadisticas.productosActivos}">87</h3>
                 <p>Productos Activos</p>
+                <h3 th:text="${estadisticas.productosActivos}">0</h3>
             </div>
             <div class="stat-icon purple">
-                <i class="fas fa-box"></i>
+                <i class="fas fa-layer-group"></i>
             </div>
         </div>
     </div>
 
     <div class="content-card">
-        <h4><i class="fas fa-bolt me-2"></i> Acciones Rápidas</h4>
+        <h4><i class="fas fa-bolt me-2 text-warning"></i> Acciones Rápidas</h4>
         <div class="quick-actions">
             <a th:href="@{/admin/productos/nuevo}" class="quick-action-btn">
-                <i class="fas fa-plus-circle"></i>
+                <div class="stat-icon blue mb-2"><i class="fas fa-plus"></i></div>
                 <strong>Nuevo Producto</strong>
+                <small class="text-muted">Añadir al catálogo</small>
             </a>
             <a th:href="@{/admin/productos}" class="quick-action-btn">
-                <i class="fas fa-box"></i>
-                <strong>Ver Productos</strong>
+                <div class="stat-icon purple mb-2"><i class="fas fa-boxes"></i></div>
+                <strong>Gestionar Stock</strong>
+                <small class="text-muted">Ver inventario</small>
             </a>
             <a href="#clientes" class="quick-action-btn">
-                <i class="fas fa-user-plus"></i>
-                <strong>Agregar Cliente</strong>
+                <div class="stat-icon orange mb-2"><i class="fas fa-user-plus"></i></div>
+                <strong>Nuevo Cliente</strong>
+                <small class="text-muted">Registro manual</small>
             </a>
             <a href="#reportes" class="quick-action-btn">
-                <i class="fas fa-chart-bar"></i>
-                <strong>Ver Reportes</strong>
+                <div class="stat-icon green mb-2"><i class="fas fa-file-invoice-dollar"></i></div>
+                <strong>Reporte Mensual</strong>
+                <small class="text-muted">Descargar PDF</small>
             </a>
         </div>
     </div>
 
     <div class="row">
-        <div class="col-lg-6">
-            <div class="content-card">
-                <h4><i class="fas fa-clock me-2"></i> Productos Recientes</h4>
+        <div class="col-lg-7">
+            <div class="content-card h-100">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="mb-0">Productos Recientes</h4>
+                    <a th:href="@{/admin/productos}" class="btn btn-sm btn-outline-primary rounded-pill">Ver todos</a>
+                </div>
+
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table">
                         <thead>
                         <tr>
                             <th>Producto</th>
-                            <th>Categoría</th>
                             <th>Precio</th>
-                            <th>Stock</th>
+                            <th>Estado</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr th:if="${#lists.isEmpty(productosRecientes)}">
-                            <td colspan="4" class="text-center text-muted">No hay productos recientes</td>
+                            <td colspan="3" class="text-center text-muted py-4">Sin actividad reciente</td>
                         </tr>
                         <tr th:each="producto : ${productosRecientes}">
                             <td>
-                                <strong th:text="${producto.nombre}">Producto</strong><br>
-                                <small class="text-muted"
-                                       th:text="${#temporals.format(producto.fechaCreacion, 'dd/MM/yyyy')}">
-                                    Fecha
-                                </small>
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded bg-light d-flex align-items-center justify-content-center me-3"
+                                         style="width: 40px; height: 40px;">
+                                        <i class="fas fa-box text-muted"></i>
+                                    </div>
+                                    <div>
+                                        <span class="d-block fw-bold text-dark" th:text="${producto.nombre}">Nom</span>
+                                        <small class="text-muted" th:text="${producto.categoria}">Cat</small>
+                                    </div>
+                                </div>
                             </td>
+                            <td class="fw-bold" th:text="'S/ ' + ${producto.precio}">S/ 0</td>
                             <td>
-                                <span class="badge bg-info" th:text="${producto.categoria}">Cat</span>
-                            </td>
-                            <td>
-                                <strong th:text="'S/ ' + ${producto.precio}">S/ 0</strong>
-                            </td>
-                            <td>
-                                    <span th:class="${producto.stock < 10} ? 'text-danger fw-bold' : ''"
-                                          th:text="${producto.stock}">0</span>
+                                <span class="badge bg-info"
+                                      th:classappend="${producto.stock < 10} ? 'bg-warning text-dark' : 'bg-success text-white bg-opacity-75'"
+                                      th:text="${producto.stock < 10 ? 'Stock Bajo' : 'En Stock'}">Status</span>
                             </td>
                         </tr>
                         </tbody>
@@ -118,37 +154,29 @@
             </div>
         </div>
 
-        <div class="col-lg-6">
-            <div class="content-card">
-                <h4><i class="fas fa-exclamation-triangle me-2 text-warning"></i> Alerta de Stock</h4>
+        <div class="col-lg-5">
+            <div class="content-card h-100 border-warning border-opacity-25" style="background: #FFFBF0;">
+                <h4 class="text-dark"><i class="fas fa-exclamation-triangle me-2 text-warning"></i> Stock Crítico</h4>
+
                 <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
+                    <table class="table table-borderless bg-transparent">
+                        <thead style="background: transparent;">
                         <tr>
-                            <th>Producto</th>
-                            <th>Stock</th>
-                            <th>Acciones</th>
+                            <th class="bg-transparent text-dark opacity-50">Item</th>
+                            <th class="bg-transparent text-end text-dark opacity-50">Cant.</th>
+                            <th class="bg-transparent"></th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr th:if="${#lists.isEmpty(productosStockBajo)}">
-                            <td colspan="3" class="text-center text-success">
-                                <i class="fas fa-check-circle me-2"></i>
-                                Todos los productos tienen stock suficiente
+                        <tr th:each="producto : ${productosStockBajo}" class="border-bottom border-warning border-opacity-10">
+                            <td class="bg-transparent fw-bold text-dark" th:text="${producto.nombre}">Producto</td>
+                            <td class="bg-transparent text-end">
+                                <span class="badge bg-danger rounded-pill" th:text="${producto.stock}">0</span>
                             </td>
-                        </tr>
-                        <tr th:each="producto : ${productosStockBajo}">
-                            <td>
-                                <strong th:text="${producto.nombre}">Producto</strong><br>
-                                <small class="text-muted" th:text="${producto.categoria}">Cat</small>
-                            </td>
-                            <td>
-                                <span class="text-danger fw-bold" th:text="${producto.stock}">0</span>
-                            </td>
-                            <td>
+                            <td class="bg-transparent text-end">
                                 <a th:href="@{/admin/productos/editar/{id}(id=${producto.id})}"
-                                   class="btn btn-sm btn-primary">
-                                    <i class="fas fa-edit"></i> Editar
+                                   class="btn btn-sm btn-light text-warning hover-shadow">
+                                    <i class="fas fa-pen"></i>
                                 </a>
                             </td>
                         </tr>
@@ -159,92 +187,6 @@
         </div>
     </div>
 
-    <div class="content-card">
-        <h4><i class="fas fa-chart-pie me-2"></i> Productos por Categoría</h4>
-        <div class="row mt-4">
-            <div class="col-md-3" th:each="entry : ${productosPorCategoria}">
-                <div class="text-center p-3 border rounded">
-                    <h2 class="mb-2" th:text="${entry.value}">0</h2>
-                    <p class="mb-0 text-muted" th:text="${entry.key}">Categoría</p>
-                </div>
-            </div>
-            <div class="col-md-3" th:if="${#maps.isEmpty(productosPorCategoria)}">
-                <div class="text-center p-3 border rounded">
-                    <p class="mb-0 text-muted">No hay productos</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="content-card">
-        <h4><i class="fas fa-star me-2"></i> Productos Destacados</h4>
-        <div class="row mt-4">
-            <div class="col-md-4" th:each="producto : ${topProductos}">
-                <div class="card">
-                    <img th:if="${producto.imagenUrl != null}"
-                         th:src="${producto.imagenUrl}"
-                         class="card-img-top"
-                         style="height: 200px; object-fit: cover;"
-                         alt="Producto">
-                    <div th:if="${producto.imagenUrl == null}"
-                         style="height: 200px; background: #f0f0f0; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-image fa-3x text-muted"></i>
-                    </div>
-                    <div class="card-body">
-                        <h5 class="card-title" th:text="${producto.nombre}">Producto</h5>
-                        <p class="mb-2">
-                            <strong>Precio:</strong>
-                            <span th:text="'S/ ' + ${producto.precio}">S/ 0</span>
-                        </p>
-                        <p class="mb-2">
-                            <strong>Stock:</strong>
-                            <span th:text="${producto.stock}">0</span>
-                        </p>
-                        <a th:href="@{/admin/productos/editar/{id}(id=${producto.id})}"
-                           class="btn btn-sm btn-primary w-100">
-                            <i class="fas fa-edit me-1"></i> Editar
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12" th:if="${#lists.isEmpty(topProductos)}">
-                <p class="text-center text-muted">No hay productos destacados</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="content-card">
-        <h4><i class="fas fa-warehouse me-2"></i> Resumen del Inventario</h4>
-        <div class="row text-center mt-4">
-            <div class="col-md-3">
-                <div class="p-3 bg-light rounded">
-                    <h3 th:text="${estadisticas.totalProductos}">0</h3>
-                    <p class="mb-0">Total Productos</p>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="p-3 bg-success bg-opacity-10 rounded">
-                    <h3 class="text-success" th:text="${estadisticas.productosActivos}">0</h3>
-                    <p class="mb-0">Productos Activos</p>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="p-3 bg-warning bg-opacity-10 rounded">
-                    <h3 class="text-warning" th:text="${estadisticas.productosStockBajo}">0</h3>
-                    <p class="mb-0">Stock Bajo</p>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="p-3 bg-primary bg-opacity-10 rounded">
-                    <h3 class="text-primary"
-                        th:text="'S/ ' + ${#numbers.formatDecimal(estadisticas.valorInventario, 1, 'COMMA', 2, 'POINT')}">
-                        S/ 0
-                    </h3>
-                    <p class="mb-0">Valor Inventario</p>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

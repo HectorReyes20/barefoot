@@ -2,9 +2,7 @@ package com.barefoot.controller;
 
 import com.barefoot.model.Pedido;
 import com.barefoot.service.PedidoService;
-import com.barefoot.security.RoleValidator;
 import jakarta.servlet.http.HttpSession;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -14,7 +12,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.List;
 import java.util.Optional;
 
-@Slf4j
 @Controller
 @RequestMapping("/admin/pedidos")
 public class PedidoController {
@@ -30,7 +27,7 @@ public class PedidoController {
             HttpSession session,
             Model model) {
 
-        if (!RoleValidator.esAdminOEncargado(session)) {
+        if (!esAdmin(session)) {
             return "redirect:/login";
         }
 
@@ -55,14 +52,21 @@ public class PedidoController {
             model.addAttribute("totalPages", pedidosPage.getTotalPages());
         }
 
+        // --- ESTADÍSTICAS CORREGIDAS ---
         model.addAttribute("totalPedidos", pedidoService.obtenerTodosPedidos().size());
-        model.addAttribute("pedidosConfirmados", pedidoService.contarPedidosPorEstado(Pedido.EstadoPedido.CONFIRMADO));
+
+        // CORRECCIÓN 1: PENDIENTE ya no existe -> Usamos CONFIRMADO (son los que toca preparar)
+        model.addAttribute("pedidosPendientes", pedidoService.contarPedidosPorEstado(Pedido.EstadoPedido.CONFIRMADO));
+
+        // CORRECCIÓN 2: ENVIADO ya no existe -> Usamos EN_CAMINO
         model.addAttribute("pedidosEnviados", pedidoService.contarPedidosPorEstado(Pedido.EstadoPedido.EN_CAMINO));
+
         model.addAttribute("pedidosEntregados", pedidoService.contarPedidosPorEstado(Pedido.EstadoPedido.ENTREGADO));
         model.addAttribute("ventasTotales", pedidoService.calcularTotalVentas());
+
+        // Estados disponibles para el filtro
         model.addAttribute("estados", Pedido.EstadoPedido.values());
         model.addAttribute("nombreUsuario", session.getAttribute("usuarioNombre"));
-        model.addAttribute("usuarioRol", RoleValidator.obtenerRol(session));
 
         return "admin/pedidos/lista";
     }
@@ -74,7 +78,7 @@ public class PedidoController {
             Model model,
             RedirectAttributes redirectAttributes) {
 
-        if (!RoleValidator.esAdminOEncargado(session)) {
+        if (!esAdmin(session)) {
             return "redirect:/login";
         }
 
@@ -89,7 +93,6 @@ public class PedidoController {
         model.addAttribute("pedido", pedido.get());
         model.addAttribute("estados", Pedido.EstadoPedido.values());
         model.addAttribute("nombreUsuario", session.getAttribute("usuarioNombre"));
-        model.addAttribute("usuarioRol", RoleValidator.obtenerRol(session));
 
         return "admin/pedidos/detalle";
     }
@@ -101,28 +104,14 @@ public class PedidoController {
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
-        if (!RoleValidator.esAdminOEncargado(session)) {
+        if (!esAdmin(session)) {
             return "redirect:/login";
         }
 
         try {
-            Optional<Pedido> pedidoOpt = pedidoService.obtenerPedidoPorId(id);
-            if (pedidoOpt.isEmpty()) {
-                throw new RuntimeException("Pedido no encontrado");
-            }
-
-            Pedido pedido = pedidoOpt.get();
             Pedido.EstadoPedido estado = Pedido.EstadoPedido.valueOf(nuevoEstado);
-
-            if (RoleValidator.esEncargado(session)) {
-                boolean transicionValida = (pedido.getEstado() == Pedido.EstadoPedido.CONFIRMADO && estado == Pedido.EstadoPedido.PREPARANDO) ||
-                                           (pedido.getEstado() == Pedido.EstadoPedido.PREPARANDO && estado == Pedido.EstadoPedido.EN_CAMINO);
-                if (!transicionValida) {
-                    throw new RuntimeException("Como ENCARGADO, solo puedes cambiar estados de CONFIRMADO -> PREPARANDO -> EN_CAMINO");
-                }
-            }
-
             pedidoService.actualizarEstado(id, estado);
+
             redirectAttributes.addFlashAttribute("mensaje", "Estado actualizado correctamente");
             redirectAttributes.addFlashAttribute("tipoMensaje", "success");
         } catch (Exception e) {
@@ -140,14 +129,13 @@ public class PedidoController {
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
-        if (!RoleValidator.esAdmin(session)) {
-            redirectAttributes.addFlashAttribute("mensaje", "No tienes permisos para cancelar pedidos");
-            redirectAttributes.addFlashAttribute("tipoMensaje", "danger");
-            return "redirect:/admin/pedidos";
+        if (!esAdmin(session)) {
+            return "redirect:/login";
         }
 
         try {
             pedidoService.cancelarPedido(id, motivo);
+
             redirectAttributes.addFlashAttribute("mensaje", "Pedido cancelado correctamente");
             redirectAttributes.addFlashAttribute("tipoMensaje", "success");
         } catch (Exception e) {
@@ -165,7 +153,7 @@ public class PedidoController {
             Model model,
             RedirectAttributes redirectAttributes) {
 
-        if (!RoleValidator.esAdminOEncargado(session)) {
+        if (!esAdmin(session)) {
             return "redirect:/login";
         }
 
@@ -178,5 +166,10 @@ public class PedidoController {
         }
 
         return "redirect:/admin/pedidos/" + pedido.get().getId();
+    }
+
+    private boolean esAdmin(HttpSession session) {
+        String rol = (String) session.getAttribute("usuarioRol");
+        return "ADMIN".equals(rol);
     }
 }

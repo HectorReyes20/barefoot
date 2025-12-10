@@ -1,225 +1,279 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Control de Inventario - Barefoot Admin</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link th:href="@{/css/dashboard.css}" rel="stylesheet">
+  <th:block th:insert="~{admin/layout/head :: head(titulo='Inventario - Barefoot Admin')}"></th:block>
+
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
-    .alert-badge {
-        position: absolute;
-        top: -10px;
-        right: -10px;
-        background: #dc3545;
-        color: white;
-        border-radius: 50%;
-        width: 24px;
-        height: 24px;
+    :root {
+        --primary-bg: #F8FAFC;
+        --card-bg: #FFFFFF;
+        --text-main: #1E293B;
+        --text-muted: #64748B;
+        --border-radius: 16px;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    }
+
+    body {
+        background-color: var(--primary-bg);
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        color: var(--text-main);
+    }
+
+    .main-content {
+        margin-left: 260px;
+        padding: 2rem 2.5rem;
+    }
+
+    /* --- KPI GRID --- */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .kpi-card {
+        background: var(--card-bg);
+        padding: 1.5rem;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid #E2E8F0;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .kpi-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 0.75rem;
-        font-weight: bold;
+        font-size: 1.5rem;
     }
-    .product-stock-item {
+
+    /* Colores KPI */
+    .kpi-blue { background: #E0F2FE; color: #0284C7; }
+    .kpi-green { background: #DCFCE7; color: #16A34A; }
+    .kpi-purple { background: #F3E8FF; color: #9333EA; }
+    .kpi-red { background: #FEE2E2; color: #DC2626; }
+
+    /* --- STOCK BAJO LIST --- */
+    .stock-card {
+        background: var(--card-bg);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid #E2E8F0;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    .card-header-clean {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid #E2E8F0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .card-title { font-weight: 700; color: var(--text-main); margin: 0; font-size: 1rem; }
+
+    .stock-item {
         display: flex;
         align-items: center;
-        padding: 15px;
-        background: #f8f9fa;
-        border-radius: 10px;
-        margin-bottom: 10px;
-        transition: all 0.3s;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px dashed #E2E8F0;
+        transition: background 0.2s;
     }
-    .product-stock-item:hover {
-        background: #e9ecef;
-        transform: translateX(5px);
-    }
+    .stock-item:last-child { border-bottom: none; }
+    .stock-item:hover { background-color: #F8FAFC; }
+
     .stock-indicator {
-        width: 50px;
-        height: 50px;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: bold;
-        margin-right: 15px;
-        font-size: 1.1rem;
+        font-weight: 700;
+        font-size: 0.9rem;
+        margin-right: 1rem;
     }
-    .stock-critico { background: #dc3545; color: white; }
-    .stock-bajo { background: #ffc107; color: #333; }
-    .stock-normal { background: #28a745; color: white; }
+    .stock-critico { background: #FEF2F2; color: #DC2626; border: 2px solid #FEE2E2; }
+    .stock-warning { background: #FFFBEB; color: #D97706; border: 2px solid #FEF3C7; }
+
+    /* --- ALERTAS --- */
+    .alert-item {
+        display: flex;
+        gap: 1rem;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #E2E8F0;
+    }
+    .alert-item:last-child { border-bottom: none; }
+
+    .alert-icon-box {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: #F1F5F9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #64748B;
+        flex-shrink: 0;
+    }
+
+    /* --- TABLA MOVIMIENTOS --- */
+    .table { margin-bottom: 0; vertical-align: middle; }
+    .table thead th {
+        background-color: #F8FAFC;
+        color: var(--text-muted);
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #E2E8F0;
+    }
+    .table tbody td {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #F1F5F9;
+        color: var(--text-main);
+        font-size: 0.9rem;
+    }
+
+    /* Badges Movimientos */
+    .badge-pill {
+        padding: 0.35em 0.8em;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+    .bg-entrada { background: #DCFCE7; color: #166534; }
+    .bg-salida { background: #FEE2E2; color: #991B1B; }
+    .bg-ajuste { background: #EFF6FF; color: #1E40AF; }
+
+    @media (max-width: 992px) {
+        .main-content { margin-left: 0; }
+    }
   </style>
 </head>
 <body>
 
-<!-- Sidebar -->
-<div class="sidebar">
-  <div class="sidebar-header">
-    <h3><i class="fas fa-shoe-prints me-2"></i> Barefoot Admin</h3>
-  </div>
-  <ul class="sidebar-menu">
-    <li><a th:href="@{/admin/dashboard}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-    <li><a th:href="@{/admin/productos}"><i class="fas fa-box"></i> Productos</a></li>
-    <li><a th:href="@{/admin/pedidos}"><i class="fas fa-shopping-cart"></i> Pedidos</a></li>
-    <li><a href="#clientes"><i class="fas fa-users"></i> Clientes</a></li>
-    <li><a th:href="@{/admin/reportes}"><i class="fas fa-chart-line"></i> Reportes</a></li>
-    <li><a th:href="@{/admin/inventario}" class="active"><i class="fas fa-warehouse"></i> Inventario</a></li>
-    <li><a th:href="@{/logout}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
-  </ul>
-</div>
+<div th:replace="~{admin/layout/sidebar :: sidebar(paginaActiva='inventario')}"></div>
 
-<!-- Main Content -->
 <div class="main-content">
-  <!-- Top Bar -->
-  <div class="top-bar">
-    <h2><i class="fas fa-warehouse me-2"></i> Control de Inventario</h2>
-    <div class="d-flex align-items-center gap-3">
-      <a th:href="@{/admin/inventario/movimientos/nuevo}" class="btn btn-primary">
-        <i class="fas fa-plus me-2"></i> Registrar Movimiento
-      </a>
-      <div style="position: relative;">
-        <a th:href="@{/admin/inventario/alertas}" class="btn btn-warning">
-          <i class="fas fa-bell me-2"></i> Alertas
-          <span th:if="${cantidadAlertas > 0}" class="alert-badge" th:text="${cantidadAlertas}">0</span>
-        </a>
+
+  <div th:replace="~{admin/layout/navbar :: navbar(tituloPagina='Control de Inventario')}"></div>
+
+  <div class="d-flex justify-content-end mb-4 gap-3">
+    <a th:href="@{/admin/inventario/movimientos/nuevo}" class="btn btn-primary shadow-sm" style="border-radius: 10px;">
+      <i class="fas fa-plus me-2"></i> Registrar Movimiento
+    </a>
+  </div>
+
+  <div class="stats-grid">
+    <div class="kpi-card">
+      <div class="kpi-icon kpi-blue"><i class="fas fa-box"></i></div>
+      <div>
+        <h3 class="fw-bold m-0" th:text="${estadisticas.totalProductos}">0</h3>
+        <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Productos</small>
       </div>
-      <div class="user-info">
-        <span><strong>Admin:</strong> <span th:text="${nombreUsuario}">Usuario</span></span>
-        <div class="user-avatar">
-          <i class="fas fa-user-shield"></i>
-        </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon kpi-green"><i class="fas fa-layer-group"></i></div>
+      <div>
+        <h3 class="fw-bold m-0" th:text="${estadisticas.unidadesTotales}">0</h3>
+        <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Unidades</small>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon kpi-purple"><i class="fas fa-dollar-sign"></i></div>
+      <div>
+        <h3 class="fw-bold m-0" th:text="'S/ ' + ${#numbers.formatDecimal(estadisticas.valorInventario, 1, 'COMMA', 0, 'POINT')}">0</h3>
+        <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Valor Total</small>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon kpi-red"><i class="fas fa-exclamation-triangle"></i></div>
+      <div>
+        <h3 class="fw-bold m-0" th:text="${estadisticas.productosStockBajo}">0</h3>
+        <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Stock Bajo</small>
       </div>
     </div>
   </div>
 
-  <!-- Mensajes -->
-  <div th:if="${mensaje}" th:class="'alert alert-' + ${tipoMensaje}" role="alert">
-    <i class="fas fa-check-circle me-2"></i>
-    <span th:text="${mensaje}"></span>
-  </div>
+  <div class="row g-4 mb-4">
 
-  <!-- Estadísticas -->
-  <div class="stats-container">
-    <div class="stat-card">
-      <div class="stat-info">
-        <h3 th:text="${estadisticas.totalProductos}">0</h3>
-        <p>Total Productos</p>
-      </div>
-      <div class="stat-icon blue">
-        <i class="fas fa-box"></i>
-      </div>
-    </div>
-
-    <div class="stat-card">
-      <div class="stat-info">
-        <h3 th:text="${estadisticas.unidadesTotales}">0</h3>
-        <p>Unidades en Stock</p>
-      </div>
-      <div class="stat-icon green">
-        <i class="fas fa-layer-group"></i>
-      </div>
-    </div>
-
-    <div class="stat-card">
-      <div class="stat-info">
-        <h3 th:text="'S/ ' + ${#numbers.formatDecimal(estadisticas.valorInventario, 1, 'COMMA', 2, 'POINT')}">S/ 0</h3>
-        <p>Valor del Inventario</p>
-      </div>
-      <div class="stat-icon purple">
-        <i class="fas fa-dollar-sign"></i>
-      </div>
-    </div>
-
-    <div class="stat-card">
-      <div class="stat-info">
-        <h3 th:text="${estadisticas.productosStockBajo}">0</h3>
-        <p>Productos Stock Bajo</p>
-      </div>
-      <div class="stat-icon orange">
-        <i class="fas fa-exclamation-triangle"></i>
-      </div>
-    </div>
-  </div>
-
-  <div class="row">
-    <!-- Productos con Stock Bajo -->
     <div class="col-lg-6">
-      <div class="content-card">
-        <h4><i class="fas fa-exclamation-triangle me-2 text-warning"></i> Productos con Stock Bajo</h4>
-        <div th:if="${#lists.isEmpty(productosStockBajo)}" class="text-center text-success py-4">
-          <i class="fas fa-check-circle fa-3x mb-3"></i>
-          <p>Todos los productos tienen stock suficiente</p>
+      <div class="stock-card">
+        <div class="card-header-clean">
+          <h5 class="card-title text-danger"><i class="fas fa-arrow-down me-2"></i> Reposición Urgente</h5>
+          <a th:href="@{/admin/inventario/alertas}" class="small text-decoration-none">Ver todas</a>
         </div>
-        <div th:each="producto : ${productosStockBajo}" class="product-stock-item">
-          <div th:class="${producto.stock == 0 ? 'stock-indicator stock-critico' :
-                                    producto.stock <= 3 ? 'stock-indicator stock-critico' :
-                                    'stock-indicator stock-bajo'}">
-            <span th:text="${producto.stock}">0</span>
-          </div>
+
+        <div th:if="${#lists.isEmpty(productosStockBajo)}" class="text-center py-5 text-muted">
+          <i class="fas fa-check-circle fa-2x mb-2 text-success opacity-50"></i>
+          <p class="m-0">Inventario Saludable</p>
+        </div>
+
+        <div th:each="producto : ${productosStockBajo}" class="stock-item">
+          <div class="stock-indicator"
+               th:classappend="${producto.stock == 0 ? 'stock-critico' : 'stock-warning'}"
+               th:text="${producto.stock}">0</div>
+
           <div class="flex-grow-1">
-            <h6 class="mb-1" th:text="${producto.nombre}">Producto</h6>
+            <div class="fw-bold text-dark" th:text="${producto.nombre}">Producto</div>
             <small class="text-muted" th:text="${producto.categoria}">Categoría</small>
-            <div class="mt-1">
-              <small class="text-success me-2">
-                <i class="fas fa-arrow-up"></i> <span th:text="${producto.totalEntradas}">0</span> entradas
-              </small>
-              <small class="text-danger">
-                <i class="fas fa-arrow-down"></i> <span th:text="${producto.totalSalidas}">0</span> salidas
-              </small>
-            </div>
+          </div>
+
+          <a th:href="@{/admin/inventario/movimientos/nuevo(productoId=${producto.id})}"
+             class="btn btn-sm btn-light border text-primary" title="Reponer Stock">
+            <i class="fas fa-plus"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="stock-card">
+        <div class="card-header-clean">
+          <h5 class="card-title"><i class="far fa-bell me-2 text-muted"></i> Avisos Recientes</h5>
+        </div>
+
+        <div th:if="${#lists.isEmpty(alertas)}" class="text-center py-5 text-muted">
+          <i class="far fa-bell-slash fa-2x mb-2 opacity-50"></i>
+          <p class="m-0">Sin notificaciones</p>
+        </div>
+
+        <div th:each="alerta : ${alertas}" class="alert-item">
+          <div class="alert-icon-box">
+            <i th:class="'fas ' + ${alerta.tipo.icono}"></i>
           </div>
           <div>
-            <a th:href="@{/admin/inventario/producto/{id}(id=${producto.id})}"
-               class="btn btn-sm btn-primary">
-              <i class="fas fa-eye"></i>
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Alertas Recientes -->
-    <div class="col-lg-6">
-      <div class="content-card">
-        <h4><i class="fas fa-bell me-2"></i> Alertas Activas</h4>
-        <div th:if="${#lists.isEmpty(alertas)}" class="text-center text-muted py-4">
-          <i class="fas fa-check-circle fa-3x mb-3"></i>
-          <p>No hay alertas pendientes</p>
-        </div>
-        <div th:each="alerta : ${alertas}" class="alert mb-2"
-             th:classappend="'alert-' + ${alerta.tipo.colorBadge}">
-          <div class="d-flex justify-content-between align-items-start">
-            <div>
-              <strong>
-                <i th:class="'fas ' + ${alerta.tipo.icono} + ' me-2'"></i>
-                <span th:text="${alerta.tipo.nombre}">Tipo</span>
-              </strong>
-              <p class="mb-1" th:text="${alerta.mensaje}">Mensaje</p>
-              <small class="text-muted">
-                <i class="fas fa-clock me-1"></i>
-                <span th:text="${#temporals.format(alerta.fechaCreacion, 'dd/MM/yyyy HH:mm')}">Fecha</span>
-              </small>
-            </div>
-            <a th:href="@{/admin/inventario/producto/{id}(id=${alerta.producto.id})}"
-               class="btn btn-sm btn-outline-dark">
-              Ver
-            </a>
+            <div class="fw-bold text-dark" th:text="${alerta.tipo.nombre}">Tipo Alerta</div>
+            <small class="text-muted d-block" th:text="${alerta.mensaje}">Mensaje</small>
+            <small class="text-muted" style="font-size: 0.7rem;"
+                   th:text="${#temporals.format(alerta.fechaCreacion, 'dd MMM HH:mm')}">Fecha</small>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Movimientos Recientes -->
-  <div class="content-card">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h4><i class="fas fa-history me-2"></i> Movimientos Recientes</h4>
-      <a th:href="@{/admin/inventario/movimientos}" class="btn btn-sm btn-outline-primary">
-        Ver Todos <i class="fas fa-arrow-right ms-2"></i>
-      </a>
+  <div class="stock-card">
+    <div class="card-header-clean">
+      <h5 class="card-title">Movimientos Recientes</h5>
+      <a th:href="@{/admin/inventario/movimientos}" class="btn btn-sm btn-light border">Ver Historial</a>
     </div>
+
     <div class="table-responsive">
       <table class="table table-hover">
         <thead>
@@ -228,40 +282,37 @@
           <th>Producto</th>
           <th>Tipo</th>
           <th>Cantidad</th>
-          <th>Stock</th>
+          <th>Stock Final</th>
           <th>Usuario</th>
         </tr>
         </thead>
         <tbody>
         <tr th:if="${#lists.isEmpty(movimientosRecientes)}">
-          <td colspan="6" class="text-center text-muted py-4">
-            No hay movimientos registrados
-          </td>
+          <td colspan="6" class="text-center py-4 text-muted">Sin movimientos registrados</td>
         </tr>
         <tr th:each="movimiento : ${movimientosRecientes}">
+          <td class="text-muted" th:text="${#temporals.format(movimiento.fechaMovimiento, 'dd MMM HH:mm')}">Fecha</td>
+          <td class="fw-bold text-dark" th:text="${movimiento.producto.nombre}">Prod</td>
           <td>
-            <span th:text="${#temporals.format(movimiento.fechaMovimiento, 'dd/MM/yyyy')}">Fecha</span>
-            <br>
-            <small class="text-muted"
-                   th:text="${#temporals.format(movimiento.fechaMovimiento, 'HH:mm')}">Hora</small>
+                        <span class="badge-pill"
+                              th:classappend="'bg-' + ${#strings.toLowerCase(movimiento.tipo.nombre)}">
+                            <i th:class="'fas ' + ${movimiento.tipo.icono}"></i>
+                            <span th:text="${movimiento.tipo.nombre}">Tipo</span>
+                        </span>
+          </td>
+          <td class="fw-bold" th:text="${movimiento.cantidad}">0</td>
+          <td>
+            <span class="text-muted small" th:text="${movimiento.stockAnterior}">0</span>
+            <i class="fas fa-arrow-right mx-1 small text-muted"></i>
+            <span class="fw-bold text-dark" th:text="${movimiento.stockNuevo}">0</span>
           </td>
           <td>
-            <strong th:text="${movimiento.producto.nombre}">Producto</strong>
-          </td>
-          <td>
-                            <span th:class="'badge bg-' + ${movimiento.tipo.colorBadge}">
-                                <i th:class="'fas ' + ${movimiento.tipo.icono} + ' me-1'"></i>
-                                <span th:text="${movimiento.tipo.nombre}">Tipo</span>
-                            </span>
-          </td>
-          <td>
-            <strong th:text="${movimiento.cantidad}">0</strong>
-          </td>
-          <td>
-            <span th:text="${movimiento.stockAnterior} + ' → ' + ${movimiento.stockNuevo}">0 → 0</span>
-          </td>
-          <td>
-            <span th:text="${movimiento.usuario != null ? movimiento.usuario.nombre : 'Sistema'}">Usuario</span>
+            <div class="d-flex align-items-center gap-2">
+              <div class="rounded-circle bg-light d-flex align-items-center justify-content-center fw-bold text-secondary"
+                   style="width: 24px; height: 24px; font-size: 0.7rem;"
+                   th:text="${movimiento.usuario != null ? #strings.substring(movimiento.usuario.nombre, 0, 1) : 'S'}">U</div>
+              <small th:text="${movimiento.usuario != null ? movimiento.usuario.nombre : 'Sistema'}">User</small>
+            </div>
           </td>
         </tr>
         </tbody>
@@ -269,33 +320,8 @@
     </div>
   </div>
 
-  <!-- Movimientos por Tipo (Resumen) -->
-  <div class="content-card">
-    <h4><i class="fas fa-chart-pie me-2"></i> Resumen de Movimientos</h4>
-    <div class="row mt-3">
-      <div class="col-md-3" th:each="entry : ${movimientosPorTipo}">
-        <div class="text-center p-3 border rounded">
-          <h2 class="mb-2" th:text="${entry.value}">0</h2>
-          <p class="mb-0 text-muted" th:text="${entry.key}">Tipo</p>
-        </div>
-      </div>
-    </div>
-  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-  setTimeout(function() {
-      const alerts = document.querySelectorAll('.alert');
-      alerts.forEach(alert => {
-          if (!alert.classList.contains('alert-warning') &&
-              !alert.classList.contains('alert-danger')) {
-              alert.style.transition = 'opacity 0.5s';
-              alert.style.opacity = '0';
-              setTimeout(() => alert.remove(), 500);
-          }
-      });
-  }, 5000);
-</script>
 </body>
 </html>

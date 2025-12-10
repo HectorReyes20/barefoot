@@ -31,28 +31,22 @@ public class MisPedidosController {
     @Autowired
     private PedidoRepository pedidoRepository;
 
+    // 1. LISTAR TODOS LOS PEDIDOS
     @GetMapping
     public String listarMisPedidos(HttpSession session, Model model) {
-
         try {
             Long usuarioId = (Long) session.getAttribute("usuarioId");
-            if (usuarioId == null) {
-                return "redirect:/login";
-            }
+            if (usuarioId == null) return "redirect:/login";
 
-            Usuario usuario = (Usuario) session.getAttribute("usuario");
-            if (usuario == null) {
-                // Doble chequeo de seguridad
-                return "redirect:/login";
-            }
+            Usuario usuario = new Usuario();
+            usuario.setId(usuarioId);
 
-            // Obtener todos los pedidos del usuario con sus detalles
+            // Usamos el método optimizado que ya tienes en tu Repositorio
             List<Pedido> misPedidos = pedidoRepository.findByUsuarioWithDetalles(usuario);
 
             model.addAttribute("pedidos", misPedidos);
-            model.addAttribute("usuarioNombre", usuario.getNombre());
+            model.addAttribute("usuarioNombre", session.getAttribute("usuarioNombre")); // Usamos el de la sesión
 
-            // CORRECCIÓN: "pedidos" en lugar de "usuario/pedidos" si el archivo está en templates/
             return "usuario/pedidos";
 
         } catch (Exception e) {
@@ -61,6 +55,7 @@ public class MisPedidosController {
         }
     }
 
+    // 2. VER DETALLE DE UN PEDIDO
     @GetMapping("/{id}")
     public String verDetallePedido(
             @PathVariable Long id,
@@ -70,14 +65,12 @@ public class MisPedidosController {
 
         try {
             Long usuarioId = (Long) session.getAttribute("usuarioId");
-            if (usuarioId == null) {
-                return "redirect:/login";
-            }
+            if (usuarioId == null) return "redirect:/login";
 
-            Usuario usuario = (Usuario) session.getAttribute("usuario");
-
+            // Buscar el pedido
             Optional<Pedido> pedidoOpt = pedidoService.obtenerPedidoPorId(id);
 
+            // Validación de seguridad: ¿Existe? ¿Es mío?
             if (pedidoOpt.isEmpty() || !pedidoOpt.get().getUsuario().getId().equals(usuarioId)) {
                 redirectAttributes.addFlashAttribute("mensaje", "Pedido no encontrado o no autorizado");
                 redirectAttributes.addFlashAttribute("tipoMensaje", "danger");
@@ -86,20 +79,22 @@ public class MisPedidosController {
 
             Pedido pedido = pedidoOpt.get();
 
-            // 🔥 NUEVO: Buscar si hay una transacción pendiente
-            Optional<Transaccion> transaccionPendiente = transaccionRepository
+            // Buscar información del pago (Solo para mostrar el recibo/estado)
+            // Ya no es para "completar pago", sino para ver "cómo pagó"
+            Optional<Transaccion> transaccion = transaccionRepository
                     .findFirstByPedidoOrderByFechaCreacionDesc(pedido);
 
             model.addAttribute("pedido", pedido);
-            model.addAttribute("usuarioNombre", usuario != null ? usuario.getNombre() : "");
-            model.addAttribute("transaccion", transaccionPendiente.orElse(null));
+            model.addAttribute("transaccion", transaccion.orElse(null));
+
+            // Pasamos el nombre para el navbar
+            model.addAttribute("usuarioNombre", session.getAttribute("usuarioNombre"));
 
             return "usuario/detalle-pedido";
 
         } catch (Exception e) {
             log.error("Error en verDetallePedido: ", e);
-            redirectAttributes.addFlashAttribute("mensaje", "Error al cargar el pedido");
-            redirectAttributes.addFlashAttribute("tipoMensaje", "danger");
+            redirectAttributes.addFlashAttribute("mensaje", "Error al cargar el detalle");
             return "redirect:/mis-pedidos";
         }
     }

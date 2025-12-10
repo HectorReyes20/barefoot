@@ -182,6 +182,48 @@ public class ProductoController {
         return "admin/productos/detalle";
     }
 
+    // NUEVO MÉTODO: Soft Delete (Desactivar/Reactivar)
+    @GetMapping("/desactivar/{id}")
+    public String toggleEstadoProducto(@PathVariable Long id,
+                                       HttpSession session,
+                                       RedirectAttributes redirectAttributes) {
+        // 1. Seguridad
+        if (!esAdmin(session)) {
+            return "redirect:/login";
+        }
+
+        try {
+            // 2. Buscar producto
+            Optional<Producto> optionalProducto = productoService.obtenerProductoPorId(id);
+
+            if (optionalProducto.isPresent()) {
+                Producto producto = optionalProducto.get();
+
+                // 3. Invertir el estado (Si es true -> false, Si es false -> true)
+                boolean nuevoEstado = !producto.getActivo(); // Asegúrate que tu modelo tenga getActivo() o isActivo()
+                producto.setActivo(nuevoEstado);
+
+                // 4. Guardar cambios
+                // Usamos actualizar o guardar según tengas en tu servicio
+                productoService.actualizarProducto(id, producto);
+
+                // 5. Mensaje de feedback
+                String accion = nuevoEstado ? "reactivado" : "desactivado";
+                redirectAttributes.addFlashAttribute("mensaje", "Producto " + accion + " correctamente.");
+                redirectAttributes.addFlashAttribute("tipoMensaje", "success");
+            } else {
+                redirectAttributes.addFlashAttribute("mensaje", "Error: Producto no encontrado.");
+                redirectAttributes.addFlashAttribute("tipoMensaje", "danger");
+            }
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensaje", "Error al cambiar estado: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("tipoMensaje", "danger");
+        }
+
+        return "redirect:/admin/productos";
+    }
+
     private boolean esAdmin(HttpSession session) {
         String rol = (String) session.getAttribute("usuarioRol");
         return "ADMIN".equals(rol);

@@ -1,11 +1,140 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <head th:replace="~{admin/layout/head :: head(titulo='Historial de Movimientos - Barefoot Admin')}"></head>
+    <th:block th:insert="~{admin/layout/head :: head(titulo='Historial de Movimientos - Barefoot Admin')}"></th:block>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
-        .badge-entrada { background-color: #28a745; }
-        .badge-salida { background-color: #dc3545; }
-        .badge-ajuste { background-color: #17a2b8; }
+        :root {
+            --primary-bg: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-main: #1E293B;
+            --text-muted: #64748B;
+            --accent-color: #3B82F6;
+            --border-radius: 16px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            background-color: var(--primary-bg);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-main);
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 2rem 2.5rem;
+        }
+
+        /* --- TOOLBAR --- */
+        .filter-bar {
+            background: var(--card-bg);
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius);
+            border: 1px solid #E2E8F0;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .search-wrapper {
+            position: relative;
+            flex: 1;
+            max-width: 400px;
+        }
+        .search-wrapper i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94A3B8;
+        }
+        .search-input {
+            width: 100%;
+            padding: 0.6rem 1rem 0.6rem 2.5rem;
+            border: 1px solid #E2E8F0;
+            border-radius: 10px;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .search-input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .filter-select {
+            border: 1px solid #E2E8F0;
+            border-radius: 10px;
+            padding: 0.6rem 2rem 0.6rem 1rem;
+            background-color: white;
+            cursor: pointer;
+        }
+
+        /* --- TABLA --- */
+        .table-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #E2E8F0;
+            overflow: hidden;
+        }
+
+        .table { margin-bottom: 0; vertical-align: middle; }
+
+        .table thead th {
+            background-color: #F8FAFC;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #E2E8F0;
+            border-top: none;
+        }
+
+        .table tbody td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #F1F5F9;
+            color: var(--text-main);
+            font-size: 0.9rem;
+        }
+
+        /* Badges de Movimiento */
+        .move-badge {
+            padding: 0.35em 0.8em;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .bg-in { background: #DCFCE7; color: #166534; } /* Verde */
+        .bg-out { background: #FEE2E2; color: #991B1B; } /* Rojo */
+        .bg-adj { background: #FEF3C7; color: #92400E; } /* Naranja */
+
+        /* Paginación */
+        .pagination .page-link {
+            border: none;
+            color: var(--text-muted);
+            margin: 0 2px;
+            border-radius: 8px;
+        }
+        .pagination .page-item.active .page-link {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        .pagination .page-item.disabled .page-link { opacity: 0.5; }
+
+        @media (max-width: 992px) {
+            .main-content { margin-left: 0; }
+        }
     </style>
 </head>
 <body>
@@ -14,100 +143,133 @@
 
 <div class="main-content">
 
-    <div th:replace="~{admin/layout/navbar :: navbar(tituloPagina='Historial de Movimientos de Inventario', iconoPagina='fas fa-history')}"></div>
+    <div th:replace="~{admin/layout/navbar :: navbar(tituloPagina='Historial de Movimientos')}"></div>
 
-    <div class="content-card">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h4><i class="fas fa-list me-2"></i> Movimientos Registrados</h4>
-                <p class="text-muted small">Historial completo de entradas y salidas de inventario</p>
-            </div>
-            <a th:href="@{/admin/inventario/movimientos/nuevo}" class="btn btn-success">
-                <i class="fas fa-plus me-2"></i> Nuevo Movimiento
+    <div class="filter-bar">
+        <form th:action="@{/admin/inventario/movimientos}" method="get" class="search-wrapper">
+            <i class="fas fa-search"></i>
+            <input type="text" name="keyword" class="search-input"
+                   placeholder="Buscar por producto, documento..."
+                   th:value="${keyword}">
+        </form>
+
+        <div class="d-flex gap-2">
+            <form th:action="@{/admin/inventario/movimientos}" method="get" id="typeFilter">
+                <select name="tipo" class="filter-select form-select" onchange="document.getElementById('typeFilter').submit()">
+                    <option value="">Todos los Tipos</option>
+                    <option value="ENTRADA" th:selected="${tipo == 'ENTRADA'}">Entradas</option>
+                    <option value="SALIDA" th:selected="${tipo == 'SALIDA'}">Salidas</option>
+                    <option value="AJUSTE" th:selected="${tipo == 'AJUSTE'}">Ajustes</option>
+                </select>
+            </form>
+
+            <a th:href="@{/admin/inventario}" class="btn btn-light border text-muted">
+                <i class="fas fa-times me-2"></i> Limpiar
             </a>
         </div>
+    </div>
 
+    <div class="table-card">
         <div class="table-responsive">
-            <table class="table table-hover table-striped align-middle">
-                <thead class="table-light">
+            <table class="table table-hover">
+                <thead>
                 <tr>
                     <th>Fecha</th>
                     <th>Producto</th>
                     <th>Tipo</th>
                     <th>Cantidad</th>
-                    <th>Stock Anterior</th>
-                    <th>Stock Nuevo</th>
-                    <th>Motivo</th>
+                    <th>Cambio de Stock</th>
+                    <th>Detalle</th>
                     <th>Usuario</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="mov : ${movimientos}">
-                    <td>
-                        <small th:text="${#temporals.format(mov.fechaMovimiento, 'dd/MM/yyyy HH:mm')}">12/10/2024 10:30</small>
-                    </td>
-                    <td>
-                        <strong th:text="${mov.producto.nombre}">Producto</strong>
-                        <br>
-                        <small class="text-muted" th:text="'SKU: ' + ${mov.producto.sku}">SKU: XXX</small>
-                    </td>
-                    <td>
-                        <span class="badge" th:classappend="${mov.tipo.colorBadge == 'success' ? 'bg-success' : mov.tipo.colorBadge == 'danger' ? 'bg-danger' : 'bg-info'}">
-                            <i th:class="'fas ' + ${mov.tipo.icono} + ' me-1'"></i>
-                            <span th:text="${mov.tipo.nombre}">Tipo</span>
-                        </span>
-                    </td>
-                    <td>
-                        <strong th:text="${mov.cantidad}">0</strong>
-                    </td>
-                    <td>
-                        <span th:text="${mov.stockAnterior}">100</span>
-                    </td>
-                    <td>
-                        <span th:text="${mov.stockNuevo}">110</span>
-                        <br>
-                        <small th:if="${mov.aumentaStock()}" class="text-success fw-bold">↑ +<span th:text="${mov.cantidad}">10</span></small>
-                        <small th:if="${!mov.aumentaStock()}" class="text-danger fw-bold">↓ -<span th:text="${mov.cantidad}">10</span></small>
-                    </td>
-                    <td>
-                        <small th:text="${mov.motivo}">Motivo del movimiento</small>
-                    </td>
-                    <td>
-                        <small th:text="${mov.usuario != null ? mov.usuario.nombre : 'Sistema'}">Usuario</small>
+                <tr th:if="${#lists.isEmpty(movimientos)}">
+                    <td colspan="7" class="text-center py-5">
+                        <div class="d-flex flex-column align-items-center justify-content-center text-muted">
+                            <i class="fas fa-history fa-3x mb-3 opacity-50"></i>
+                            <p class="mb-0 fw-medium">No se encontraron movimientos</p>
+                        </div>
                     </td>
                 </tr>
-                <tr th:if="${#lists.isEmpty(movimientos)}">
-                    <td colspan="8" class="text-center text-muted py-5">
-                        <i class="fas fa-inbox fa-3x opacity-50 mb-3 d-block"></i>
-                        <p class="mb-0">No hay movimientos registrados</p>
+
+                <tr th:each="mov : ${movimientos}">
+                    <td>
+                        <span class="d-block fw-bold text-dark" th:text="${#temporals.format(mov.fechaMovimiento, 'dd/MM/yyyy')}">01/01/2024</span>
+                        <small class="text-muted" th:text="${#temporals.format(mov.fechaMovimiento, 'HH:mm')}">14:30</small>
+                    </td>
+
+                    <td>
+                        <div class="fw-bold text-dark" th:text="${mov.producto.nombre}">Zapato</div>
+                        <small class="text-muted" th:text="${mov.producto.categoria}">Cat</small>
+                    </td>
+
+                    <td>
+                        <span class="move-badge bg-in"
+                              th:if="${#strings.contains(mov.tipo.name(), 'ENTRADA') or #strings.contains(mov.tipo.name(), 'DEVOLUCION')}">
+                            <i class="fas fa-arrow-down"></i> <span th:text="${mov.tipo.nombre}">Entrada</span>
+                        </span>
+
+                        <span class="move-badge bg-out"
+                              th:if="${#strings.contains(mov.tipo.name(), 'SALIDA') or #strings.contains(mov.tipo.name(), 'MERMA')}">
+                            <i class="fas fa-arrow-up"></i> <span th:text="${mov.tipo.nombre}">Salida</span>
+                        </span>
+
+                        <span class="move-badge bg-adj"
+                              th:if="${#strings.contains(mov.tipo.name(), 'AJUSTE')}">
+                            <i class="fas fa-sync-alt"></i> <span th:text="${mov.tipo.nombre}">Ajuste</span>
+                        </span>
+                    </td>
+
+                    <td class="fw-bold fs-6">
+                        <span th:text="${mov.cantidad}">10</span>
+                    </td>
+
+                    <td>
+                        <div class="d-flex align-items-center text-muted" style="font-family: monospace; font-size: 0.95rem;">
+                            <span th:text="${mov.stockAnterior}">0</span>
+                            <i class="fas fa-long-arrow-alt-right mx-2 text-primary opacity-50"></i>
+                            <strong class="text-dark" th:text="${mov.stockNuevo}">10</strong>
+                        </div>
+                    </td>
+
+                    <td>
+                        <div class="text-truncate" style="max-width: 150px;" th:text="${mov.motivo}" title="${mov.motivo}">Venta</div>
+                        <div th:if="${mov.numeroDocumento}" class="small text-primary">
+                            <i class="fas fa-hashtag me-1"></i><span th:text="${mov.numeroDocumento}">DOC-123</span>
+                        </div>
+                    </td>
+
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center text-secondary fw-bold border"
+                                 style="width: 28px; height: 28px; font-size: 0.7rem;"
+                                 th:text="${mov.usuario != null ? #strings.substring(mov.usuario.nombre, 0, 1) : 'S'}">U</div>
+                            <span class="small" th:text="${mov.usuario != null ? mov.usuario.nombre : 'Sistema'}">User</span>
+                        </div>
                     </td>
                 </tr>
                 </tbody>
             </table>
         </div>
 
-        <!-- Paginación -->
-        <nav th:if="${totalPages > 1}" aria-label="Paginación" class="mt-4">
-            <ul class="pagination justify-content-center">
-                <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
-                    <a class="page-link" th:href="@{/admin/inventario/movimientos(page=${currentPage - 1})}">
-                        Anterior
-                    </a>
-                </li>
-                <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
-                    class="page-item" th:classappend="${i == currentPage ? 'active' : ''}">
-                    <a class="page-link" th:href="@{/admin/inventario/movimientos(page=${i})}" th:text="${i + 1}">
-                        1
-                    </a>
-                </li>
-                <li class="page-item" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
-                    <a class="page-link" th:href="@{/admin/inventario/movimientos(page=${currentPage + 1})}">
-                        Siguiente
-                    </a>
-                </li>
-            </ul>
-        </nav>
+        <div class="p-3 border-top d-flex justify-content-center" th:if="${totalPages > 1}">
+            <nav>
+                <ul class="pagination mb-0 gap-1">
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{/admin/inventario/movimientos(page=${currentPage - 1})}"><i class="fas fa-chevron-left"></i></a>
+                    </li>
+
+                    <li class="page-item disabled"><a class="page-link bg-light text-dark" href="#" th:text="${currentPage + 1} + ' / ' + ${totalPages}">1 / 5</a></li>
+
+                    <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/admin/inventario/movimientos(page=${currentPage + 1})}"><i class="fas fa-chevron-right"></i></a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
     </div>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

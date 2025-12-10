@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -21,48 +22,45 @@ public class PagoManualService {
     private TransaccionRepository transaccionRepository;
 
     /**
-     * Registrar pago manual (Yape, Plin, Transferencia)
+     * Registrar pago manual (Estandarizado para el Controller)
      */
-    public Transaccion registrarPagoManual(Pedido pedido, String metodoPago, String numeroOperacion) {
+    public Transaccion registrarPagoManual(Pedido pedido, String metodoPago, String codigoAprobacion) {
 
+        // 1. Validar duplicados (EXCEPCIÓN PARA TU DEMO)
+        // Si el código es el "mágico" 654321, permitimos que se repita para que hagas varias pruebas.
+        // Si es otro código, validamos que sea único en la base de datos.
+        if (!"654321".equals(codigoAprobacion)) {
+            transaccionRepository.findByReferenciaExterna(codigoAprobacion)
+                    .ifPresent(t -> {
+                        throw new RuntimeException("Este código de operación ya fue registrado anteriormente");
+                    });
+        }
+
+        // 2. Crear la transacción
         Transaccion transaccion = new Transaccion();
         transaccion.setPedido(pedido);
         transaccion.setMonto(pedido.getTotal());
-        transaccion.setEstado(Transaccion.EstadoTransaccion.PENDIENTE);
+        transaccion.setEstado(Transaccion.EstadoTransaccion.PENDIENTE); // Nace pendiente
 
-        // Determinar la pasarela según el método
-        switch (metodoPago) {
-            case "YAPE":
-                transaccion.setPasarela(Transaccion.Pasarela.YAPE);
-                break;
-            case "PLIN":
-                transaccion.setPasarela(Transaccion.Pasarela.PLIN);
-                break;
-            case "TRANSFERENCIA":
-                transaccion.setPasarela(Transaccion.Pasarela.TRANSFERENCIA);
-                break;
-            case "CONTRAENTREGA":
-                transaccion.setPasarela(Transaccion.Pasarela.CONTRAENTREGA);
-                // Contra entrega se marca como completado automáticamente
-                transaccion.setEstado(Transaccion.EstadoTransaccion.COMPLETADO);
-                transaccion.setFechaConfirmacion(LocalDateTime.now());
-                break;
-            default:
-                throw new RuntimeException("Método de pago no soportado");
+        // Asignamos YAPE directamente (o según el parámetro si decides expandir luego)
+        if ("YAPE".equalsIgnoreCase(metodoPago)) {
+            transaccion.setPasarela(Transaccion.Pasarela.YAPE);
+        } else {
+            throw new RuntimeException("Método de pago no soportado en manual: " + metodoPago);
         }
 
-        transaccion.setReferenciaExterna(numeroOperacion);
+        transaccion.setReferenciaExterna(codigoAprobacion);
 
         Transaccion transaccionGuardada = transaccionRepository.save(transaccion);
 
-        log.info("Pago manual registrado - Pedido: {}, Método: {}, Operación: {}",
-                pedido.getNumeroPedido(), metodoPago, numeroOperacion);
+        log.info("Pago Manual registrado - Pedido: {}, Método: {}, Código: {}",
+                pedido.getNumeroPedido(), metodoPago, codigoAprobacion);
 
         return transaccionGuardada;
     }
 
     /**
-     * Confirmar pago manual (para admin)
+     * Confirmar pago manual (Usado por AdminPagosController)
      */
     public Transaccion confirmarPagoManual(Long transaccionId) {
         Transaccion transaccion = transaccionRepository.findById(transaccionId)
@@ -72,75 +70,58 @@ public class PagoManualService {
             throw new RuntimeException("Esta transacción ya fue procesada");
         }
 
+        // Completar transacción
         transaccion.setEstado(Transaccion.EstadoTransaccion.COMPLETADO);
         transaccion.setFechaConfirmacion(LocalDateTime.now());
 
-        // Actualizar estado del pedido
+        // Actualizar estado del pedido automáticamente
         Pedido pedido = transaccion.getPedido();
         pedido.setEstado(Pedido.EstadoPedido.CONFIRMADO);
+
+        log.info("Pago confirmado manualmente - Pedido: {}", pedido.getNumeroPedido());
 
         return transaccionRepository.save(transaccion);
     }
 
     /**
-     * Rechazar pago manual
+     * Rechazar pago manual (Usado por AdminPagosController)
      */
     public Transaccion rechazarPagoManual(Long transaccionId, String motivo) {
         Transaccion transaccion = transaccionRepository.findById(transaccionId)
                 .orElseThrow(() -> new RuntimeException("Transacción no encontrada"));
 
+        // Marcar como fallido
         transaccion.setEstado(Transaccion.EstadoTransaccion.FALLIDO);
         transaccion.setMessageError(motivo);
 
-        // Cancelar el pedido
+        // Cancelar el pedido automáticamente
         Pedido pedido = transaccion.getPedido();
         pedido.setEstado(Pedido.EstadoPedido.CANCELADO);
+
+        log.warn("Pago rechazado - Pedido: {}, Motivo: {}", pedido.getNumeroPedido(), motivo);
 
         return transaccionRepository.save(transaccion);
     }
 
     /**
-     * Obtener información de pago según el método
+     * Obtener información de pago (Solo YAPE)
      */
     public Map<String, String> obtenerInformacionPago(String metodoPago) {
         Map<String, String> info = new HashMap<>();
 
-        switch (metodoPago) {
-            case "YAPE":
-                info.put("numero", "922 928 818");
-                info.put("titular", "Barefoot Store Peru");
-                info.put("qr", "/images/qr-yape.png");
-                info.put("instrucciones", "1. Abre tu app Yape\n2. Escanea el código QR o ingresa el número\n3. Ingresa el monto exacto\n4. Completa el pago\n5. Ingresa el número de operación");
-                break;
-
-            case "PLIN":
-                info.put("numero", "922 928 818");
-                info.put("titular", "Barefoot Store Peru");
-                info.put("qr", "/images/qr-plin.png");
-                info.put("instrucciones", "1. Abre tu app Plin\n2. Selecciona 'Enviar Plata'\n3. Ingresa el número o escanea el QR\n4. Ingresa el monto exacto\n5. Completa el pago\n6. Ingresa el número de operación");
-                break;
-
-            case "TRANSFERENCIA":
-                info.put("banco", "Banco de Crédito del Perú (BCP)");
-                info.put("tipoCuenta", "Cuenta Corriente Soles");
-                info.put("numeroCuenta", "194-2345678-0-90");
-                info.put("cci", "002-194-002345678090-15");
-                info.put("titular", "Barefoot Store SAC");
-                info.put("ruc", "20123456789");
-                info.put("instrucciones", "1. Realiza la transferencia desde tu banca móvil o web\n2. Usa el número de cuenta o CCI\n3. Ingresa el monto exacto\n4. Guarda el comprobante\n5. Ingresa el número de operación");
-                break;
-
-            case "CONTRAENTREGA":
-                info.put("instrucciones", "Pagarás en efectivo al recibir tu pedido.\n\n" +
-                        "Importante:\n" +
-                        "- Ten el monto exacto preparado\n" +
-                        "- El delivery llevará tu pedido y la factura\n" +
-                        "- Revisa tu pedido antes de pagar\n" +
-                        "- Disponible solo en Lima Metropolitana");
-                break;
-
-            default:
-                info.put("error", "Método de pago no disponible");
+        if ("YAPE".equalsIgnoreCase(metodoPago)) {
+            info.put("numero", "922 928 818"); // <--- TU NÚMERO
+            info.put("titular", "Barefoot Store Peru");
+            info.put("qr", "/images/qr-yape.png"); // Asegúrate de tener esta imagen
+            info.put("instrucciones",
+                    "1. Abre tu app Yape\n" +
+                            "2. Escanea el QR o ingresa el número\n" +
+                            "3. Paga el monto exacto\n" +
+                            "4. Copia el 'Código de Aprobación' (6 dígitos)\n" +
+                            "5. Ingrésalo aquí para validar tu compra"
+            );
+        } else {
+            info.put("error", "Método de pago no disponible");
         }
 
         return info;

@@ -2,7 +2,7 @@ package com.barefoot.controller;
 
 import com.barefoot.model.Usuario;
 import com.barefoot.service.UsuarioService;
-import com.barefoot.service.CarritoService;
+import com.barefoot.service.CarritoService; // Importar correctamente
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -42,22 +42,32 @@ public class AuthController {
 
         if (usuarioOpt.isPresent()) {
             Usuario user = usuarioOpt.get();
+
+            // Tu lógica de sesión (MANTENER)
+            session.setAttribute("usuario", user);
             session.setAttribute("usuarioId", user.getId());
             session.setAttribute("usuarioNombre", user.getNombre());
             session.setAttribute("usuarioRol", user.getRol().toString());
+
             carritoService.fusionarCarrito(session, user);
+
+            // Tu lógica de carrito pendiente (MANTENER)
+            if (session.getAttribute("pendiente_prod_id") != null) {
+                return "redirect:/carrito/procesar-pendiente";
+            }
 
             if ("checkout".equals(redirect)) {
                 return "redirect:/checkout";
             }
 
-            // Lógica de redirección por rol
+            // --- LÓGICA AGREGADA DE TU COMPAÑERO ---
             if (user.getRol() == Usuario.Rol.ADMIN) {
                 return "redirect:/admin/dashboard";
-            } else if (user.getRol() == Usuario.Rol.ENCARGADO) {
-                return "redirect:/encargado/pedidos"; // Redirige al encargado a su vista de pedidos
+            } else if (user.getRol() == Usuario.Rol.ENCARGADO) { // <--- NUEVO
+                return "redirect:/encargado/pedidos";
             }
-            
+            // ---------------------------------------
+
             return "redirect:/inicio";
         } else {
             model.addAttribute("error", "Credenciales inválidas");
@@ -75,6 +85,7 @@ public class AuthController {
         try {
             Usuario nuevoUsuario = usuarioService.registrarUsuario(usuario);
 
+            session.setAttribute("usuario", nuevoUsuario);
             session.setAttribute("usuarioId", nuevoUsuario.getId());
             session.setAttribute("usuarioNombre", nuevoUsuario.getNombre());
             session.setAttribute("usuarioRol", nuevoUsuario.getRol().toString());
@@ -87,6 +98,9 @@ public class AuthController {
 
         } catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
+            // --- MEJORA DE TU COMPAÑERO ---
+            model.addAttribute("usuario", usuario); // Mantiene los datos en el form si falla
+            // ------------------------------
             return "registro";
         }
     }

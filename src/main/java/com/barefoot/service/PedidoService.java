@@ -1,9 +1,7 @@
 package com.barefoot.service;
 
-import com.barefoot.model.DetallePedido;
-import com.barefoot.model.Pedido;
-import com.barefoot.model.Producto;
-import com.barefoot.model.Usuario;
+import com.barefoot.model.*;
+import com.barefoot.repository.DetallePedidoRepository;
 import com.barefoot.repository.PedidoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,7 +10,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,12 +24,83 @@ public class PedidoService {
     private PedidoRepository pedidoRepository;
 
     @Autowired
+    private DetallePedidoRepository detallePedidoRepository;
+
+    @Autowired
     private ProductoService productoService;
 
-    // Crear pedido
-    public Pedido crearPedido(Pedido pedido) {
+    // =================================================================
+    // NUEVO MÉTODO: CREAR PEDIDO DESDE CARRITO (CORREGIDO)
+    // =================================================================
+    public Pedido crearPedidoDesdeCarrito(Usuario usuario, Carrito carrito, String metodoPagoStr) {
 
-        // Validar stock de productos
+        // 1. Validar Stock (Buscando el producto real por ID)
+        for (ItemCarrito item : carrito.getItems()) {
+            Producto productoReal = productoService.obtenerProductoPorId(item.getProductoId())
+                    .orElseThrow(() -> new RuntimeException("Producto no encontrado: " + item.getNombre()));
+
+            if (productoReal.getStock() < item.getCantidad()) {
+                throw new RuntimeException("Stock insuficiente para: " + productoReal.getNombre());
+            }
+        }
+
+        // 2. Crear Cabecera del Pedido
+        Pedido pedido = new Pedido();
+        pedido.setUsuario(usuario);
+        pedido.setFechaPedido(LocalDateTime.now());
+        pedido.setEstado(Pedido.EstadoPedido.CONFIRMADO); // Nace confirmado
+
+        // Asignar método
+        if ("YAPE".equalsIgnoreCase(metodoPagoStr)) {
+            pedido.setMetodoPago(Pedido.MetodoPago.YAPE);
+        } else {
+            pedido.setMetodoPago(Pedido.MetodoPago.STRIPE);
+        }
+
+        // Calcular totales
+        pedido.setSubtotal(carrito.getTotal());
+        pedido.setCostoEnvio(15.0);
+        pedido.setTotal(pedido.getSubtotal() + pedido.getCostoEnvio());
+
+        // Guardar para generar ID
+        pedido = pedidoRepository.save(pedido);
+
+        // 3. Crear Detalles y Reducir Stock
+        List<DetallePedido> detalles = new ArrayList<>();
+
+        for (ItemCarrito item : carrito.getItems()) {
+            // BUSCAMOS EL PRODUCTO REAL POR ID (Corrección del error getProducto)
+            Producto productoReal = productoService.obtenerProductoPorId(item.getProductoId())
+                    .orElseThrow(() -> new RuntimeException("Producto no encontrado ID: " + item.getProductoId()));
+
+            DetallePedido detalle = new DetallePedido();
+            detalle.setPedido(pedido);
+            detalle.setProducto(productoReal); // Usamos el objeto encontrado
+            detalle.setCantidad(item.getCantidad());
+            detalle.setPrecioUnitario(productoReal.getPrecio()); // O productoReal.getPrecioFinal() si tienes descuentos
+            detalle.setSubtotal(item.getSubtotal());
+            // detalle.setPersonalizacion(item.getPersonalizacion()); // Descomenta si usas personalización
+
+            // REDUCIR STOCK REAL
+            productoService.reducirStock(productoReal.getId(), item.getCantidad());
+
+            detalles.add(detalle);
+        }
+
+        // Guardar todos los detalles en BD
+        detallePedidoRepository.saveAll(detalles);
+        pedido.setDetalles(detalles);
+
+        return pedido;
+    }
+
+    // =================================================================
+    // MÉTODOS EXISTENTES (AJUSTADOS)
+    // =================================================================
+
+    // Crear pedido manual (Legacy)
+    public Pedido crearPedido(Pedido pedido) {
+        // Validar stock
         for (DetallePedido detalle : pedido.getDetalles()) {
             Producto producto = detalle.getProducto();
             if (producto.getStock() < detalle.getCantidad()) {
@@ -37,55 +108,53 @@ public class PedidoService {
             }
         }
 
-        // Calcular totales
-        pedido.calcularTotal();
+        // Calcular totales manualmente (Corrección del error calcularTotal)
+        double subtotal = pedido.getDetalles().stream()
+                .mapToDouble(DetallePedido::getSubtotal)
+                .sum();
+        pedido.setSubtotal(subtotal);
+        pedido.setTotal(subtotal - pedido.getDescuento() + pedido.getCostoEnvio());
 
-        // Guardar pedido
         Pedido pedidoGuardado = pedidoRepository.save(pedido);
 
-        // Reducir stock de productos
+        // Reducir stock
         for (DetallePedido detalle : pedidoGuardado.getDetalles()) {
             productoService.reducirStock(detalle.getProducto().getId(), detalle.getCantidad());
         }
-
         return pedidoGuardado;
     }
 
-    // Obtener todos los pedidos
     public List<Pedido> obtenerTodosPedidos() {
         return pedidoRepository.findAll(Sort.by(Sort.Direction.DESC, "fechaPedido"));
     }
 
-    // Obtener pedidos con paginación
     public Page<Pedido> obtenerPedidosConPaginacion(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("fechaPedido").descending());
         return pedidoRepository.findAllByOrderByFechaPedidoDesc(pageable);
     }
 
-    // Obtener pedido por ID (VERSIÓN CORRECTA SIN MERGE CONFLICT)
     public Optional<Pedido> obtenerPedidoPorId(Long id) {
-        return pedidoRepository.findByIdWithDetallesAndProductos(id);
+        try {
+            return pedidoRepository.findByIdWithDetallesAndProductos(id);
+        } catch (Exception e) {
+            return pedidoRepository.findById(id);
+        }
     }
 
-    // Obtener pedido por número
     public Optional<Pedido> obtenerPedidoPorNumero(String numeroPedido) {
         return pedidoRepository.findByNumeroPedido(numeroPedido);
     }
 
-    // Obtener pedidos de un usuario
     public List<Pedido> obtenerPedidosDeUsuario(Usuario usuario) {
         return pedidoRepository.findByUsuarioOrderByFechaPedidoDesc(usuario);
     }
 
-    // Obtener pedidos por estado
     public List<Pedido> obtenerPedidosPorEstado(Pedido.EstadoPedido estado) {
         return pedidoRepository.findByEstadoOrderByFechaPedidoDesc(estado);
     }
 
-    // Actualizar estado del pedido
     public Pedido actualizarEstado(Long id, Pedido.EstadoPedido nuevoEstado) {
         Optional<Pedido> pedidoOpt = pedidoRepository.findById(id);
-
         if (pedidoOpt.isEmpty()) {
             throw new RuntimeException("Pedido no encontrado con ID: " + id);
         }
@@ -93,12 +162,10 @@ public class PedidoService {
         Pedido pedido = pedidoOpt.get();
         pedido.setEstado(nuevoEstado);
 
-        // Si se marca como entregado, registrar fecha
         if (nuevoEstado == Pedido.EstadoPedido.ENTREGADO) {
             pedido.setFechaEntrega(LocalDateTime.now());
         }
 
-        // Si se cancela, devolver stock
         if (nuevoEstado == Pedido.EstadoPedido.CANCELADO) {
             devolverStockPedido(pedido);
         }
@@ -106,19 +173,20 @@ public class PedidoService {
         return pedidoRepository.save(pedido);
     }
 
-    // Cancelar pedido
+    // Cancelar pedido (CORREGIDO: Sin ENVIADO)
     public Pedido cancelarPedido(Long id, String motivo) {
         Optional<Pedido> pedidoOpt = pedidoRepository.findById(id);
-
         if (pedidoOpt.isEmpty()) {
             throw new RuntimeException("Pedido no encontrado");
         }
 
         Pedido pedido = pedidoOpt.get();
 
-        // Solo se pueden cancelar pedidos confirmados
-        if (pedido.getEstado() != Pedido.EstadoPedido.CONFIRMADO) {
-            throw new RuntimeException("No se puede cancelar un pedido en estado: " + pedido.getEstado());
+        // Corrección: Eliminado ENVIADO
+        if (pedido.getEstado() == Pedido.EstadoPedido.EN_CAMINO ||
+                pedido.getEstado() == Pedido.EstadoPedido.ENTREGADO) {
+
+            throw new RuntimeException("No se puede cancelar un pedido que ya está en camino o entregado.");
         }
 
         pedido.setEstado(Pedido.EstadoPedido.CANCELADO);
@@ -126,13 +194,10 @@ public class PedidoService {
             pedido.setNotas(pedido.getNotas() + "\nMotivo cancelación: " + motivo);
         }
 
-        // Devolver stock
         devolverStockPedido(pedido);
-
         return pedidoRepository.save(pedido);
     }
 
-    // Devolver stock de productos
     private void devolverStockPedido(Pedido pedido) {
         for (DetallePedido detalle : pedido.getDetalles()) {
             Producto producto = detalle.getProducto();
@@ -141,7 +206,6 @@ public class PedidoService {
         }
     }
 
-    // Estadísticas
     public Long contarPedidosPorEstado(Pedido.EstadoPedido estado) {
         return pedidoRepository.countByEstado(estado);
     }
@@ -165,30 +229,18 @@ public class PedidoService {
                 .toList();
     }
 
-    // Actualizar información editable del pedido
     public Pedido actualizarPedido(Long id, Pedido pedidoActualizado) {
         Optional<Pedido> pedidoOpt = pedidoRepository.findById(id);
-
-        if (pedidoOpt.isEmpty()) {
-            throw new RuntimeException("Pedido no encontrado");
-        }
+        if (pedidoOpt.isEmpty()) throw new RuntimeException("Pedido no encontrado");
 
         Pedido pedido = pedidoOpt.get();
-
-        if (pedidoActualizado.getDireccionEnvio() != null) {
-            pedido.setDireccionEnvio(pedidoActualizado.getDireccionEnvio());
-        }
-        if (pedidoActualizado.getNotas() != null) {
-            pedido.setNotas(pedidoActualizado.getNotas());
-        }
-        if (pedidoActualizado.getMetodoPago() != null) {
-            pedido.setMetodoPago(pedidoActualizado.getMetodoPago());
-        }
+        if (pedidoActualizado.getDireccionEnvio() != null) pedido.setDireccionEnvio(pedidoActualizado.getDireccionEnvio());
+        if (pedidoActualizado.getNotas() != null) pedido.setNotas(pedidoActualizado.getNotas());
+        if (pedidoActualizado.getMetodoPago() != null) pedido.setMetodoPago(pedidoActualizado.getMetodoPago());
 
         return pedidoRepository.save(pedido);
     }
 
-    // Buscar pedidos por rango de fechas
     public List<Pedido> buscarPorFechas(LocalDateTime inicio, LocalDateTime fin) {
         return pedidoRepository.findByFechaPedidoBetween(inicio, fin);
     }

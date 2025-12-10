@@ -1,213 +1,336 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registrar Movimiento - Barefoot Admin</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link th:href="@{/css/dashboard.css}" rel="stylesheet">
+  <th:block th:insert="~{admin/layout/head :: head(titulo='Nuevo Movimiento - Barefoot Admin')}"></th:block>
+
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+        --primary-bg: #F8FAFC;
+        --card-bg: #FFFFFF;
+        --text-main: #1E293B;
+        --text-muted: #64748B;
+        --border-radius: 16px;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    }
+
+    body {
+        background-color: var(--primary-bg);
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        color: var(--text-main);
+    }
+
+    .main-content {
+        margin-left: 260px;
+        padding: 2rem 2.5rem;
+    }
+
+    /* --- LAYOUT GRID --- */
+    .editor-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+        align-items: start;
+    }
+
+    .content-card {
+        background: var(--card-bg);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid #E2E8F0;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .card-header {
+        font-weight: 700;
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--text-main);
+    }
+
+    /* --- TIPO MOVIMIENTO (Radio Cards) --- */
+    .type-selector {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    .type-option input[type="radio"] { display: none; }
+
+    .type-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+        border: 2px solid #E2E8F0;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: center;
+        height: 100%;
+    }
+
+    .type-card:hover { border-color: #CBD5E1; background-color: #F8FAFC; }
+
+    .type-card i { font-size: 1.5rem; margin-bottom: 0.5rem; color: #64748B; }
+    .type-card span { font-weight: 600; color: var(--text-main); font-size: 0.9rem; }
+
+    /* Estados Seleccionados */
+    input:checked + .type-card.entrada {
+        border-color: #16A34A; background-color: #F0FDF4;
+    }
+    input:checked + .type-card.entrada i, input:checked + .type-card.entrada span { color: #16A34A; }
+
+    input:checked + .type-card.salida {
+        border-color: #DC2626; background-color: #FEF2F2;
+    }
+    input:checked + .type-card.salida i, input:checked + .type-card.salida span { color: #DC2626; }
+
+    /* --- PREVIEW CARD (Derecha) --- */
+    .preview-box {
+        background-color: #F8FAFC;
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-align: center;
+        border: 1px solid #E2E8F0;
+    }
+
+    .stock-change {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1.5rem;
+        margin: 1.5rem 0;
+    }
+
+    .stock-num { font-size: 1.8rem; font-weight: 800; color: var(--text-main); }
+    .arrow-icon { color: #CBD5E1; font-size: 1.5rem; }
+
+    .stock-badge {
+        background: #E2E8F0;
+        color: #475569;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    @media (max-width: 992px) {
+        .editor-grid { grid-template-columns: 1fr; }
+        .main-content { margin-left: 0; }
+    }
+  </style>
 </head>
 <body>
 
-<!-- Sidebar -->
-<div class="sidebar">
-  <div class="sidebar-header">
-    <h3><i class="fas fa-shoe-prints me-2"></i> Barefoot Admin</h3>
-  </div>
-  <ul class="sidebar-menu">
-    <li><a th:href="@{/admin/dashboard}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-    <li><a th:href="@{/admin/productos}"><i class="fas fa-box"></i> Productos</a></li>
-    <li><a th:href="@{/admin/pedidos}"><i class="fas fa-shopping-cart"></i> Pedidos</a></li>
-    <li><a th:href="@{/admin/reportes}"><i class="fas fa-chart-line"></i> Reportes</a></li>
-    <li><a th:href="@{/admin/inventario}" class="active"><i class="fas fa-warehouse"></i> Inventario</a></li>
-    <li><a th:href="@{/logout}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
-  </ul>
-</div>
+<div th:replace="~{admin/layout/sidebar :: sidebar(paginaActiva='inventario')}"></div>
 
-<!-- Main Content -->
 <div class="main-content">
-  <!-- Top Bar -->
-  <div class="top-bar">
-    <h2><i class="fas fa-plus-circle me-2"></i> Registrar Movimiento de Inventario</h2>
-    <a th:href="@{/admin/inventario}" class="btn btn-secondary">
-      <i class="fas fa-arrow-left me-2"></i> Volver
-    </a>
-  </div>
 
-  <div class="content-card" style="max-width: 800px; margin: 0 auto;">
-    <form th:action="@{/admin/inventario/movimientos/registrar}" method="post" id="formMovimiento">
+  <div th:replace="~{admin/layout/navbar :: navbar(tituloPagina='Registrar Movimiento')}"></div>
 
-      <!-- Seleccionar Producto -->
-      <div class="form-section">
-        <h5 class="form-section-title">
-          <i class="fas fa-box me-2"></i> Producto
-        </h5>
-        <div class="mb-3">
-          <label for="productoId" class="form-label">
-            <i class="fas fa-search me-1"></i> Buscar Producto *
-          </label>
-          <select class="form-select" id="productoId" name="productoId" required
-                  onchange="mostrarStockActual(this)">
-            <option value="">Seleccionar producto...</option>
+  <form th:action="@{/admin/inventario/movimientos/registrar}" method="post" id="movimientoForm">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <a th:href="@{/admin/inventario}" class="text-decoration-none text-muted fw-bold">
+        <i class="fas fa-arrow-left me-2"></i> Cancelar
+      </a>
+      <button type="submit" class="btn btn-primary px-4 py-2 fw-bold shadow-sm" style="border-radius: 10px;">
+        <i class="fas fa-save me-2"></i> Confirmar Movimiento
+      </button>
+    </div>
+
+    <div class="editor-grid">
+
+      <div class="left-col">
+
+        <div class="content-card">
+          <div class="card-header"><i class="fas fa-box text-primary"></i> Producto</div>
+
+          <label class="form-label small fw-bold text-muted text-uppercase ls-1">Buscar Producto</label>
+          <select class="form-select form-select-lg mb-3" id="productoId" name="productoId" required onchange="updatePreview()">
+            <option value="" data-stock="0" selected>Seleccionar producto...</option>
             <option th:each="producto : ${productos}"
                     th:value="${producto.id}"
-                    th:text="${producto.nombre} + ' (Stock: ' + ${producto.stock} + ')'"
-                    th:attr="data-stock=${producto.stock}">
+                    th:text="${producto.nombre} + ' - ' + ${producto.categoria}"
+                    th:attr="data-stock=${producto.stock}, data-img=${producto.imagenUrl}">
               Producto
             </option>
           </select>
         </div>
-        <div id="stockInfo" class="alert alert-info" style="display: none;">
-          <i class="fas fa-info-circle me-2"></i>
-          <strong>Stock actual:</strong> <span id="stockActual">0</span> unidades
+
+        <div class="content-card">
+          <div class="card-header"><i class="fas fa-exchange-alt text-secondary"></i> Detalles del Movimiento</div>
+
+          <div class="row g-4">
+            <div class="col-md-7">
+              <label class="form-label small fw-bold text-muted text-uppercase ls-1 mb-3">Tipo de Operación</label>
+              <div class="type-selector">
+                <label class="type-option">
+                  <input type="radio" name="tipo" value="ENTRADA" checked onchange="updatePreview()">
+                  <div class="type-card entrada">
+                    <i class="fas fa-arrow-down"></i>
+                    <span>Entrada</span>
+                  </div>
+                </label>
+                <label class="type-option">
+                  <input type="radio" name="tipo" value="SALIDA" onchange="updatePreview()">
+                  <div class="type-card salida">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>Salida</span>
+                  </div>
+                </label>
+                <label class="type-option">
+                  <input type="radio" name="tipo" value="DEVOLUCION" onchange="updatePreview()">
+                  <div class="type-card entrada">
+                    <i class="fas fa-undo"></i>
+                    <span>Devolución</span>
+                  </div>
+                </label>
+                <label class="type-option">
+                  <input type="radio" name="tipo" value="MERMA" onchange="updatePreview()">
+                  <div class="type-card salida">
+                    <i class="fas fa-trash-alt"></i>
+                    <span>Merma</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div class="col-md-5">
+              <label class="form-label small fw-bold text-muted text-uppercase ls-1 mb-3">Cantidad</label>
+              <input type="number" class="form-control form-control-lg fw-bold text-center"
+                     id="cantidad" name="cantidad" value="1" min="1" required
+                     oninput="updatePreview()" style="font-size: 2rem; height: 80px;">
+              <div class="form-text text-center mt-2">Unidades a mover</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-card">
+          <div class="card-header"><i class="fas fa-file-alt text-muted"></i> Justificación</div>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-bold text-muted">Motivo / Referencia</label>
+              <input type="text" class="form-control" name="motivo" placeholder="Ej: Compra mensual, Venta mostrador..." required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-bold text-muted">N° Documento (Opcional)</label>
+              <input type="text" class="form-control" name="numeroDocumento" placeholder="FAC-001, GR-123...">
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="right-col">
+        <div class="content-card bg-white border-0 shadow-lg sticky-top" style="top: 2rem;">
+          <h6 class="text-uppercase text-muted fw-bold ls-1 mb-4" style="font-size: 0.75rem;">Resumen de Impacto</h6>
+
+          <div class="preview-box">
+            <div id="productPlaceholder" class="text-muted py-4">
+              <i class="fas fa-box-open fa-3x mb-3 opacity-25"></i>
+              <p class="m-0 small">Selecciona un producto para ver el impacto</p>
+            </div>
+
+            <div id="stockPreview" style="display: none;">
+              <h5 class="fw-bold text-dark mb-1" id="previewName">Nombre Producto</h5>
+              <span class="stock-badge">Stock Actual: <span id="currentStockDisplay">0</span></span>
+
+              <div class="stock-change">
+                <div>
+                  <div class="text-muted small mb-1">Antes</div>
+                  <div class="stock-num text-muted" id="beforeVal">10</div>
+                </div>
+                <i class="fas fa-long-arrow-alt-right arrow-icon"></i>
+                <div>
+                  <div class="text-muted small mb-1">Después</div>
+                  <div class="stock-num text-primary" id="afterVal">15</div>
+                </div>
+              </div>
+
+              <div class="alert alert-warning mb-0 small d-flex align-items-center" id="stockError" style="display: none;">
+                <i class="fas fa-exclamation-triangle me-2"></i> Stock insuficiente
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Tipo de Movimiento -->
-      <div class="form-section">
-        <h5 class="form-section-title">
-          <i class="fas fa-exchange-alt me-2"></i> Tipo de Movimiento
-        </h5>
-        <div class="mb-3">
-          <label for="tipo" class="form-label">Seleccionar Tipo *</label>
-          <select class="form-select" id="tipo" name="tipo" required onchange="actualizarIcono(this)">
-            <option value="">Seleccionar...</option>
-            <option th:each="tipoMov : ${tiposMovimiento}"
-                    th:value="${tipoMov}"
-                    th:text="${tipoMov.nombre}"
-                    th:attr="data-icono=${tipoMov.icono}, data-color=${tipoMov.colorBadge}">
-              Tipo
-            </option>
-          </select>
-        </div>
-        <div id="tipoInfo" class="alert" style="display: none;">
-          <i id="tipoIcono" class="fas fa-info-circle me-2"></i>
-          <span id="tipoDescripcion"></span>
-        </div>
-      </div>
+    </div>
+  </form>
 
-      <!-- Cantidad y Detalles -->
-      <div class="form-section">
-        <h5 class="form-section-title">
-          <i class="fas fa-list-ol me-2"></i> Detalles del Movimiento
-        </h5>
-
-        <div class="mb-3">
-          <label for="cantidad" class="form-label">
-            <i class="fas fa-sort-numeric-up me-1"></i> Cantidad *
-          </label>
-          <input type="number" class="form-control" id="cantidad" name="cantidad"
-                 min="1" required placeholder="Ej: 10">
-        </div>
-
-        <div class="mb-3">
-          <label for="motivo" class="form-label">
-            <i class="fas fa-comment me-1"></i> Motivo *
-          </label>
-          <textarea class="form-control" id="motivo" name="motivo" rows="3" required
-                    placeholder="Describe el motivo del movimiento..."></textarea>
-        </div>
-
-        <div class="mb-3">
-          <label for="numeroDocumento" class="form-label">
-            <i class="fas fa-file-invoice me-1"></i> N° Documento (Opcional)
-          </label>
-          <input type="text" class="form-control" id="numeroDocumento" name="numeroDocumento"
-                 placeholder="Ej: FAC-001234">
-          <small class="text-muted">Número de factura, guía de remisión, etc.</small>
-        </div>
-      </div>
-
-      <!-- Botones -->
-      <div class="d-flex gap-3 justify-content-end">
-        <a th:href="@{/admin/inventario}" class="btn btn-secondary">
-          <i class="fas fa-times me-2"></i> Cancelar
-        </a>
-        <button type="submit" class="btn btn-primary">
-          <i class="fas fa-save me-2"></i> Registrar Movimiento
-        </button>
-      </div>
-    </form>
-  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  function mostrarStockActual(select) {
+  function updatePreview() {
+      // 1. Obtener valores
+      const select = document.getElementById('productoId');
       const selectedOption = select.options[select.selectedIndex];
-      const stock = selectedOption.getAttribute('data-stock');
+      const stockActual = parseInt(selectedOption.getAttribute('data-stock') || 0);
+      const cantidad = parseInt(document.getElementById('cantidad').value || 0);
 
-      if (stock !== null && select.value !== '') {
-          document.getElementById('stockActual').textContent = stock;
-          document.getElementById('stockInfo').style.display = 'block';
+      // Obtener tipo seleccionado
+      const tipos = document.getElementsByName('tipo');
+      let tipo = 'ENTRADA';
+      for (const t of tipos) { if (t.checked) tipo = t.value; }
+
+      // 2. Elementos UI
+      const placeholder = document.getElementById('productPlaceholder');
+      const preview = document.getElementById('stockPreview');
+
+      // 3. Si no hay producto, ocultar
+      if (!select.value) {
+          placeholder.style.display = 'block';
+          preview.style.display = 'none';
+          return;
+      }
+
+      // 4. Calcular nuevo stock
+      let nuevoStock = stockActual;
+      let esSalida = (tipo === 'SALIDA' || tipo === 'MERMA');
+
+      if (esSalida) {
+          nuevoStock = stockActual - cantidad;
       } else {
-          document.getElementById('stockInfo').style.display = 'none';
+          nuevoStock = stockActual + cantidad;
+      }
+
+      // 5. Actualizar UI
+      placeholder.style.display = 'none';
+      preview.style.display = 'block';
+
+      document.getElementById('previewName').textContent = selectedOption.text.split(' - ')[0];
+      document.getElementById('currentStockDisplay').textContent = stockActual;
+      document.getElementById('beforeVal').textContent = stockActual;
+      document.getElementById('afterVal').textContent = nuevoStock;
+
+      // 6. Validación Visual
+      const errorBox = document.getElementById('stockError');
+      const submitBtn = document.querySelector('button[type="submit"]');
+      const afterVal = document.getElementById('afterVal');
+
+      if (nuevoStock < 0) {
+          errorBox.style.display = 'flex';
+          submitBtn.disabled = true;
+          afterVal.classList.add('text-danger');
+          afterVal.classList.remove('text-primary');
+      } else {
+          errorBox.style.display = 'none';
+          submitBtn.disabled = false;
+          afterVal.classList.remove('text-danger');
+          afterVal.classList.add('text-primary');
       }
   }
-
-  function actualizarIcono(select) {
-      const selectedOption = select.options[select.selectedIndex];
-      const icono = selectedOption.getAttribute('data-icono');
-      const color = selectedOption.getAttribute('data-color');
-      const infoDiv = document.getElementById('tipoInfo');
-      const iconoElement = document.getElementById('tipoIcono');
-      const descripcionElement = document.getElementById('tipoDescripcion');
-
-      if (icono && select.value !== '') {
-          iconoElement.className = 'fas ' + icono + ' me-2';
-          infoDiv.className = 'alert alert-' + color;
-
-          // Descripciones según el tipo
-          const descripciones = {
-              'ENTRADA': 'Aumento de stock por compra o producción',
-              'SALIDA': 'Disminución de stock por venta',
-              'AJUSTE_ENTRADA': 'Corrección positiva del inventario',
-              'AJUSTE_SALIDA': 'Corrección negativa del inventario',
-              'DEVOLUCION': 'Retorno de productos al inventario',
-              'MERMA': 'Pérdida o deterioro de productos',
-              'TRANSFERENCIA': 'Movimiento entre ubicaciones'
-          };
-
-          descripcionElement.textContent = descripciones[select.value] || '';
-          infoDiv.style.display = 'block';
-      } else {
-          infoDiv.style.display = 'none';
-      }
-  }
-
-  // Validación del formulario
-  document.getElementById('formMovimiento').addEventListener('submit', function(e) {
-      const productoId = document.getElementById('productoId').value;
-      const tipo = document.getElementById('tipo').value;
-      const cantidad = parseInt(document.getElementById('cantidad').value);
-      const motivo = document.getElementById('motivo').value.trim();
-
-      if (!productoId || !tipo || !cantidad || !motivo) {
-          e.preventDefault();
-          alert('Por favor completa todos los campos obligatorios');
-          return false;
-      }
-
-      if (cantidad <= 0) {
-          e.preventDefault();
-          alert('La cantidad debe ser mayor a 0');
-          return false;
-      }
-
-      // Verificar stock suficiente para salidas
-      if (tipo.includes('SALIDA') || tipo === 'MERMA') {
-          const select = document.getElementById('productoId');
-          const selectedOption = select.options[select.selectedIndex];
-          const stockActual = parseInt(selectedOption.getAttribute('data-stock'));
-
-          if (cantidad > stockActual) {
-              e.preventDefault();
-              alert('Stock insuficiente. Stock actual: ' + stockActual + ' unidades');
-              return false;
-          }
-      }
-  });
 </script>
 </body>
 </html>

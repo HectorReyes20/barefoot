@@ -1,119 +1,260 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <th:block th:insert="~{fragments :: head('Procesar Pago - Barefoot Store')}"></th:block>
+    <th:block th:insert="~{fragments :: head('Pago Seguro - Barefoot')}"></th:block>
+
     <script src="https://js.stripe.com/v3/"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
     <style>
-        .pago-container {
-            background: var(--color-surface);
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            max-width: 600px;
-            margin: 30px auto;
+        :root {
+            --bg-color: #F9FAFB;
+            --card-bg: #FFFFFF;
+            --primary-dark: #111827;
+            --primary-hover: #000000;
+            --accent-yape: #742284;
+            --text-main: #1F2937;
+            --text-muted: #6B7280;
+            --border-color: #E5E7EB;
+            --radius-lg: 24px;
+            --radius-md: 12px;
+            --shadow-soft: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+            --color-primary-step: #2563EB; /* Azul para el stepper */
+            --color-success-step: #10B981; /* Verde para pasos completados */
         }
-        .seccion-pago {
-            margin-bottom: 30px;
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-main);
+            min-height: 100vh;
         }
-        .seccion-pago h3 {
-            color: var(--color-primary);
-            margin-bottom: 20px;
-            font-weight: 700;
-        }
-        .resumen {
-            background: #f5f1ed;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-        }
-        .resumen-item {
+
+        /* --- ESTILOS DEL STEPPER (Barra de Progreso) --- */
+        .stepper-wrapper {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #e0e0e0;
+            margin-bottom: 2.5rem;
+            position: relative;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 2rem;
         }
-        .resumen-item:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-            font-weight: 700;
-            font-size: 1.2rem;
-            color: var(--color-primary);
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 600;
-        }
-        .StripeElement {
-            border: 2px solid #e0e0e0;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 1rem;
-        }
-        .StripeElement--focus {
-            border-color: var(--color-primary);
-        }
-        .StripeElement--invalid {
-            border-color: #dc3545;
-        }
-        .error-message {
-            color: #dc3545;
-            font-size: 0.9rem;
-            margin-top: 8px;
-            display: none;
-        }
-        .btn-pagar {
+        .stepper-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
             width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: all 0.3s;
+            height: 2px;
+            background: #E5E7EB;
+            z-index: 0;
         }
-        .btn-pagar:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(78, 52, 46, 0.3);
+        .step-item {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            background: var(--bg-color);
+            padding: 0 10px;
         }
-        .btn-pagar:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        .spinner {
-            display: none;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--color-primary);
+        .step-circle {
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
+            background-color: white;
+            border: 2px solid #D1D5DB;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin: 0 auto 8px auto;
+            transition: all 0.3s ease;
+        }
+
+        /* Estado Activo (Pago) */
+        .step-item.active .step-circle {
+            background-color: var(--color-primary-step);
+            border-color: var(--color-primary-step);
+            color: white;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
+        }
+        .step-item.active .step-label {
+            color: var(--color-primary-step);
+            font-weight: 700;
+        }
+
+        /* Estado Completado (Envío) */
+        .step-item.completed .step-circle {
+            background-color: var(--color-success-step);
+            border-color: var(--color-success-step);
+            color: white;
+        }
+        .step-item.completed .step-label {
+            color: var(--color-success-step);
+            font-weight: 600;
+        }
+
+        .step-label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        /* --- ESTILOS DE LA TARJETA DE PAGO --- */
+        .checkout-container {
+            max-width: 520px;
+            margin: 0 auto 4rem auto;
+            width: 100%;
+            padding: 0 20px;
+        }
+
+        .checkout-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-soft);
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+
+        .amount-display {
+            text-align: center;
+            margin-bottom: 35px;
+            padding-bottom: 25px;
+            border-bottom: 1px dashed var(--border-color);
+        }
+        .amount-label {
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .amount-value {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+        .currency {
+            font-size: 1.5rem;
+            vertical-align: top;
+            margin-right: 4px;
+        }
+
+        /* Botón Yape */
+        .method-yape {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: #fff;
+            text-decoration: none;
+            color: var(--text-main);
+            transition: all 0.2s ease;
+        }
+        .method-yape:hover {
+            border-color: var(--accent-yape);
+            background-color: #FBF5FF;
+            transform: translateY(-2px);
+        }
+        .yape-icon {
+            width: 40px;
+            height: 40px;
+            background-color: var(--accent-yape);
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-right: 15px;
+        }
+
+        /* Formulario Tarjeta */
+        .card-form-container {
+            background-color: #F9FAFB;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 25px;
+            margin-top: 15px;
+        }
+
+        .input-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .form-control, .StripeElement {
+            background-color: #FFFFFF;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 15px;
+            font-size: 1rem;
+            transition: all 0.2s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            width: 100%;
+        }
+
+        .form-control:focus, .StripeElement--focus {
+            border-color: var(--primary-dark);
+            box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.05);
+            outline: none;
+        }
+
+        .btn-pay-secure {
+            background-color: var(--primary-dark);
+            color: white;
+            width: 100%;
+            padding: 18px;
+            border-radius: var(--radius-md);
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            margin-top: 25px;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-pay-secure:hover:not(:disabled) {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Spinner */
+        .spinner {
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top: 3px solid #ffffff;
             width: 20px;
             height: 20px;
             animation: spin 1s linear infinite;
-            margin-right: 10px;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .info-seguridad {
-            background: #e8f5e9;
-            border-left: 4px solid #4caf50;
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .alert-box {
+            display: none;
             padding: 15px;
             border-radius: 8px;
-            margin-bottom: 20px;
             font-size: 0.9rem;
-            color: #2e7d32;
-        }
-        .info-seguridad i {
-            margin-right: 10px;
+            margin-top: 20px;
+            text-align: center;
         }
     </style>
 </head>
@@ -121,204 +262,197 @@
 
 <nav th:replace="~{fragments :: navbar}"></nav>
 
-<div class="container my-5">
-    <h1 style="color: var(--color-primary); text-align: center; margin-bottom: 40px;">
-        <i class="fas fa-credit-card me-2"></i> Procesar Pago
-    </h1>
+<div class="container my-5 pt-4">
 
-    <div class="pago-container">
-        <!-- Resumen del Pedido -->
-        <div class="seccion-pago">
-            <h3><i class="fas fa-box me-2"></i> Resumen del Pedido</h3>
-            <div class="resumen">
-                <div class="resumen-item">
-                    <span>Número de Pedido:</span>
-                    <span th:text="${pedido.numeroPedido}">PED-0000000001</span>
+    <div class="stepper-wrapper">
+        <div class="step-item completed">
+            <div class="step-circle"><i class="fas fa-check"></i></div>
+            <div class="step-label">Envío</div>
+        </div>
+        <div class="step-item active">
+            <div class="step-circle">2</div>
+            <div class="step-label">Pago</div>
+        </div>
+        <div class="step-item">
+            <div class="step-circle">3</div>
+            <div class="step-label">Fin</div>
+        </div>
+    </div>
+
+    <div class="checkout-container">
+
+        <div class="checkout-card">
+
+            <div class="amount-display">
+                <span class="amount-label">Total a Pagar</span>
+                <div class="amount-value">
+                    <span class="currency">S/</span><span id="display-total" th:text="${#numbers.formatDecimal(total, 1, 'COMMA', 2, 'POINT')}">0.00</span>
                 </div>
-                <div class="resumen-item">
-                    <span>Subtotal:</span>
-                    <span>S/ <span th:text="${#numbers.formatDecimal(pedido.subtotal, 1, 'COMMA', 2, 'POINT')}">0.00</span></span>
+            </div>
+
+            <div class="mb-4">
+                <h6 class="mb-3 text-muted small fw-bold text-uppercase ls-1">Selecciona método de pago</h6>
+
+                <a th:href="@{/pago/yape}" class="method-yape mb-3">
+                    <div class="d-flex align-items-center">
+                        <div class="yape-icon">Y</div>
+                        <div>
+                            <div class="fw-bold">Pagar con Yape</div>
+                            <small class="text-muted" style="font-size: 0.8rem;">Aprobación inmediata</small>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-right text-muted"></i>
+                </a>
+
+                <div class="card-form-container">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="bg-dark text-white rounded p-2 me-3">
+                            <i class="fas fa-credit-card"></i>
+                        </div>
+                        <span class="fw-bold">Tarjeta de Crédito / Débito</span>
+                    </div>
+
+                    <form id="payment-form">
+                        <div class="mb-3">
+                            <label class="input-label">Datos de la tarjeta</label>
+                            <div id="card-element" class="StripeElement"></div>
+                            <div id="card-errors" class="text-danger small mt-2"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="input-label">Email para el recibo</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0 text-muted"><i class="fas fa-envelope"></i></span>
+                                <input type="email" id="email" class="form-control border-start-0 ps-0"
+                                       th:value="${session.usuarioEmail}"
+                                       placeholder="tu@email.com" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-pay-secure" id="submit-button">
+                            <span id="btn-text">Pagar S/ <span th:text="${#numbers.formatDecimal(total, 1, 'COMMA', 2, 'POINT')}"></span></span>
+                            <span id="btn-spinner" class="spinner" style="display: none;"></span>
+                        </button>
+                    </form>
                 </div>
-                <div class="resumen-item">
-                    <span>Descuento:</span>
-                    <span th:if="${pedido.descuento == 0 || pedido.descuento == null}">-</span>
-                    <span th:if="${pedido.descuento > 0}">-S/ <span th:text="${#numbers.formatDecimal(pedido.descuento, 1, 'COMMA', 2, 'POINT')}">0.00</span></span>
-                </div>
-                <div class="resumen-item">
-                    <span>Envío:</span>
-                    <span th:if="${pedido.costoEnvio == 0 || pedido.costoEnvio == null}" class="text-success">
-                        <strong>GRATIS</strong>
-                    </span>
-                    <span th:if="${pedido.costoEnvio > 0}">
-                        S/ <span th:text="${#numbers.formatDecimal(pedido.costoEnvio, 1, 'COMMA', 2, 'POINT')}">0.00</span>
-                    </span>
-                </div>
-                <div class="resumen-item">
-                    <span>Total a Pagar:</span>
-                    <span>S/ <span th:text="${#numbers.formatDecimal(pedido.total, 1, 'COMMA', 2, 'POINT')}">0.00</span></span>
-                </div>
+            </div>
+
+            <div id="payment-message" class="alert-box"></div>
+
+            <div class="text-center mt-3 small text-muted">
+                <i class="fas fa-lock me-1"></i> Pagos procesados seguramente vía Stripe.
             </div>
         </div>
 
-        <!-- Información de Seguridad -->
-        <div class="info-seguridad">
-            <i class="fas fa-shield-alt"></i>
-            <strong>Pago Seguro:</strong> Tu información está protegida y se procesa de forma segura con Stripe.
-        </div>
-
-        <!-- Formulario de Pago -->
-        <div class="seccion-pago">
-            <h3><i class="fas fa-lock me-2"></i> Información de Pago</h3>
-
-            <form id="payment-form">
-                <div class="form-group">
-                    <label for="card-element">Datos de la Tarjeta</label>
-                    <div id="card-element" class="StripeElement"></div>
-                    <div id="card-errors" class="error-message"></div>
-                </div>
-
-                <div class="form-group">
-                    <label for="email">Email de Confirmación</label>
-                    <input type="email" id="email" class="form-control" th:value="${session.usuarioEmail}" readonly>
-                </div>
-
-                <button type="submit" class="btn-pagar" id="submit-button">
-                    <span class="spinner" id="spinner"></span>
-                    <span id="button-text">Pagar S/ <span th:text="${#numbers.formatDecimal(pedido.total, 1, 'COMMA', 2, 'POINT')}">0.00</span></span>
-                </button>
-            </form>
-
-            <!-- Mensaje de Éxito/Error -->
-            <div id="payment-message" style="display: none; margin-top: 20px; padding: 15px; border-radius: 8px;">
-            </div>
+        <div class="text-center mt-4">
+            <a th:href="@{/checkout}" class="text-decoration-none text-muted">
+                <i class="fas fa-arrow-left me-1"></i> Cancelar y volver a detalles
+            </a>
         </div>
     </div>
 </div>
 
-<footer th:replace="~{fragments :: footer}"></footer>
-<div th:replace="~{fragments :: scripts}"></div>
-
-<script>
-    const stripe = Stripe('[[${stripePublicKey}]]');
+<script th:inline="javascript">
+    const stripe = Stripe(/*[[${stripePublicKey}]]*/ 'pk_test_public_key');
     const elements = stripe.elements();
-    const cardElement = elements.create('card');
 
-    cardElement.mount('#card-element');
+    const style = {
+        base: {
+            color: "#1F2937",
+            fontFamily: '"Inter", sans-serif',
+            fontSmoothing: "antialiased",
+            fontSize: "16px",
+            "::placeholder": { color: "#9CA3AF" }
+        },
+        invalid: { color: "#DC2626", iconColor: "#DC2626" }
+    };
+
+    const card = elements.create("card", { style: style, hidePostalCode: true });
+    card.mount("#card-element");
 
     const form = document.getElementById('payment-form');
     const submitButton = document.getElementById('submit-button');
-    const spinner = document.getElementById('spinner');
-    const cardErrors = document.getElementById('card-errors');
-    const paymentMessage = document.getElementById('payment-message');
-    const pedidoId = [[${pedido.id}]];
+    const btnText = document.getElementById('btn-text');
+    const btnSpinner = document.getElementById('btn-spinner');
+    const messageDiv = document.getElementById('payment-message');
 
-    // Manejar errores de la tarjeta
-    cardElement.on('change', (event) => {
-        if (event.error) {
-            cardErrors.textContent = event.error.message;
-            cardErrors.style.display = 'block';
-        } else {
-            cardErrors.style.display = 'none';
-        }
-    });
-
-    // Manejar envío del formulario
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        submitButton.disabled = true;
-        spinner.style.display = 'inline-block';
-        submitButton.querySelector('#button-text').textContent = 'Procesando...';
+    form.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        setLoading(true);
 
         try {
-            // Paso 1: Iniciar pago en el servidor
-            const initResponse = await fetch('/pago/api/iniciar-stripe', {
+            const response = await fetch('/pago/api/iniciar-stripe', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: 'pedidoId=' + pedidoId
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
             });
 
-            if (!initResponse.ok) {
-                throw new Error('Error al contactar el servidor');
-            }
+            const sessionData = await response.json();
 
-            const initData = await initResponse.json();
+            if (sessionData.error) { throw new Error(sessionData.error); }
 
-            if (initData.error) {
-                showError(initData.error);
-                submitButton.disabled = false;
-                spinner.style.display = 'none';
-                submitButton.querySelector('#button-text').textContent = 'Pagar S/ ...';
-                return;
-            }
-
-            // Paso 2: Confirmar pago con Stripe
-            const { paymentIntent, error } = await stripe.confirmCardPayment(
-                initData.clientSecret,
-                {
-                    payment_method: {
-                        card: cardElement,
-                        billing_details: {
-                            email: document.getElementById('email').value
-                        }
-                    }
+            const result = await stripe.confirmCardPayment(sessionData.clientSecret, {
+                payment_method: {
+                    card: card,
+                    billing_details: { email: document.getElementById('email').value }
                 }
-            );
+            });
 
-            if (error) {
-                showError(error.message);
-                submitButton.disabled = false;
-                spinner.style.display = 'none';
-                submitButton.querySelector('#button-text').textContent = 'Reintentar Pago';
-            } else if (paymentIntent.status === 'succeeded') {
-                // Paso 3: Confirmar en servidor
-                const confirmResponse = await fetch('/pago/api/confirmar-stripe', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: 'paymentIntentId=' + paymentIntent.id
-                });
-
-                const confirmData = await confirmResponse.json();
-
-                if (confirmData.exito) {
-                    showSuccess('¡Pago completado exitosamente! Redirigiendo...');
-                    setTimeout(() => {
-                        window.location.href = confirmData.redirect;
-                    }, 2000);
-                } else {
-                    showError(confirmData.error || 'Error al confirmar el pago');
-                    submitButton.disabled = false;
-                    spinner.style.display = 'none';
-                    submitButton.querySelector('#button-text').textContent = 'Reintentar';
+            if (result.error) {
+                showMessage(result.error.message, 'error');
+                setLoading(false);
+            } else {
+                if (result.paymentIntent.status === 'succeeded') {
+                    confirmarPedido(result.paymentIntent.id);
                 }
             }
-
-        } catch (err) {
-            console.error('Error completo:', err);
-            showError('Error inesperado: ' + err.message);
-            submitButton.disabled = false;
-            spinner.style.display = 'none';
-            submitButton.querySelector('#button-text').textContent = 'Reintentar Pago';
+        } catch (error) {
+            showMessage(error.message || "Error de conexión", 'error');
+            setLoading(false);
         }
     });
 
-    function showError(message) {
-        paymentMessage.style.display = 'block';
-        paymentMessage.style.background = '#ffebee';
-        paymentMessage.style.borderLeft = '4px solid #dc3545';
-        paymentMessage.style.color = '#c62828';
-        paymentMessage.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i>' + message;
+    async function confirmarPedido(paymentIntentId) {
+        try {
+            const response = await fetch('/pago/api/confirmar-stripe', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'paymentIntentId=' + paymentIntentId
+            });
+            const data = await response.json();
+
+            if (data.exito) {
+                showMessage("¡Pago exitoso! Redirigiendo...", "success");
+                setTimeout(() => window.location.href = data.redirect, 1500);
+            } else { throw new Error(data.error); }
+        } catch (error) {
+            showMessage("Error al confirmar: " + error.message, 'error');
+            setLoading(false);
+        }
     }
 
-    function showSuccess(message) {
-        paymentMessage.style.display = 'block';
-        paymentMessage.style.background = '#e8f5e9';
-        paymentMessage.style.borderLeft = '4px solid #4caf50';
-        paymentMessage.style.color = '#2e7d32';
-        paymentMessage.innerHTML = '<i class="fas fa-check-circle me-2"></i>' + message;
+    function setLoading(isLoading) {
+        if (isLoading) {
+            submitButton.disabled = true;
+            btnText.style.display = "none";
+            btnSpinner.style.display = "inline-block";
+        } else {
+            submitButton.disabled = false;
+            btnText.style.display = "inline";
+            btnSpinner.style.display = "none";
+        }
+    }
+
+    function showMessage(text, type) {
+        messageDiv.style.display = "block";
+        messageDiv.textContent = text;
+        if (type === 'error') {
+            messageDiv.style.backgroundColor = "#FEE2E2";
+            messageDiv.style.color = "#DC2626";
+        } else {
+            messageDiv.style.backgroundColor = "#D1FAE5";
+            messageDiv.style.color = "#047857";
+        }
     }
 </script>
-
 </body>
 </html>
-

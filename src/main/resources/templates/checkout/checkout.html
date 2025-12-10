@@ -2,43 +2,236 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <th:block th:insert="~{fragments :: head('Checkout - Barefoot Store')}"></th:block>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+
     <style>
-        .checkout-container {
-            background: var(--color-surface);
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        :root {
+            --font-heading: 'Poppins', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --color-primary: #2563EB; /* Azul vibrante moderno */
+            --color-primary-dark: #1D4ED8;
+            --color-bg: #F3F4F6;
+            --color-surface: #FFFFFF;
+            --color-text-main: #111827;
+            --color-text-muted: #6B7280;
+            --color-border: #E5E7EB;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
-        .form-section {
-            margin-bottom: 30px;
-            padding-bottom: 30px;
-            border-bottom: 2px solid #f0f0f0;
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--color-bg);
+            color: var(--color-text-main);
+            -webkit-font-smoothing: antialiased;
         }
-        .form-section:last-child {
-            border-bottom: none;
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-heading);
+            color: var(--color-text-main);
         }
-        .metodo-pago {
-            border: 2px solid #e0e0e0;
-            padding: 15px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-bottom: 10px;
+
+        /* --- Stepper (Indicador de Pasos) --- */
+        .stepper-wrapper {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            margin-top: 3rem;
+            position: relative;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
         }
-        .metodo-pago:hover {
+        .stepper-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #E5E7EB;
+            z-index: 0;
+        }
+        .step-item {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            background: var(--color-bg); /* Mismo que el body para ocultar la línea */
+            padding: 0 10px;
+        }
+        .step-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: white;
+            border: 2px solid #D1D5DB;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin: 0 auto 8px auto;
+            transition: all 0.3s ease;
+        }
+        .step-item.active .step-circle {
+            background-color: var(--color-primary);
             border-color: var(--color-primary);
-            background: #f8f9fa;
+            color: white;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
         }
-        .metodo-pago input[type="radio"]:checked + label {
+        .step-item.completed .step-circle {
+            background-color: #10B981; /* Verde éxito */
+            border-color: #10B981;
+            color: white;
+        }
+        .step-label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--color-text-muted);
+        }
+        .step-item.active .step-label {
             color: var(--color-primary);
-            font-weight: bold;
+            font-weight: 700;
         }
-        .resumen-checkout {
-            background: var(--color-background);
-            padding: 30px;
-            border-radius: 15px;
+
+        /* --- Layout --- */
+        .checkout-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        /* --- Formulario --- */
+        .card-modern {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            padding: 2rem;
+            border: 1px solid var(--color-border);
+        }
+
+        .form-label {
+            font-weight: 500;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+
+        .form-control {
+            border-radius: var(--radius-md);
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--color-border);
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            background-color: #fff;
+        }
+
+        .form-control:focus {
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-control-readonly {
+            background-color: #F9FAFB;
+            border-color: #F3F4F6;
+            color: var(--color-text-muted);
+            cursor: not-allowed;
+        }
+
+        /* --- Resumen --- */
+        .order-summary {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
             position: sticky;
-            top: 100px;
+            top: 2rem; /* Hace que siga el scroll */
+        }
+
+        .product-item {
+            display: flex;
+            gap: 1rem;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px dashed var(--color-border);
+        }
+
+        .product-img {
+            width: 72px;
+            height: 72px;
+            object-fit: cover;
+            border-radius: var(--radius-md);
+            background-color: #F3F4F6;
+        }
+
+        .price-tag {
+            font-family: var(--font-heading);
+            font-weight: 600;
+            color: var(--color-text-main);
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 2px solid var(--color-border);
+        }
+
+        .total-amount {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-primary);
+            letter-spacing: -0.5px;
+        }
+
+        /* --- Botones y Checkbox --- */
+        .btn-checkout {
+            background-color: var(--color-primary);
+            color: white;
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            letter-spacing: 0.3px;
+            transition: transform 0.1s, background-color 0.2s;
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
+            border: none;
+        }
+
+        .btn-checkout:hover {
+            background-color: var(--color-primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .form-check-input {
+            width: 1.2em;
+            height: 1.2em;
+            margin-top: 0.2em;
+            border-radius: 4px;
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 992px) {
+            .checkout-grid {
+                grid-template-columns: 1fr;
+            }
+            .order-summary {
+                order: -1; /* Muestra el resumen primero en móvil, opcional */
+                margin-bottom: 2rem;
+                position: relative;
+                top: 0;
+            }
+            .stepper-wrapper {
+                margin-bottom: 1.5rem;
+            }
         }
     </style>
 </head>
@@ -46,190 +239,169 @@
 
 <nav th:replace="~{fragments :: navbar}"></nav>
 
-<div class="container my-5">
-    <h1 class="mb-4">
-        <i class="fas fa-credit-card me-2"></i> Finalizar Compra
-    </h1>
+<div class="container my-5 pt-4">
 
-    <!-- Mensajes -->
-    <div th:if="${mensaje}" th:class="'alert alert-' + ${tipoMensaje}" role="alert">
-        <span th:text="${mensaje}"></span>
+    <div class="stepper-wrapper">
+        <div class="step-item active">
+            <div class="step-circle">1</div>
+            <div class="step-label">Envío</div>
+        </div>
+        <div class="step-item">
+            <div class="step-circle">2</div>
+            <div class="step-label">Pago</div>
+        </div>
+        <div class="step-item">
+            <div class="step-circle">3</div>
+            <div class="step-label">Fin</div>
+        </div>
     </div>
 
     <div class="row">
-        <div class="col-lg-7">
-            <form th:action="@{/checkout/procesar}" method="post" id="checkoutForm">
+        <div class="col-12 mb-4 text-center">
+            <h2 class="fw-bold">Detalles de Entrega</h2>
+            <p class="text-muted">Dinos dónde enviamos tus barefoot</p>
+        </div>
+    </div>
 
-                <div class="checkout-container">
-                    <!-- Información de Envío -->
-                    <div class="form-section">
-                        <h4><i class="fas fa-truck me-2"></i> Información de Envío</h4>
+    <form th:action="@{/checkout/procesar}" method="post" id="checkoutForm" class="checkout-grid">
 
-                        <div class="mb-3">
-                            <label class="form-label">Nombre Completo *</label>
-                            <input type="text" class="form-control"
-                                   th:value="${nombreUsuario + ' ' + session.usuario.apellido}"
-                                   readonly>
-                        </div>
+        <div class="left-column">
 
-                        <div class="mb-3">
-                            <label class="form-label">Email *</label>
-                            <input type="email" class="form-control"
-                                   th:value="${usuarioEmail}"
-                                   readonly>
-                        </div>
+            <div th:if="${mensaje}" th:class="'alert alert-' + ${tipoMensaje} + ' mb-4 shadow-sm rounded-3'" role="alert">
+                <i class="fas fa-info-circle me-2"></i><span th:text="${mensaje}"></span>
+            </div>
 
-                        <div class="mb-3">
-                            <label for="direccionEnvio" class="form-label">Dirección de Envío *</label>
-                            <textarea class="form-control" id="direccionEnvio" name="direccionEnvio"
-                                      rows="3" required
-                                      placeholder="Calle, número, distrito, ciudad, referencias"></textarea>
-                            <small class="text-muted">
-                                Incluye referencias para facilitar la entrega
-                            </small>
+            <div class="card-modern">
+                <h4 class="mb-4"><i class="fas fa-map-pin me-2 text-primary"></i>Dirección de Envío</h4>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Nombre</label>
+                        <input type="text" class="form-control form-control-readonly"
+                               th:value="${usuario.nombre}" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Apellido</label>
+                        <input type="text" class="form-control form-control-readonly"
+                               th:value="${usuario.apellido}" readonly>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">Email de confirmación</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="fas fa-envelope text-muted"></i></span>
+                            <input type="email" class="form-control form-control-readonly border-start-0 ps-0"
+                                   th:value="${usuario.email}" readonly>
                         </div>
                     </div>
 
-                    <!-- Método de Pago -->
-                    <div class="form-section">
-                        <h4><i class="fas fa-money-bill-wave me-2"></i> Método de Pago</h4>
-
-                        <div th:each="metodo : ${metodosPago}" class="metodo-pago">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="metodoPago"
-                                       th:id="'metodo_' + ${metodo}"
-                                       th:value="${metodo}"
-                                       required>
-                                <label class="form-check-label w-100"
-                                       th:for="'metodo_' + ${metodo}">
-                                    <span th:text="${metodo.icono}" class="me-2">💳</span>
-                                    <span th:text="${metodo.nombre}">Método</span>
-                                    <span th:if="${metodo.requierePasarela}" class="badge bg-primary ms-2">
-                                        Pago Online
-                                     </span>
-                                </label>
-                            </div>
+                    <div class="col-12 mt-4">
+                        <label for="direccionEnvio" class="form-label">Dirección exacta *</label>
+                        <textarea class="form-control" id="direccionEnvio" name="direccionEnvio"
+                                  rows="3" required
+                                  placeholder="Calle, número, dpto, urbanización..."></textarea>
+                        <div class="form-text text-muted small mt-1">
+                            <i class="fas fa-lightbulb text-warning me-1"></i> Consejo: Incluye referencias (ej. "Frente al parque")
                         </div>
                     </div>
 
-                    <!-- Notas Adicionales -->
-                    <div class="form-section">
-                        <h4><i class="fas fa-comment me-2"></i> Notas del Pedido (Opcional)</h4>
-                        <textarea class="form-control" name="notas" rows="3"
-                                  placeholder="Instrucciones especiales para tu pedido..."></textarea>
+                    <div class="col-12 mt-3">
+                        <label class="form-label">Notas para el repartidor (Opcional)</label>
+                        <input type="text" class="form-control" name="notas"
+                               placeholder="Ej: Dejar en portería, timbre malogrado...">
                     </div>
+                </div>
 
-                    <!-- Términos y Condiciones -->
-                    <div class="form-check mb-3">
+                <div class="mt-4 pt-3 border-top">
+                    <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="terminos" required>
-                        <label class="form-check-label" for="terminos">
-                            Acepto los <a href="#" target="_blank">términos y condiciones</a> y la
-                            <a href="#" target="_blank">política de privacidad</a>
+                        <label class="form-check-label user-select-none" for="terminos">
+                            Confirmo que mis datos de envío son correctos y actualizados.
                         </label>
                     </div>
-
-                    <button type="submit" class="btn btn-checkout w-100">
-                        <i class="fas fa-lock me-2"></i> Realizar Pedido
-                    </button>
                 </div>
-            </form>
+            </div>
+
         </div>
 
-        <div class="col-lg-5">
-            <div class="resumen-checkout">
-                <h4 class="mb-4">Resumen del Pedido</h4>
+        <div class="right-column">
+            <div class="order-summary">
+                <h4 class="mb-4">Tu Pedido</h4>
 
-                <!-- Lista de Productos -->
-                <div class="mb-3">
-                    <div th:each="item : ${carrito}" class="d-flex align-items-center mb-3 pb-3 border-bottom">
-                        <img th:if="${item.imagenUrl != null}"
-                             th:src="${item.imagenUrl}"
-                             style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;"
-                             th:alt="${item.nombre}">
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="mb-0" th:text="${item.nombre}">Producto</h6>
-                            <small class="text-muted">
-                                Cantidad: <span th:text="${item.cantidad}">1</span>
-                            </small>
-                            <p th:if="${item.personalizacion != null}" class="text-info small mb-0">
-                                <i class="fas fa-palette"></i> Personalizado
+                <div class="products-list mb-4">
+                    <div th:each="item : ${carrito}" class="product-item">
+                        <div class="product-img-wrapper">
+                            <img th:if="${item.imagenUrl != null}" th:src="${item.imagenUrl}" class="product-img">
+                            <div th:if="${item.imagenUrl == null}" class="product-img d-flex align-items-center justify-content-center text-muted">
+                                <i class="fas fa-shoe-prints"></i>
+                            </div>
+                        </div>
+
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1 fw-bold text-dark" th:text="${item.nombre}">Producto</h6>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">Cant: <span th:text="${item.cantidad}">1</span></small>
+                                <span class="price-tag small">S/ <span th:text="${#numbers.formatDecimal(item.subtotal, 1, 'COMMA', 2, 'POINT')}"></span></span>
+                            </div>
+                            <p th:if="${item.personalizacion}" class="text-primary x-small mb-0 mt-1">
+                                <i class="fas fa-magic me-1"></i> <span th:text="${item.personalizacion}"></span>
                             </p>
                         </div>
-                        <strong>S/ <span th:text="${#numbers.formatDecimal(item.subtotal, 1, 'COMMA', 2, 'POINT')}">0.00</span></strong>
                     </div>
                 </div>
 
-                <hr>
-
-                <!-- Cálculos -->
-                <div class="d-flex justify-content-between mb-2">
-                    <span>Subtotal:</span>
-                    <strong>S/ <span th:text="${#numbers.formatDecimal(subtotal, 1, 'COMMA', 2, 'POINT')}">0.00</span></strong>
+                <div class="d-flex justify-content-between mb-2 text-muted">
+                    <span>Subtotal</span>
+                    <span>S/ <span th:text="${#numbers.formatDecimal(subtotal, 1, 'COMMA', 2, 'POINT')}"></span></span>
                 </div>
 
-                <div class="d-flex justify-content-between mb-2">
-                    <span>Costo de Envío:</span>
-                    <span th:if="${costoEnvio == 0}" class="text-success">
-                        <strong>¡GRATIS!</strong>
-                    </span>
-                    <span th:if="${costoEnvio > 0}">
-                        S/ <span th:text="${#numbers.formatDecimal(costoEnvio, 1, 'COMMA', 2, 'POINT')}">0.00</span>
-                    </span>
+                <div class="d-flex justify-content-between mb-2 text-muted">
+                    <span>Envío</span>
+                    <span th:if="${costoEnvio == 0}" class="text-success fw-bold">GRATIS</span>
+                    <span th:if="${costoEnvio > 0}">S/ <span th:text="${#numbers.formatDecimal(costoEnvio, 1, 'COMMA', 2, 'POINT')}"></span></span>
                 </div>
 
-                <div th:if="${subtotal < 400}" class="alert alert-info small mb-3">
-                    <i class="fas fa-info-circle me-1"></i>
-                    Envío gratis en compras mayores a S/ 400
+                <div class="total-row">
+                    <span>Total a Pagar</span>
+                    <span class="total-amount">S/ <span th:text="${#numbers.formatDecimal(total, 1, 'COMMA', 2, 'POINT')}"></span></span>
                 </div>
 
-                <hr>
-
-                <div class="d-flex justify-content-between mb-4">
-                    <h5>Total a Pagar:</h5>
-                    <h3 class="text-primary mb-0">
-                        S/ <span th:text="${#numbers.formatDecimal(total, 1, 'COMMA', 2, 'POINT')}">0.00</span>
-                    </h3>
-                </div>
-
-                <div class="alert alert-success small">
-                    <i class="fas fa-shield-alt me-1"></i>
-                    Compra 100% segura y protegida
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-checkout w-100">
+                        Ir a Pagar <i class="fas fa-lock ms-2"></i>
+                    </button>
+                    <div class="text-center mt-3 small text-muted">
+                        <i class="fas fa-shield-alt me-1"></i> Pagos procesados de forma segura
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </form>
 </div>
 
 <footer th:replace="~{fragments :: footer}"></footer>
 <div th:replace="~{fragments :: scripts}"></div>
 
 <script>
-    // Validación del formulario
     document.getElementById('checkoutForm').addEventListener('submit', function(e) {
-        const direccion = document.getElementById('direccionEnvio').value.trim();
-        const metodoPago = document.querySelector('input[name="metodoPago"]:checked');
-        const terminos = document.getElementById('terminos').checked;
+        const direccion = document.getElementById('direccionEnvio');
+        const terminos = document.getElementById('terminos');
 
-        if (!direccion) {
+        if (!direccion.value.trim()) {
             e.preventDefault();
-            alert('Por favor ingresa la dirección de envío');
+            direccion.classList.add('is-invalid');
+            direccion.focus();
+            // Opcional: Toast o alerta suave en lugar de alert()
             return false;
+        } else {
+            direccion.classList.remove('is-invalid');
         }
 
-        if (!metodoPago) {
-            e.preventDefault();
-            alert('Por favor selecciona un método de pago');
-            return false;
+        // El required del HTML se encarga del checkbox, pero si quieres validación JS extra:
+        if(!terminos.checked) {
+             e.preventDefault();
+             terminos.classList.add('is-invalid');
         }
-
-        if (!terminos) {
-            e.preventDefault();
-            alert('Debes aceptar los términos y condiciones');
-            return false;
-        }
-
-        // Confirmar pedido
-        return confirm('¿Confirmas que deseas realizar este pedido?');
     });
 </script>
 
