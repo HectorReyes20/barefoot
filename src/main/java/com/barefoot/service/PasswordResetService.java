@@ -40,7 +40,7 @@ public class PasswordResetService {
             // IMPORTANTE: Cambia esto por tu dominio de Railway cuando despliegues
             // Local: http://localhost:8080...
             // Prod: https://barefoot-production.up.railway.app...
-            String baseUrl = "https://barefoot-production.up.railway.app";
+            String baseUrl = "http://localhost:8080";
             String link = baseUrl + "/reset-password?token=" + token;
 
             enviarEmailResend(email, link, usuario.getNombre());
