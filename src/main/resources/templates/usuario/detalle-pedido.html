@@ -136,16 +136,22 @@
                         <tbody>
                         <tr th:each="detalle : ${pedido.detalles}">
                             <td class="ps-4">
-                                <div class="d-flex align-items-center">
+                                <div class="d-flex align-items-center gap-3">
                                     <img th:if="${detalle.producto.imagenUrl != null}"
                                          th:src="${detalle.producto.imagenUrl}"
-                                         style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px; margin-right: 15px;">
+                                         class="rounded" style="width: 50px; height: 50px; object-fit: cover;">
+
                                     <div>
-                                        <strong th:text="${detalle.producto.nombre}"></strong>
-                                        <small th:if="${detalle.personalizacion != null}"
-                                               class="text-muted d-block"
-                                               th:text="'Nota: ' + ${detalle.personalizacion}">
-                                        </small>
+                                        <span class="fw-bold d-block" th:text="${detalle.producto.nombre}">Nombre Producto</span>
+                                        <small class="text-muted" th:text="${detalle.producto.categoria}">Categoría</small>
+
+                                        <div th:if="${detalle.personalizacion != null and !#strings.isEmpty(detalle.personalizacion)}"
+                                             class="mt-1">
+                                            <span class="badge bg-light text-dark border border-warning text-wrap text-start">
+                                                <i class="fas fa-magic me-1 text-warning"></i>
+                                             <span th:text="${detalle.personalizacion}" class="fst-italic">Texto personalizado...</span>
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </td>

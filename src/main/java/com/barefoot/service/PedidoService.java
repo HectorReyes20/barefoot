@@ -79,7 +79,10 @@ public class PedidoService {
             detalle.setCantidad(item.getCantidad());
             detalle.setPrecioUnitario(productoReal.getPrecio()); // O productoReal.getPrecioFinal() si tienes descuentos
             detalle.setSubtotal(item.getSubtotal());
-            // detalle.setPersonalizacion(item.getPersonalizacion()); // Descomenta si usas personalización
+
+            // --- AQUÍ ESTÁ LA LÍNEA QUE TE FALTABA PARA LA PERSONALIZACIÓN ---
+            detalle.setPersonalizacion(item.getPersonalizacion());
+            // ------------------------------------------------------------------
 
             // REDUCIR STOCK REAL
             productoService.reducirStock(productoReal.getId(), item.getCantidad());
