@@ -8,18 +8,80 @@
 
 <nav th:replace="~{fragments :: navbar}"></nav>
 
-<div style="height: 100px;"></div>
+<div style="height: 80px;"></div>
 
-<div class="container mb-5">
-    <div class="text-center mb-5">
-        <span class="text-uppercase text-accent ls-2 fw-bold small mb-2 d-block">Atelier</span>
-        <h1 class="display-4 font-serif fw-bold text-primary-dark">Diseña tu Par Único</h1>
+<div class="container">
+    <div class="text-center mb-3">
+        <span class="text-uppercase text-accent ls-2 fw-bold small mb-1 d-block">Atelier</span>
+        <h1 class="display-5 font-serif fw-bold text-primary-dark">Diseña tu Par Único</h1>
     </div>
 
-    <div class="customizer-card">
-        <div class="row g-0">
+    <div class="customizer-card card shadow-sm">
 
-            <div class="col-lg-8 preview-area">
+        <div class="settings-bar bg-white border-bottom p-3">
+            <div class="row align-items-end g-3">
+
+                <div class="col-lg-4 col-md-5">
+                    <div class="d-flex justify-content-between mb-1">
+                        <label class="small fw-bold text-muted text-uppercase mb-0">1. Modelo Base</label>
+                        <span id="precio-display" class="badge bg-primary-dark">S/ 0.00</span>
+                    </div>
+                    <select id="select-modelo" class="form-select form-select-custom">
+                        <option value="1"
+                                th:data-id="${modelo1.id}"
+                                th:data-precio="${modelo1.precio}"
+                                th:data-material="${modelo1.material}"
+                                th:data-img="${modelo1.imagenUrl}"
+                                data-nombre="Urban Custom">Modelo 1 - Senderismo</option>
+
+                        <option value="2"
+                                th:data-id="${modelo2.id}"
+                                th:data-precio="${modelo2.precio}"
+                                th:data-material="${modelo2.material}"
+                                th:data-img="${modelo2.imagenUrl}"
+                                data-nombre="Sport Custom">Modelo 2 - Casual</option>
+
+                        <option value="3"
+                                th:data-id="${modelo3.id}"
+                                th:data-precio="${modelo3.precio}"
+                                th:data-material="${modelo3.material}"
+                                th:data-img="${modelo3.imagenUrl}"
+                                data-nombre="Classic Custom">Modelo 3 - Deportivo</option>
+                    </select>
+                </div>
+
+                <div class="col-lg-5 col-md-5">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label class="small fw-bold text-muted text-uppercase mb-1">2. Talla</label>
+                            <select id="select-talla" class="form-select form-select-custom">
+                                <option th:each="i : ${#numbers.sequence(35, 45)}" th:value="${i}" th:text="${i}"></option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label class="small fw-bold text-muted text-uppercase mb-1">3. Material</label>
+                            <input type="text" id="input-material" class="form-control bg-light" readonly value="...">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-2 text-center">
+                    <div id="preview-box" class="d-none border rounded p-1" style="background: #fff; display: inline-block;">
+                        <img id="modelo-img-real" src="" alt="Ref" style="height: 45px; width: auto; object-fit: contain;">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-0 h-100">
+
+            <div class="col-lg-9 preview-area position-relative">
+
+                <div class="position-absolute top-0 end-0 m-3 d-flex flex-column gap-2" style="z-index: 10;">
+                    <button class="btn btn-white shadow-sm rounded-circle" onclick="zoomIn()"><i class="fas fa-plus"></i></button>
+                    <button class="btn btn-white shadow-sm rounded-circle" onclick="zoomOut()"><i class="fas fa-minus"></i></button>
+                    <button class="btn btn-white shadow-sm rounded-circle" onclick="resetZoom()"><i class="fas fa-compress"></i></button>
+                </div>
 
                 <div id="svg-modelo-1" class="svg-container active">
                     <svg width="609" height="289" viewBox="0 0 609 289" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -176,60 +238,31 @@
                         </g>
                     </svg>
                 </div>
+
             </div>
 
-            <div class="col-lg-4 controls-area">
-                <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-light-brown">
-                    <h4 class="font-serif m-0">Configuración</h4>
-                    <span id="precio-display" class="fs-4 fw-bold text-primary-dark">S/ 0.00</span>
+            <div class="col-lg-3 controls-area border-start d-flex flex-column">
+
+                <div class="p-3 bg-light border-bottom">
+                    <h6 class="m-0 text-primary-dark fw-bold"><i class="fas fa-paint-brush me-2"></i>Personalizar</h6>
                 </div>
 
-                <div class="option-group">
-                    <label class="option-title">1. Elige el Modelo</label>
-                    <select id="select-modelo" class="form-select form-select-custom">
-                        <option value="1" th:data-id="${modelo1.id}" th:data-precio="${modelo1.precio}" data-nombre="Urban Custom">Modelo 1 - Senderismo</option>
-                        <option value="2" th:data-id="${modelo2.id}" th:data-precio="${modelo2.precio}" data-nombre="Sport Custom">Modelo 2 - Casual</option>
-                        <option value="3" th:data-id="${modelo3.id}" th:data-precio="${modelo3.precio}" data-nombre="Classic Custom">Modelo 3 - Deportivo</option>
-                    </select>
+                <div id="dynamic-color-controls" class="flex-grow-1 overflow-auto p-3">
                 </div>
 
-                <div class="row option-group">
-                    <div class="col-6">
-                        <label class="option-title">2. Talla</label>
-                        <select id="select-talla" class="form-select form-select-custom">
-                            <option value="36">36</option>
-                            <option value="37">37</option>
-                            <option value="38">38</option>
-                            <option value="39">39</option>
-                            <option value="40">40</option>
-                            <option value="41">41</option>
-                            <option value="42">42</option>
-                            <option value="43">43</option>
-                        </select>
-                    </div>
-                    <div class="col-6">
-                        <label class="option-title">3. Material</label>
-                        <select id="select-material" class="form-select form-select-custom">
-                            <option value="Cuero">Cuero Premium</option>
-                            <option value="Lona">Lona Respirable</option>
-                            <option value="Sintetico">Sintético Vegano</option>
-                        </select>
-                    </div>
+                <div class="p-3 border-top bg-white mt-auto">
+                    <form id="form-add-cart" th:action="@{/carrito/agregar}" method="post">
+                        <input type="hidden" name="productoId" id="input-producto-id">
+                        <input type="hidden" name="cantidad" value="1">
+                        <input type="hidden" name="personalizacion" id="input-personalizacion">
+
+                        <button type="button" class="btn btn-primary-dark w-100 py-3 rounded-pill shadow-sm fw-bold text-uppercase" style="font-size: 0.85rem; letter-spacing: 1px;" onclick="validarYAgregar()">
+                            Agregar al Carrito
+                        </button>
+                    </form>
                 </div>
-
-                <div id="dynamic-color-controls">
-                </div>
-
-                <form id="form-add-cart" th:action="@{/carrito/agregar}" method="post" class="mt-5">
-                    <input type="hidden" name="productoId" id="input-producto-id">
-                    <input type="hidden" name="cantidad" value="1">
-                    <input type="hidden" name="personalizacion" id="input-personalizacion">
-
-                    <button type="button" class="btn-add-custom" onclick="validarYAgregar()">
-                        Añadir Diseño al Carrito <i class="fas fa-arrow-right ms-2"></i>
-                    </button>
-                </form>
             </div>
+
         </div>
     </div>
 </div>
@@ -239,24 +272,19 @@
 
 <script th:inline="javascript">
     /*<![CDATA[*/
-    // Estado de login desde el backend
-    const isLoggedIn = /*[[${isLoggedIn}]]*/ false;
 
-    // Configuración de las partes editables por modelo
-    // 'targetIds': Array de IDs del SVG que cambian juntos
-    // 'label': Nombre visible para el usuario
+    // --- CONFIGURACIÓN CORREGIDA (IDs EXACTOS DE TUS SVGs) ---
     const modelosConfig = {
         '1': {
             parts: [
-                { id: 'part_base', label: 'Color Principal', targetIds: ['coPrincipal'] }, // ID SVG: coPrincipal
-                { id: 'part_sec',  label: 'Detalles Secundarios', targetIds: ['coSecundario', 'coSecundario1'] }, // Lógica agrupada
+                { id: 'part_base', label: 'Color Principal', targetIds: ['coPrincipal'] },
+                { id: 'part_sec',  label: 'Detalles', targetIds: ['coSecundario', 'coSecundario1'] },
                 { id: 'part_suela', label: 'Suela', targetIds: ['suela'] },
                 { id: 'part_cont',  label: 'Contrafuerte', targetIds: ['contrafuerte'] },
                 { id: 'part_cuello', label: 'Cuello', targetIds: ['cuello'] },
-                { id: 'part_cord',  label: 'Cordones', targetIds: ['cordones'] }, // Ojo: a veces son paths stroke
+                { id: 'part_cord',  label: 'Cordones', targetIds: ['cordones'] },
                 { id: 'part_stamp', label: 'Estampado', targetIds: ['estampado'] }
-            ],
-            // Vectores 1 y 2 ignorados explícitamente como pediste
+            ]
         },
         '2': {
             parts: [
@@ -269,24 +297,22 @@
                 { id: 'part_nw',     label: 'Logo N (Blanco)', targetIds: ['n-white'] },
                 { id: 'part_cord2',  label: 'Cordones', targetIds: ['cordones'] }
             ]
-            // n-black ignorado
         },
         '3': {
             parts: [
-                { id: 'part_main',   label: 'Color Base', targetIds: ['color-principal', 'color-principal1'] }, // Lógica agrupada
+                { id: 'part_main',   label: 'Color Base', targetIds: ['color-principal', 'color-principal1'] },
                 { id: 'part_suelaA', label: 'Suela Alta', targetIds: ['suela-alta'] },
                 { id: 'part_suelaB', label: 'Suela Baja', targetIds: ['suela-baja'] },
                 { id: 'part_dis3',   label: 'Diseño', targetIds: ['diseno'] },
                 { id: 'part_dis2b',  label: 'Detalles', targetIds: ['diseno2'] },
-                { id: 'part_cord3',  label: 'Cordones', targetIds: ['coordones'] } // ID según tu SVG (ojo con el typo 'coordones')
+                { id: 'part_cord3',  label: 'Cordones', targetIds: ['coordones'] } // Nota: 'coordones' es tu ID en el SVG 3
             ]
         }
     };
 
-    // Paleta de colores disponibles
     const colores = [
         { hex: '#FFFFFF', name: 'Blanco' },
-        { hex: '#000000', name: 'Negro' },
+        { hex: '#1C1C1C', name: 'Negro' },
         { hex: '#4E342E', name: 'Marrón' },
         { hex: '#1565C0', name: 'Azul' },
         { hex: '#C62828', name: 'Rojo' },
@@ -295,138 +321,197 @@
         { hex: '#9E9E9E', name: 'Gris' }
     ];
 
-    // Estado actual de la personalización
     let estadoActual = {};
+    // --- VARIABLES PARA ZOOM Y PANNING (MOVIMIENTO) ---
+    let currentZoom = 1;
+    let isDragging = false;
+    let startX, startY;
+    let translateX = 0, translateY = 0;
 
+    // --- FUNCIONES DE ZOOM Y MOVIMIENTO ---
+    function zoomIn() {
+        if(currentZoom < 2.5) {
+            currentZoom += 0.1;
+            updateTransform();
+        }
+    }
+
+    function zoomOut() {
+        if(currentZoom > 0.5) {
+            currentZoom -= 0.1;
+            updateTransform();
+        }
+    }
+
+    function resetZoom() {
+        currentZoom = 1;
+        translateX = 0;
+        translateY = 0;
+        updateTransform();
+    }
+
+    function updateTransform() {
+        const el = document.querySelector('.svg-container.active');
+        if(el) {
+            // Aplicamos tanto el movimiento (translate) como el zoom (scale)
+            el.style.transform = `translate(${translateX}px, ${translateY}px) scale(${currentZoom})`;
+        }
+    }
+
+    // Inicializar eventos de arrastre
     document.addEventListener('DOMContentLoaded', function() {
-        const selectModelo = document.getElementById('select-modelo');
+        const previewArea = document.querySelector('.preview-area');
 
-        // Listener cambio de modelo
-        selectModelo.addEventListener('change', (e) => cargarModelo(e.target.value));
+        previewArea.addEventListener('mousedown', (e) => {
+            // Evitar conflicto si clicamos los botones de zoom
+            if(e.target.closest('button')) return;
 
-        // Cargar modelo inicial
-        cargarModelo(selectModelo.value);
+            isDragging = true;
+            startX = e.clientX - translateX;
+            startY = e.clientY - translateY;
+            previewArea.style.cursor = 'grabbing';
+        });
+
+        window.addEventListener('mouseup', () => {
+            isDragging = false;
+            if(previewArea) previewArea.style.cursor = 'grab';
+        });
+
+        previewArea.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            translateX = e.clientX - startX;
+            translateY = e.clientY - startY;
+            updateTransform();
+        });
+
+        // Inicializar selectores
+        const select = document.getElementById('select-modelo');
+        select.addEventListener('change', (e) => cargarModelo(e.target.value));
+        if(select.value) cargarModelo(select.value);
+    });
+
+    // --- LÓGICA DE NEGOCIO ---
+    document.addEventListener('DOMContentLoaded', function() {
+        const select = document.getElementById('select-modelo');
+        select.addEventListener('change', (e) => cargarModelo(e.target.value));
+        if(select.value) cargarModelo(select.value);
     });
 
     function cargarModelo(modeloId) {
         // 1. Mostrar SVG correcto
-        document.querySelectorAll('.svg-container').forEach(el => el.classList.remove('active'));
-        const svgContainer = document.getElementById(`svg-modelo-${modeloId}`);
-        if(svgContainer) svgContainer.classList.add('active');
+        document.querySelectorAll('.svg-container').forEach(el => {
+            el.classList.remove('active');
+            el.style.transform = 'scale(1)';
+        });
+        currentZoom = 1;
+        const target = document.getElementById(`svg-modelo-${modeloId}`);
+        if(target) target.classList.add('active');
 
-        // 2. Actualizar precio y ID producto
-        const option = document.getElementById('select-modelo').options[document.getElementById('select-modelo').selectedIndex];
+        // 2. Actualizar Datos (Precio, Material, Img)
+        const select = document.getElementById('select-modelo');
+        const option = select.options[select.selectedIndex];
+
         document.getElementById('precio-display').innerText = 'S/ ' + parseFloat(option.dataset.precio).toFixed(2);
         document.getElementById('input-producto-id').value = option.dataset.id;
+        document.getElementById('input-material').value = option.dataset.material || 'Estándar';
 
-        // 3. Generar controles de color
+        const imgBox = document.getElementById('preview-box');
+        const imgEl = document.getElementById('modelo-img-real');
+        if (option.dataset.img && option.dataset.img.length > 5) {
+            imgEl.src = option.dataset.img;
+            imgBox.classList.remove('d-none');
+        } else {
+            imgBox.classList.add('d-none');
+        }
+
+        // 3. Generar Colores
+        generarControles(modeloId);
+    }
+
+    function generarControles(modeloId) {
         const container = document.getElementById('dynamic-color-controls');
         container.innerHTML = '';
-        estadoActual = {}; // Reset estado
+        estadoActual = {};
 
         const config = modelosConfig[modeloId];
-
         if (config) {
             config.parts.forEach(part => {
-                // Crear título de sección
                 const group = document.createElement('div');
                 group.className = 'option-group';
 
-                const label = document.createElement('label');
-                label.className = 'option-title';
-                label.innerText = part.label;
-                group.appendChild(label);
+                const title = document.createElement('label');
+                title.className = 'option-title text-uppercase mb-2 d-block';
+                title.innerText = part.label;
+                group.appendChild(title);
 
-                // Crear botones de colores
-                const colorContainer = document.createElement('div');
-                colorContainer.className = 'color-picker-container';
+                const picker = document.createElement('div');
+                picker.className = 'color-picker-container';
 
                 colores.forEach(color => {
                     const btn = document.createElement('div');
                     btn.className = 'color-btn';
                     btn.style.backgroundColor = color.hex;
                     btn.title = color.name;
+                    if(color.hex === '#FFFFFF') btn.style.border = '1px solid #ccc';
 
-                    // Evento click
-                    btn.onclick = function() {
-                        // UI Update
-                        colorContainer.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
+                    btn.onclick = () => {
+                        picker.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
                         btn.classList.add('selected');
-
-                        // SVG Update
                         aplicarColor(modeloId, part.targetIds, color.hex);
-
-                        // Guardar estado
                         estadoActual[part.label] = color.name;
                     };
-                    colorContainer.appendChild(btn);
+                    picker.appendChild(btn);
                 });
-
-                group.appendChild(colorContainer);
+                group.appendChild(picker);
                 container.appendChild(group);
             });
         }
     }
 
+    // --- CORRECCIÓN EN LA LÓGICA DE COLOR ---
     function aplicarColor(modeloId, targetIds, colorHex) {
-        const svgContainer = document.getElementById(`svg-modelo-${modeloId}`);
+        const svg = document.getElementById(`svg-modelo-${modeloId}`);
+        if (!svg) return;
 
         targetIds.forEach(id => {
             // Buscamos por ID dentro del SVG
-            const element = svgContainer.querySelector(`#${id}`);
+            const element = svg.querySelector(`#${id}`);
+
             if (element) {
-                // Verificamos si es un grupo 'g' o un path directo
+                // Si es un grupo <g>, pintar a todos sus hijos
                 if (element.tagName === 'g') {
-                    const children = element.querySelectorAll('path, rect, circle, polygon');
+                    const children = element.querySelectorAll('path, rect, circle, polygon, ellipse');
                     children.forEach(child => {
-                        // Si es cordones, a veces se usa stroke en lugar de fill
-                        if (id.includes('cordones') || id.includes('coordones')) {
-                            if (child.getAttribute('stroke')) child.style.stroke = colorHex;
-                            else child.style.fill = colorHex;
-                        } else {
-                            child.style.fill = colorHex;
-                        }
+                        // Usamos FILL para todo, ya que tus SVGs originales usan FILL.
+                        child.style.fill = colorHex;
+                        // Opcional: Si el elemento ya tenía stroke definido en el SVG, no lo tocamos.
                     });
                 } else {
                     // Elemento individual
-                    if (id.includes('cordones') || id.includes('coordones') && element.getAttribute('stroke') !== 'none') {
-                        element.style.stroke = colorHex;
-                    } else {
-                        element.style.fill = colorHex;
-                    }
+                    element.style.fill = colorHex;
                 }
-            } else {
-                console.warn(`Elemento SVG con ID '${id}' no encontrado en modelo ${modeloId}`);
             }
         });
     }
 
     function validarYAgregar() {
-        // IMPORTANTE: Hemos quitado el bloqueo de "if (!isLoggedIn)..."
-        // Ahora dejamos que el servidor maneje la redirección si no hay sesión.
+        const select = document.getElementById('select-modelo');
+        if (!select.value) { alert("Selecciona un modelo"); return; }
 
-        // 1. Construir el String de personalización
-        const selectModelo = document.getElementById('select-modelo');
-        const modeloNombre = selectModelo.options[selectModelo.selectedIndex].dataset.nombre;
+        const modeloNombre = select.options[select.selectedIndex].dataset.nombre;
         const talla = document.getElementById('select-talla').value;
-        const material = document.getElementById('select-material').value;
+        const material = document.getElementById('input-material').value;
 
-        // Creamos un resumen legible para guardar en la BD
-        let personalizacionString = `Modelo: ${modeloNombre}, Talla: ${talla}, Material: ${material}`;
-
-        // Agregamos los colores seleccionados (si el usuario eligió alguno)
+        let resumen = `Modelo: ${modeloNombre}, Talla: ${talla}, Material: ${material}`;
         if (Object.keys(estadoActual).length > 0) {
-            personalizacionString += ', Diseño: ' + Object.entries(estadoActual)
-                .map(([parte, color]) => `${parte}: ${color}`)
-                .join(', ');
+            resumen += ', Diseño: ' + Object.entries(estadoActual)
+                .map(([k, v]) => `${k}: ${v}`).join(', ');
         } else {
-            personalizacionString += ', Diseño: Estándar';
+            resumen += ', Diseño: Estándar';
         }
 
-        // 2. Asignar al input oculto y enviar
-        document.getElementById('input-personalizacion').value = personalizacionString;
-
-        // Esto enviará los datos al método /carrito/agregar que modificamos
+        document.getElementById('input-personalizacion').value = resumen;
         document.getElementById('form-add-cart').submit();
     }
     /*]]>*/
