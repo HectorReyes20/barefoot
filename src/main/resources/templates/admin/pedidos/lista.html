@@ -2,7 +2,6 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <th:block th:insert="~{admin/layout/head :: head(titulo='Pedidos - Barefoot Admin')}"></th:block>
-
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
@@ -27,7 +26,7 @@
             padding: 2rem 2.5rem;
         }
 
-        /* --- STATS CARDS --- */
+        /* Stats cards */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -66,7 +65,6 @@
             line-height: 1;
         }
 
-        /* Iconos de Stats */
         .icon-box {
             width: 36px;
             height: 36px;
@@ -81,7 +79,7 @@
         .icon-purple { background: #F3E8FF; color: #9333EA; }
         .icon-green { background: #DCFCE7; color: #16A34A; }
 
-        /* --- TOOLBAR DE FILTROS --- */
+        /* Filter bar */
         .filter-bar {
             background: var(--card-bg);
             padding: 1rem 1.5rem;
@@ -131,7 +129,7 @@
             min-width: 180px;
         }
 
-        /* --- TABLA --- */
+        /* Table */
         .table-card {
             background: var(--card-bg);
             border-radius: var(--border-radius);
@@ -161,7 +159,7 @@
             font-size: 0.9rem;
         }
 
-        /* Badges de Estado */
+        /* Status badges */
         .status-pill {
             padding: 0.35em 0.8em;
             border-radius: 50px;
@@ -173,14 +171,13 @@
         }
         .status-pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.6; }
 
-        /* Colores dinámicos para badges */
         .badge-bg-info { background: #E0F2FE; color: #0284C7; }
         .badge-bg-warning { background: #FEF3C7; color: #D97706; }
         .badge-bg-success { background: #DCFCE7; color: #166534; }
         .badge-bg-danger { background: #FEE2E2; color: #DC2626; }
         .badge-bg-secondary { background: #F1F5F9; color: #64748B; }
 
-        /* Paginación */
+        /* Pagination */
         .pagination .page-link {
             border: none;
             color: var(--text-muted);
@@ -343,6 +340,27 @@
                                     </a>
                                 </li>
 
+                                <!-- SECCIÓN DE COMPROBANTES -->
+                                <li><hr class="dropdown-divider"></li>
+                                <li class="dropdown-header small text-uppercase">Comprobantes</li>
+
+                                <li>
+                                    <a class="dropdown-item rounded-2 py-2"
+                                       th:href="@{/comprobantes/boleta/{id}(id=${pedido.id})}"
+                                       target="_blank">
+                                        <i class="fas fa-file-invoice me-2 text-info"></i> Generar Boleta
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item rounded-2 py-2"
+                                       th:href="@{/comprobantes/factura/{id}(id=${pedido.id})}"
+                                       target="_blank">
+                                        <i class="fas fa-file-invoice-dollar me-2 text-success"></i> Generar Factura
+                                    </a>
+                                </li>
+
+                                <!-- CAMBIAR ESTADOS -->
                                 <th:block th:if="${pedido.estado.name() != 'ENTREGADO' and pedido.estado.name() != 'CANCELADO'}">
                                     <li><hr class="dropdown-divider"></li>
                                     <li class="dropdown-header small text-uppercase">Avanzar a</li>

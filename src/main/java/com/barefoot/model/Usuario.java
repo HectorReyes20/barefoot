@@ -29,6 +29,12 @@ public class Usuario {
     @Column(length = 15)
     private String telefono;
 
+    @Column(length = 8)
+    private String dni;
+
+    @Column(length = 11)
+    private String ruc;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Rol rol = Rol.USUARIO;

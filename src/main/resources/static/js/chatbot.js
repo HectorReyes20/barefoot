@@ -6,32 +6,32 @@ const chatbotInput = document.getElementById('chatbotInput');
 const chatbotSend = document.getElementById('chatbotSend');
 
 const responses = {
-    'hola': '¡Hola! 😊 Soy tu asistente de Arilu Store. Estoy aquí para ayudarte con cualquier duda sobre nuestras colecciones de ropa.',
-    'arilu': 'Arilu Store es tu tienda de ropa de mujer con las últimas tendencias. Ofrecemos:\n• Prendas de alta calidad\n• Diseños modernos y exclusivos\n• Tallas variadas (XS-XXXL)\n• Envíos rápidos y seguros 👗',
-    'talla': 'Guía de Tallas 📏\n\nXS: 32-34 | S: 34-36 | M: 36-38 | L: 38-40 | XL: 40-42 | XXL: 42-44 | XXXL: 44+\n\n¿Cómo medir correctamente?\n1. Mide tu busto en cm\n2. Consulta la guía en cada prenda\n3. Si dudas, elige la talla mayor\n\n¿Necesitas ayuda? 👚',
-    'envio': 'Información de Envíos 📦\n\n🚚 Bogotá: 24-48 horas\n🇨🇴 Ciudades principales: 3-5 días\n✅ Envío GRATIS en pedidos +$150.000\n📍 Seguimiento en tiempo real\n\n¿Tu ciudad?',
-    'devolucion': 'Política de Devoluciones 🔄\n\n✅ 30 días para devoluciones\n✅ Prenda sin usar, con etiquetas\n✅ Reembolso o cambio por otra talla\n✅ Envío de devolución gratis\n\n¿Necesitas iniciar una devolución?',
-    'pago': 'Métodos de Pago 💳\n\n✅ Tarjetas de crédito/débito\n✅ Transferencia bancaria\n✅ Nequi / Daviplata\n✅ PayPal\n✅ Pago contra entrega (Bogotá)\n\n¡Todos los pagos son seguros!',
-    'cuidado': 'Cuidado de tu Ropa 🧼\n\n• Lee la etiqueta de cuidado\n• Lava con agua fría o tibia\n• Usa detergente suave\n• Seca al aire libre\n• Plancha a temperatura media si necesario\n\n¿Material específico?',
-    'garantia': 'Garantía de Calidad ✨\n\n✅ Prendas de primera calidad\n✅ Materiales certificados\n✅ Garantía en defectos de fabricación\n\n¿Tienes una prenda con defecto?',
-    'colecciones': 'Nuestras Colecciones 👗\n\n👔 Casual - Cómoda y versátil\n💼 Formal - Para ocasiones especiales\n🏃‍♀️ Deportiva - Activa y moderna\n🌙 Básicos - Essentials que no faltan\n✨ Premium - Edición limitada\n\n¿Cuál te interesa?',
-    'contacto': 'Contáctanos 📱\n\nWhatsApp: +57 300 1234567\nEmail: hola@arilutore.com\nInstagram: @AriluStore\n\n¿Deseas que te contactemos?',
-    'stock': 'Para verificar stock:\n1. Ve al producto\n2. Selecciona tu talla\n3. Verás disponibilidad en tiempo real\n\n¿Buscas algún modelo? 🔍',
+    'hola': '¡Hola! 😊 Soy tu asistente de Barefoot Store. Estoy aquí para ayudarte con cualquier duda sobre nuestros calzados: zapatillas, botas, sandalias y más. 👟',
+    'barefoot': 'Barefoot Store es tu tienda de calzado con estilo y comodidad. Ofrecemos:\n• Modelos para hombre y mujer\n• Desde casual hasta deportivo y formal\n• Tallas completas y medias tallas (según modelo)\n• Envíos rápidos y cambios fáciles ✅',
+    'talla': 'Guía de Tallas de Calzado 📏\n\nCómo elegir tu talla:\n1) Pon tu pie sobre una hoja y marca talón y punta\n2) Mide la distancia en cm\n3) Compara con la guía del producto\n\nReferencia (aprox.):\n• 22.5 cm ≈ 35\n• 23.5 cm ≈ 36\n• 24.0 cm ≈ 37\n• 24.5 cm ≈ 38\n• 25.5 cm ≈ 39\n• 26.0 cm ≈ 40\n• 26.5 cm ≈ 41\n• 27.0 cm ≈ 42\n• 27.5 cm ≈ 43\n• 28.0 cm ≈ 44\n\nSi dudas entre dos tallas, te sugerimos la mayor.',
+    'envio': 'Información de Envíos 📦\n\n🚚 Lima Metropolitana: 24-48 horas\n📦 Provincias: 2-5 días hábiles\n✅ Envío GRATIS desde S/400\n📍 Seguimiento del pedido disponible\n\n¿Desde qué ciudad nos escribes?',
+    'devolucion': 'Cambios y Devoluciones 🔄\n\n✅ 15 días para cambios\n✅ El calzado debe estar sin uso, en su caja original\n✅ Cambios por talla o modelo (según stock)\n✅ Reembolso en compras online según políticas\n\n¿Deseas iniciar un cambio?',
+    'pago': 'Métodos de Pago 💳\n\n✅ Tarjetas de crédito/débito\n✅ Yape / Transferencia\n✅ Pago en efectivo (según cobertura)\n✅ Stripe para pagos online\n\nTodos los pagos son seguros.',
+    'cuidado': 'Cuidado del Calzado 🧼\n\n• No lavar zapatillas en lavadora\n• Para cuero: limpiar con paño ligeramente húmedo y usar crema especial\n• Para gamuza/serraje: cepillo suave y protector para repelencia\n• Secar a la sombra, nunca al sol directo\n• Usar hormas o papel para conservar la forma\n\n¿Material específico?',
+    'garantia': 'Garantía de Calidad ✨\n\n✅ Garantía por defectos de fabricación\n✅ Materiales y acabados de primera\n✅ Revisión técnica en caso de reclamos\n\n¿Tuviste algún inconveniente con un par?',
+    'colecciones': 'Nuestras Colecciones 👟\n\n👟 Casual - Para el día a día\n🏃‍♂️ Running - Amortiguación y ligereza\n🥾 Outdoor - Trekking y aventura\n👞 Formal - Elegancia y confort\n🩴 Sandalias - Frescas y cómodas\n\n¿Qué estilo estás buscando?',
+    'contacto': 'Contáctanos 📱\n\nWhatsApp: +51 997 256 008\nEmail: soporte@barefoot-store.com\nInstagram: @BarefootStore\n\n¿Deseas que te contactemos?',
+    'stock': 'Para verificar stock:\n1) Entra al producto\n2) Selecciona tu talla\n3) Verás disponibilidad en tiempo real\n\n¿Buscas algún modelo o talla en particular? 🔍',
     'seguimiento': 'Seguimiento de Pedido 📍\n\nIngresa tu código de pedido para rastrear tu compra en tiempo real.',
-    'descuentos': 'Promociones y Descuentos 🎉\n\n✨ Suscríbete a nuestro newsletter para ofertas exclusivas\n🎁 Promociones semanales\n💝 Descuentos por volumen\n\n¿Quieres conocer nuestras ofertas?',
-    'talles': 'Dudas sobre Tallas? 📐\n\nOfrecemos tallas para todas: XS, S, M, L, XL, XXL, XXXL\n\n¿Cuál es tu talla habitual?',
+    'descuentos': 'Promociones y Descuentos 🎉\n\n✨ Únete a nuestro newsletter para ofertas exclusivas\n🎁 Promos semanales\n💝 Descuentos por volumen\n\n¿Quieres ver las ofertas vigentes?',
+    'talles': 'Dudas sobre Tallas? 📐\n\nTe ayudamos a elegir la talla ideal según la longitud de tu pie en cm. ¿Cuál es tu medida?',
     'gracias': '¡De nada! 😊 ¿Algo más?',
     'adios': '¡Hasta pronto! 👋',
     'ayuda': 'Puedo ayudarte con preguntas sobre tallas, envíos, devoluciones, cuidado, colecciones y más.',
-    'default': 'No entendí muy bien 🤔. Pregúntame sobre tallas, envíos, devoluciones o nuestras colecciones.'
+    'default': 'No entendí muy bien 🤔. Pregúntame sobre tallas, envíos, devoluciones o nuestros modelos de calzado.'
 };
 
 // Menú principal
 const mainMenuOptions = [
     { text: '📏 ¿Qué talla necesito?', action: 'talla' },
     { text: '📦 Información de envíos', action: 'envio' },
-    { text: '🔄 Devoluciones y cambios', action: 'devolucion' },
-    { text: '👗 Nuestras colecciones', action: 'colecciones' },
+    { text: '🔄 Cambios y devoluciones', action: 'devolucion' },
+    { text: '👟 Nuestras colecciones', action: 'colecciones' },
     { text: '📍 Seguir mi pedido', action: 'seguimiento_pedido' },
     { text: '❓ Más preguntas frecuentes', action: 'ayuda' }
 ];
@@ -40,7 +40,7 @@ const mainMenuOptions = [
 const contextMenus = {
     'ayuda': [
         { text: '💳 Métodos de pago', action: 'pago' },
-        { text: '🧼 Cuidado de la ropa', action: 'cuidado' },
+        { text: '🧼 Cuidado del calzado', action: 'cuidado' },
         { text: '✨ Garantía y calidad', action: 'garantia' },
         { text: '🎉 Promociones', action: 'descuentos' },
         { text: '📱 Contacto directo', action: 'contacto' },
@@ -54,8 +54,8 @@ const contextMenus = {
 // Respuestas detalladas
 const detailedResponses = {
     'menu': '¡Perfecto! ¿Qué necesitas saber? 😊',
-    'envio_bogota': 'Envíos en Bogotá: 24-48 horas, $20.000 o gratis desde $150.000.',
-    'envio_ciudades': 'Envíos a ciudades principales: 3-5 días hábiles.',
+    'envio_lima': 'Envíos en Lima: 24-48 horas. Envío gratis desde S/199.',
+    'envio_provincias': 'Provincias: 2-5 días hábiles. Revisa tu tracking para más detalles.',
     'seguimiento': 'Para rastrear tu pedido ingresa tu código de compra.'
 };
 
@@ -154,7 +154,7 @@ function handleOptionClick(action, text) {
 // Nueva función para manejar seguimiento de pedido
 function handleOrderTracking() {
     addMessage(
-        'Ingresa tu código de pedido de compra (ej: ARD-2025-001234)',
+        'Ingresa tu código de pedido de compra (ej: BFT-2025-001234)',
         'bot',
         false
     );
@@ -210,7 +210,7 @@ function validateOrderCode(code, inputWrapper) {
             wrapper.className = 'message bot';
 
             const whatsappBtn = document.createElement('a');
-            whatsappBtn.href = 'https://wa.me/573001234567?text=Hola%20Arilu%20Store%20quiero%20conocer%20el%20estado%20de%20mi%20pedido';
+            whatsappBtn.href = 'https://wa.me/51900000000?text=Hola%20Barefoot%20Store%20quiero%20conocer%20el%20estado%20de%20mi%20pedido';
             whatsappBtn.target = '_blank';
             whatsappBtn.className = 'whatsapp-btn';
             whatsappBtn.textContent = '📱 Chatear por WhatsApp';
@@ -237,7 +237,7 @@ function getBotResponse(message) {
 // Mensaje de bienvenida
 setTimeout(() => {
     addMessage(
-        '¡Hola! Soy el Asistente de Arilu Store. ¿En qué puedo ayudarte? 👗',
+        '¡Hola! Soy el Asistente de Barefoot Store. ¿En qué puedo ayudarte? 👟',
         'bot'
     );
 }, 1000);
