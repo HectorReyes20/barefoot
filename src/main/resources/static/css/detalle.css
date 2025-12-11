@@ -125,3 +125,26 @@ body {
     aspect-ratio: 1/1;
     object-fit: cover;
 }
+
+/* --- SELECTOR DE TALLA PERSONALIZADO --- */
+.form-select-elegant {
+    border: 1px solid var(--border-color); /* Borde marrón suave existente */
+    color: var(--primary-color);           /* Texto marrón oscuro */
+    font-weight: 600;
+    background-color: var(--card-bg);
+    border-radius: 4px;                    /* Radio ligero consistente con botones */
+    padding: 8px 12px;                     /* Espaciado interno cómodo */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='%234E342E' stroke='%234E342E' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e"); /* Flecha color marrón */
+}
+
+.form-select-elegant:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(78, 52, 46, 0.1); /* Sombra difusa color primario */
+    outline: 0;
+}
+
+.form-select-elegant:hover {
+    border-color: var(--accent-color); /* Borde dorado al pasar el mouse */
+}

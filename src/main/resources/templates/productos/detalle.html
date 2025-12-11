@@ -72,12 +72,18 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-6" th:if="${producto.talla != null}">
-                            <div class="d-flex align-items-center">
-                                <div class="icon-square me-3"><i class="fas fa-ruler"></i></div>
-                                <div>
-                                    <span class="d-block small text-uppercase fw-bold text-muted">Talla</span>
-                                    <span th:text="${producto.talla}">40</span>
+                        <div class="col-6">
+                            <div class="d-flex align-items-start"> <div class="icon-square me-3 mt-1"><i class="fas fa-ruler"></i></div>
+                                <div class="w-100">
+                                    <label for="talla-select" class="d-block small text-uppercase fw-bold text-muted mb-1">
+                                        Talla
+                                    </label>
+                                    <select id="talla-select" class="form-select form-select-elegant">
+                                        <option value="" selected disabled>Seleccionar...</option>
+                                        <th:block th:each="i : ${#numbers.sequence(35, 45)}">
+                                            <option th:value="${i}" th:text="${i}"></option>
+                                        </th:block>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -154,18 +160,44 @@
 
     function addToCart() {
         const quantity = document.getElementById('quantity').value;
+        const tallaSelect = document.getElementById('talla-select');
+
+        // 1. VALIDACIÓN: Asegurar que se haya elegido una talla
+        if (!tallaSelect || tallaSelect.value === "") {
+            alert("Por favor, selecciona una talla antes de agregar al carrito.");
+            tallaSelect.focus(); // Enfocar el selector para ayudar al usuario
+            return;
+        }
+
+        const tallaSeleccionada = tallaSelect.value;
+
+        // 2. CREAR EL FORMULARIO
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = '/carrito/agregar';
 
+        // Input ID Producto
         const pInput = document.createElement('input');
-        pInput.type = 'hidden'; pInput.name = 'productoId'; pInput.value = productoId;
-
-        const qInput = document.createElement('input');
-        qInput.type = 'hidden'; qInput.name = 'cantidad'; qInput.value = quantity;
-
+        pInput.type = 'hidden';
+        pInput.name = 'productoId';
+        pInput.value = productoId;
         form.appendChild(pInput);
+
+        // Input Cantidad
+        const qInput = document.createElement('input');
+        qInput.type = 'hidden';
+        qInput.name = 'cantidad';
+        qInput.value = quantity;
         form.appendChild(qInput);
+
+        // 3. NUEVO: Input Personalización (Para guardar la talla)
+        // Usamos el campo 'personalizacion' que ya existe en tu controlador
+        const persInput = document.createElement('input');
+        persInput.type = 'hidden';
+        persInput.name = 'personalizacion';
+        persInput.value = 'Talla: ' + tallaSeleccionada;
+        form.appendChild(persInput);
+
         document.body.appendChild(form);
         form.submit();
     }
