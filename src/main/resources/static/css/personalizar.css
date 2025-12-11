@@ -5,7 +5,15 @@
     --border-color: rgba(78, 52, 46, 0.15);
     --card-bg: #FFFFFF;
 }
-
+/* ESTA ES LA CORRECCIÓN:
+   1. Empuja el footer hacia abajo (flex: 1 0 auto)
+   2. Empuja el contenido hacia abajo para que no lo tape el navbar (padding-top)
+*/
+.main-wrapper {
+    flex: 1 0 auto;
+    padding-top: 100px; /* <--- ESPACIO RESERVADO PARA EL NAVBAR Y TITULO */
+    width: 100%;
+}
 /* FIX FOOTER: Hacemos que el body ocupe toda la altura y use flex */
 html, body {
     height: 100%;
