@@ -133,7 +133,7 @@ public class PagoController {
                 transaccionRepository.save(transaccion);
 
                 // Vaciar carrito
-                carritoService.vaciarCarrito(usuarioId);
+                carritoService.vaciarCarrito(session);
 
                 response.put("exito", true);
                 response.put("redirect", "/checkout/confirmacion/" + nuevoPedido.getId());
@@ -214,7 +214,7 @@ public class PagoController {
             transaccionRepository.save(t);
 
             // C. Vaciar Carrito
-            carritoService.vaciarCarrito(usuario.getId());
+            carritoService.vaciarCarrito(session);
 
             redirectAttributes.addFlashAttribute("mensaje", "¡Pago Exitoso! Pedido generado.");
             return "redirect:/checkout/confirmacion/" + nuevoPedido.getId();

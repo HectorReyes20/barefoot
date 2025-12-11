@@ -236,4 +236,10 @@ public class ProductoService {
         }
         movimientoRepository.save(mov);
     }
+    public List<Producto> obtenerProductosRecientes(int limite) {
+        return productoRepository.findTop10ByActivoTrueOrderByFechaCreacionDesc()
+                .stream()
+                .limit(limite)
+                .collect(java.util.stream.Collectors.toList());
+    }
 }

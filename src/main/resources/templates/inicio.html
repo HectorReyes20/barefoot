@@ -146,70 +146,44 @@
         </div>
 
         <div class="row g-4">
-            <div class="col-md-3">
-                <div class="product-item">
+            <div class="col-md-3" th:each="producto : ${productosTendencia}">
+                <div class="product-item h-100">
                     <div class="product-thumb">
-                        <img src="https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=500" alt="Zapato">
+                        <span th:if="${producto.tieneDescuento()}"
+                              class="badge bg-danger position-absolute top-0 start-0 m-3">Sale</span>
+
+                        <a th:href="@{/productos/{id}(id=${producto.id})}">
+                            <img th:if="${producto.imagenUrl != null}" th:src="${producto.imagenUrl}" th:alt="${producto.nombre}">
+                            <div th:if="${producto.imagenUrl == null}" class="d-flex align-items-center justify-content-center bg-light" style="height: 100%; min-height: 250px;">
+                                <i class="fas fa-image text-muted fa-2x"></i>
+                            </div>
+                        </a>
+
                         <div class="product-action">
-                            <button class="btn btn-white rounded-circle shadow"><i class="fas fa-shopping-cart"></i></button>
-                            <a th:href="@{/productos}" class="btn btn-white rounded-circle shadow"><i class="fas fa-eye"></i></a>
+                            <a th:href="@{/productos/{id}(id=${producto.id})}"
+                               class="btn btn-white rounded-circle shadow"
+                               title="Ver Detalles">
+                                <i class="fas fa-eye"></i>
+                            </a>
                         </div>
                     </div>
+
                     <div class="product-content mt-3">
-                        <span class="text-uppercase small text-muted">Deportivo</span>
-                        <h5 class="mb-1"><a href="#" class="text-dark text-decoration-none">Active Motion</a></h5>
-                        <div class="price fw-bold text-accent">S/ 329.00</div>
+                        <span class="text-uppercase small text-muted" th:text="${producto.categoria}">Categoría</span>
+                        <h5 class="mb-1">
+                            <a th:href="@{/productos/{id}(id=${producto.id})}"
+                               class="text-dark text-decoration-none"
+                               th:text="${producto.nombre}">Nombre</a>
+                        </h5>
+                        <div class="price fw-bold text-accent">
+                            S/ <span th:text="${#numbers.formatDecimal(producto.precioFinal, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="product-item">
-                    <div class="product-thumb">
-                        <img src="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=500" alt="Zapato">
-                        <div class="product-action">
-                            <button class="btn btn-white rounded-circle shadow"><i class="fas fa-shopping-cart"></i></button>
-                            <a th:href="@{/productos}" class="btn btn-white rounded-circle shadow"><i class="fas fa-eye"></i></a>
-                        </div>
-                    </div>
-                    <div class="product-content mt-3">
-                        <span class="text-uppercase small text-muted">Casual</span>
-                        <h5 class="mb-1"><a href="#" class="text-dark text-decoration-none">Limited Edition</a></h5>
-                        <div class="price fw-bold text-accent">S/ 459.00</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="product-item">
-                    <div class="product-thumb">
-                        <img src="https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?w=500" alt="Zapato">
-                        <div class="product-action">
-                            <button class="btn btn-white rounded-circle shadow"><i class="fas fa-shopping-cart"></i></button>
-                            <a th:href="@{/productos}" class="btn btn-white rounded-circle shadow"><i class="fas fa-eye"></i></a>
-                        </div>
-                    </div>
-                    <div class="product-content mt-3">
-                        <span class="text-uppercase small text-muted">Senderismo</span>
-                        <h5 class="mb-1"><a href="#" class="text-dark text-decoration-none">Mountain Trek</a></h5>
-                        <div class="price fw-bold text-accent">S/ 419.00</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="product-item">
-                    <div class="product-thumb">
-                        <span class="badge bg-danger position-absolute top-0 start-0 m-3">Sale</span>
-                        <img src="https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=500" alt="Zapato">
-                        <div class="product-action">
-                            <button class="btn btn-white rounded-circle shadow"><i class="fas fa-shopping-cart"></i></button>
-                            <a th:href="@{/productos}" class="btn btn-white rounded-circle shadow"><i class="fas fa-eye"></i></a>
-                        </div>
-                    </div>
-                    <div class="product-content mt-3">
-                        <span class="text-uppercase small text-muted">Running</span>
-                        <h5 class="mb-1"><a href="#" class="text-dark text-decoration-none">Speed Natural</a></h5>
-                        <div class="price fw-bold text-accent">S/ 359.00</div>
-                    </div>
-                </div>
+
+            <div th:if="${#lists.isEmpty(productosTendencia)}" class="col-12 text-center text-muted py-5">
+                <p>No hay tendencias disponibles por el momento.</p>
             </div>
         </div>
     </div>

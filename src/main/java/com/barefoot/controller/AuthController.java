@@ -1,6 +1,8 @@
 package com.barefoot.controller;
 
+import com.barefoot.model.Producto;
 import com.barefoot.model.Usuario;
+import com.barefoot.service.ProductoService;
 import com.barefoot.service.UsuarioService;
 import com.barefoot.service.CarritoService; // Importar correctamente
 import jakarta.servlet.http.HttpSession;
@@ -8,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -18,6 +22,9 @@ public class AuthController {
 
     @Autowired
     private CarritoService carritoService;
+
+    @Autowired
+    private ProductoService productoService; // Inyectamos el servicio
 
     @GetMapping("/login")
     public String mostrarLogin() {
@@ -110,9 +117,11 @@ public class AuthController {
         session.invalidate();
         return "redirect:/login";
     }
-
     @GetMapping("/inicio")
     public String inicio(HttpSession session, Model model) {
+        // AHORA SÍ FUNCIONARÁ PORQUE AGREGAMOS EL MÉTODO AL SERVICIO
+        List<Producto> tendencias = productoService.obtenerProductosRecientes(4);
+        model.addAttribute("productosTendencia", tendencias);
         return "inicio";
     }
 }

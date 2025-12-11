@@ -104,20 +104,57 @@
 <footer th:fragment="footer" class="footer-elegant">
     <div class="container">
         <div class="row gy-5">
-            <div class="col-lg-4">
-                <h4 class="font-serif mb-4">Barefoot Store.</h4>
-                <p class="text-muted text-justify">
-                    Reconectando al ser humano con la tierra. Calzado diseñado para respetar tu anatomía, no para forzarla.
+
+            <div class="col-lg-4 col-md-6">
+                <h4 class="font-serif mb-4 fw-bold">BAREFOOT.</h4>
+                <p class="text-muted text-justify pe-lg-4">
+                    Reconectando al ser humano con la tierra. Calzado diseñado para respetar tu anatomía.
                 </p>
                 <div class="social-icons mt-4">
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#"><i class="fab fa-pinterest"></i></a>
+                    <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+                    <a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" target="_blank"><i class="fab fa-tiktok"></i></a>
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-md-6">
+                <h6 class="text-uppercase fw-bold mb-4 text-primary-dark ls-1">Tienda</h6>
+                <ul class="list-unstyled footer-menu d-flex flex-column gap-2">
+                    <li><a th:href="@{/inicio}">Inicio</a></li>
+                    <li><a th:href="@{/productos}">Catálogo</a></li>
+                    <li><a th:href="@{/productos/destacados}">Destacados</a></li> <li><a th:href="@{/personalizar}">Personalizar</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-2 col-md-6">
+                <h6 class="text-uppercase fw-bold mb-4 text-primary-dark ls-1">Mi Cuenta</h6>
+                <ul class="list-unstyled footer-menu d-flex flex-column gap-2">
+                    <li th:if="${usuarioLogueado}"><a th:href="@{/perfil}">Perfil</a></li>
+                    <li th:if="${usuarioLogueado}"><a th:href="@{/mis-pedidos}">Mis Pedidos</a></li>
+                    <li th:if="${usuarioLogueado}"><a th:href="@{/favoritos}">Favoritos</a></li>
+                    <li th:unless="${usuarioLogueado}"><a th:href="@{/login}">Iniciar Sesión</a></li>
+                    <li th:unless="${usuarioLogueado}"><a th:href="@{/registro}">Registrarse</a></li>
+                    <li><a th:href="@{/carrito}">Mi Bolsa</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <h6 class="text-uppercase fw-bold mb-4 text-primary-dark ls-1">Atención al Cliente</h6>
+                <ul class="list-unstyled footer-menu d-flex flex-column gap-2">
+                    <li><a th:href="@{/nosotros}">Sobre Nosotros</a></li> <li><a href="#">Guía de Tallas</a></li>
+                    <li><a href="#">Política de Cambios</a></li>
+                </ul>
+                <div class="mt-4 pt-3 border-top border-light-brown">
+                    <small class="text-muted d-block mb-1">¿Dudas?</small>
+                    <a href="mailto:hola@barefoot.pe" class="fw-bold text-primary-dark text-decoration-none">
+                        <i class="fas fa-envelope me-2"></i> hola@barefoot.pe
+                    </a>
                 </div>
             </div>
         </div>
+
         <div class="footer-bottom mt-5 pt-4 border-top text-center">
-            <small class="text-muted">&copy; 2025 Barefoot Store.</small>
+            <small class="text-muted">&copy; 2025 Barefoot Store. Todos los derechos reservados.</small>
         </div>
     </div>
 </footer>
