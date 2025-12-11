@@ -3,6 +3,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "usuarios")
 @Data
@@ -29,6 +30,14 @@ public class Usuario {
     @Column(length = 15)
     private String telefono;
 
+    // ====== NUEVOS CAMPOS PARA COMPROBANTES ======
+    @Column(length = 8)
+    private String dni;
+
+    @Column(length = 11)
+    private String ruc;
+    // =============================================
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Rol rol = Rol.USUARIO;
@@ -49,6 +58,7 @@ public class Usuario {
         ADMIN
     }
 
+    // Getters y Setters existentes...
     public void setId(Long id) {
         this.id = id;
     }
@@ -120,4 +130,22 @@ public class Usuario {
     public boolean isActivo() {
         return activo;
     }
+
+    // ====== NUEVOS GETTERS Y SETTERS ======
+    public String getDni() {
+        return dni;
+    }
+
+    public void setDni(String dni) {
+        this.dni = dni;
+    }
+
+    public String getRuc() {
+        return ruc;
+    }
+
+    public void setRuc(String ruc) {
+        this.ruc = ruc;
+    }
+    // =======================================
 }
